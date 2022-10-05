@@ -6,6 +6,7 @@ import 'package:efleet_project_tree/pages/account.dart';
 import 'package:efleet_project_tree/pages/home.dart';
 import 'package:efleet_project_tree/pages/notifications.dart';
 import 'package:efleet_project_tree/pages/tasks.dart';
+import 'package:efleet_project_tree/variables.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/src/widgets/container.dart';
@@ -47,6 +48,9 @@ class _HomePageState extends State<HomePage> {
     // TODO: implement initState
     super.initState();
     BackButtonInterceptor.add(myInterceptor);
+    setState(() {
+      is_pressed_project_details = false;
+    });
   }
 
   @override
@@ -75,6 +79,8 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     height = MediaQuery.of(context).size.height;
     width = MediaQuery.of(context).size.width;
+    ColorsTheme obj = new ColorsTheme();
+
     return Scaffold(
       body: CupertinoTabScaffold(
           tabBar: CupertinoTabBar(
@@ -143,16 +149,21 @@ class _HomePageState extends State<HomePage> {
           margin: EdgeInsets.only(bottom: 40.0),
           height: 90,
           width: 90,
-          decoration: BoxDecoration(
-              image: _current_index == 0
-                  ? DecorationImage(
-                      image: AssetImage('assets/tasks_floating_button.png'),
-                      fit: BoxFit.fill)
-                  : _current_index == 1
+          decoration: is_pressed_project_details == true && _current_index == 0
+              ? BoxDecoration(
+                  image: DecorationImage(
+                      image: AssetImage('assets/plus_floating_button.png')))
+              : BoxDecoration(
+                  image: _current_index == 0
                       ? DecorationImage(
-                          image: AssetImage('assets/plus_floating_button.png'),
+                          image: AssetImage('assets/tasks_floating_button.png'),
                           fit: BoxFit.fill)
-                      : null),
+                      : _current_index == 1
+                          ? DecorationImage(
+                              image:
+                                  AssetImage('assets/plus_floating_button.png'),
+                              fit: BoxFit.fill)
+                          : null),
         ),
       ),
     );

@@ -1,4 +1,6 @@
 import 'package:efleet_project_tree/colors.dart';
+import 'package:efleet_project_tree/pages/projectdetails.dart';
+import 'package:efleet_project_tree/variables.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/src/widgets/container.dart';
 import 'package:flutter/src/widgets/framework.dart';
@@ -30,6 +32,12 @@ class HomeTabPage extends StatefulWidget {
 }
 
 class _HomeTabPageState extends State<HomeTabPage> {
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     height = MediaQuery.of(context).size.height;
@@ -78,49 +86,59 @@ class _HomeTabPageState extends State<HomeTabPage> {
                     shrinkWrap: true,
                     itemExtent: 120.0,
                     itemBuilder: (BuildContext context, index) {
-                      return ListTile(
-                        title: Container(
-                          height: 89.0,
-                          width: width * 0.85,
-                          decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(14.0),
-                              border:
-                                  Border.all(color: ColorsTheme.txtDescColor)),
-                          child: Row(
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            mainAxisAlignment: MainAxisAlignment.start,
-                            children: [
-                              Container(
-                                padding: EdgeInsets.all(10.0),
-                                child: Image(
-                                    image:
-                                        AssetImage('assets/sample_logo.png')),
-                              ),
-                              Container(
-                                padding: EdgeInsets.all(10.0),
-                                margin: EdgeInsets.only(top: 15.0),
-                                child: new RichText(
-                                    text: new TextSpan(children: [
-                                  new TextSpan(
-                                      text: 'eFleetPass \n',
-                                      style: TextStyle(color: Colors.black)),
-                                  new TextSpan(
-                                      text: '6 Members \n',
-                                      style: TextStyle(color: Colors.black)),
-                                ])),
-                              ),
-                              SizedBox(
-                                width: orientation == Orientation.portrait
-                                    ? width * 0.3
-                                    : width * 0.6,
-                              ),
-                              GestureDetector(
-                                onTap: () {},
-                                child: Image(
-                                  image: AssetImage('assets/arrow_details.png'),
+                      return GestureDetector(
+                        onTap: () {
+                          Navigator.of(context).push(MaterialPageRoute(
+                              builder: (context) => ProjectDetails()));
+                          setState(() {
+                            is_pressed_project_details = true;
+                          });
+                        },
+                        child: ListTile(
+                          title: Container(
+                            height: 89.0,
+                            width: width * 0.85,
+                            decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(14.0),
+                                border: Border.all(
+                                    color: ColorsTheme.txtDescColor)),
+                            child: Row(
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              children: [
+                                Container(
+                                  padding: EdgeInsets.all(10.0),
+                                  child: Image(
+                                      image:
+                                          AssetImage('assets/sample_logo.png')),
                                 ),
-                              )
-                            ],
+                                Container(
+                                  padding: EdgeInsets.all(10.0),
+                                  margin: EdgeInsets.only(top: 15.0),
+                                  child: new RichText(
+                                      text: new TextSpan(children: [
+                                    new TextSpan(
+                                        text: 'eFleetPass \n',
+                                        style: TextStyle(color: Colors.black)),
+                                    new TextSpan(
+                                        text: '6 Members \n',
+                                        style: TextStyle(color: Colors.black)),
+                                  ])),
+                                ),
+                                SizedBox(
+                                  width: orientation == Orientation.portrait
+                                      ? width * 0.3
+                                      : width * 0.6,
+                                ),
+                                GestureDetector(
+                                  onTap: () {},
+                                  child: Image(
+                                    image:
+                                        AssetImage('assets/arrow_details.png'),
+                                  ),
+                                )
+                              ],
+                            ),
                           ),
                         ),
                       );
