@@ -154,7 +154,8 @@ class _HomePageState extends State<HomePage> {
                   image: DecorationImage(
                       image: AssetImage('assets/plus_floating_button.png')))
               : BoxDecoration(
-                  image: _current_index == 0
+                  image: _current_index == 0 &&
+                          is_pressed_project_details == false
                       ? DecorationImage(
                           image: AssetImage('assets/tasks_floating_button.png'),
                           fit: BoxFit.fill)
