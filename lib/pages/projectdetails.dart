@@ -53,8 +53,6 @@ class _ProjectDetailsPageState extends State<ProjectDetailsPage> {
 
   Future<void> pref() async {
     this.preferences = await SharedPreferences.getInstance();
-    this.preferences?.setBool('viewed_project_details', true);
-    print(this.preferences?.getBool('viewed_project_details'));
   }
 
   @override
@@ -68,10 +66,11 @@ class _ProjectDetailsPageState extends State<ProjectDetailsPage> {
             width: width,
             height: orientation == Orientation.portrait ? height : height * 2.2,
             child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Container(
-                  padding: EdgeInsets.all(40.0),
-                  margin: EdgeInsets.only(top: 20.0),
+                  padding: EdgeInsets.all(15.0),
+                  margin: EdgeInsets.only(top: 40.0),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: <Widget>[
@@ -118,7 +117,8 @@ class _ProjectDetailsPageState extends State<ProjectDetailsPage> {
                 ),
                 Container(
                   height: 40,
-                  width: width * 0.8,
+                  width: width * 0.95,
+                  margin: EdgeInsets.only(left: 30.0),
                   child: SingleChildScrollView(
                     scrollDirection: Axis.horizontal,
                     child: Row(
@@ -261,7 +261,173 @@ class _ProjectDetailsPageState extends State<ProjectDetailsPage> {
                       ],
                     ),
                   ),
-                )
+                ),
+                Container(
+                  width: width,
+                  height: orientation == Orientation.portrait
+                      ? height * 0.68
+                      : height,
+                  padding: EdgeInsets.only(left: 15.0),
+                  child: ListView.builder(
+                      itemCount: 4,
+                      shrinkWrap: true,
+                      itemExtent: 300.0,
+                      itemBuilder: (BuildContext context, index) {
+                        return Container(
+                          margin: EdgeInsets.all(10),
+                          width: width,
+                          child: GestureDetector(
+                            onTap: () {},
+                            child: Container(
+                              height: 180.0,
+                              decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(20.0),
+                                  border: Border.all(color: Color(0xffEBEBEB))),
+                              child: Column(children: [
+                                Container(
+                                  padding: EdgeInsets.all(20.0),
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.start,
+                                    children: [
+                                      SizedBox(
+                                        width: width * 0.4,
+                                        height: 40.0,
+                                        child: TextButton(
+                                          style: ButtonStyle(
+                                            shape: MaterialStateProperty.all(
+                                                RoundedRectangleBorder(
+                                              borderRadius:
+                                                  BorderRadius.circular(30.0),
+                                            )),
+                                            foregroundColor:
+                                                MaterialStateProperty
+                                                    .resolveWith<Color>(
+                                                        (Set<MaterialState>
+                                                            states) {
+                                              if (states.contains(
+                                                      MaterialState.hovered) ||
+                                                  states.contains(
+                                                      MaterialState.focused))
+                                                return ColorsTheme.uIUxColor;
+                                              return ColorsTheme.uIUxColor;
+                                            }),
+                                            backgroundColor:
+                                                MaterialStateProperty
+                                                    .resolveWith<Color>(
+                                                        (Set<MaterialState>
+                                                            states) {
+                                              if (states.contains(
+                                                      MaterialState.hovered) ||
+                                                  states.contains(
+                                                      MaterialState.focused))
+                                                return Colors.purple.shade100;
+
+                                              return Colors.purple.shade100;
+                                            }),
+                                          ),
+                                          child: Text(
+                                            'UI/UX Design',
+                                            style: TextStyle(
+                                                color: ColorsTheme.uIUxColor,
+                                                fontSize: 12.0,
+                                                fontWeight: FontWeight.w400),
+                                          ),
+                                          onPressed: () {},
+                                        ),
+                                      ),
+                                      SizedBox(
+                                        width: 10.0,
+                                      ),
+                                      SizedBox(
+                                        width: width * 0.2,
+                                        height: 40.0,
+                                        child: TextButton(
+                                          style: ButtonStyle(
+                                            shape: MaterialStateProperty.all(
+                                                RoundedRectangleBorder(
+                                              borderRadius:
+                                                  BorderRadius.circular(30.0),
+                                            )),
+                                            foregroundColor:
+                                                MaterialStateProperty
+                                                    .resolveWith<Color>(
+                                                        (Set<MaterialState>
+                                                            states) {
+                                              if (states.contains(
+                                                      MaterialState.hovered) ||
+                                                  states.contains(
+                                                      MaterialState.focused))
+                                                return ColorsTheme.uIUxColor;
+                                              return ColorsTheme.uIUxColor;
+                                            }),
+                                            backgroundColor:
+                                                MaterialStateProperty
+                                                    .resolveWith<Color>(
+                                                        (Set<MaterialState>
+                                                            states) {
+                                              if (states.contains(
+                                                      MaterialState.hovered) ||
+                                                  states.contains(
+                                                      MaterialState.focused))
+                                                return Colors.red.shade100;
+
+                                              return Colors.red.shade100;
+                                            }),
+                                          ),
+                                          child: Text(
+                                            'High',
+                                            style: TextStyle(
+                                                color:
+                                                    ColorsTheme.inCompbtnColor,
+                                                fontSize: 12.0,
+                                                fontWeight: FontWeight.w400),
+                                          ),
+                                          onPressed: () {},
+                                        ),
+                                      )
+                                    ],
+                                  ),
+                                ),
+                                Container(
+                                  alignment: Alignment.centerLeft,
+                                  margin: EdgeInsets.all(20.0),
+                                  height: 60,
+                                  decoration: BoxDecoration(
+                                      border: Border(
+                                          bottom:
+                                              BorderSide(color: Colors.black))),
+                                  child: Text(
+                                    'Create a Landing Page',
+                                    style: TextStyle(
+                                        fontWeight: FontWeight.w600,
+                                        fontSize: 18.0),
+                                  ),
+                                ),
+                                Row(
+                                  children: [
+                                    Container(
+                                      padding: EdgeInsets.all(20.0),
+                                      child: Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.start,
+                                        children: [
+                                          Image.asset(
+                                              'assets/due_date_icon.png'),
+                                          SizedBox(
+                                            width: 10.0,
+                                          ),
+                                          Text('Mon, 10 July 2022')
+                                        ],
+                                      ),
+                                    )
+                                  ],
+                                )
+                              ]),
+                            ),
+                          ),
+                        );
+                      }),
+                ),
               ],
             ),
           ),

@@ -12,4 +12,5 @@ class ColorsTheme {
   static const Color inCompbtnColor = Color(0xffEE2841);
   static const Color compbtnColor = Color(0xff10A330);
   static const Color inProgbtnColor = Color(0xffF2994A);
+  static const Color uIUxColor = Color(0xff8E61E9);
 }
