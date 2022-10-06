@@ -100,7 +100,7 @@ class _HomeTabPageState extends State<HomeTabPage> {
                             decoration: BoxDecoration(
                                 borderRadius: BorderRadius.circular(14.0),
                                 border: Border.all(
-                                    color: ColorsTheme.txtDescColor)),
+                                    color: Color(0xffEBEBEB), width: 2.0)),
                             child: Row(
                               crossAxisAlignment: CrossAxisAlignment.center,
                               mainAxisAlignment: MainAxisAlignment.start,

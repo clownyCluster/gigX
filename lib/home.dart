@@ -82,65 +82,62 @@ class _HomePageState extends State<HomePage> {
     height = MediaQuery.of(context).size.height;
     width = MediaQuery.of(context).size.width;
 
-    return Scaffold(
-      body: CupertinoTabScaffold(
-          tabBar: CupertinoTabBar(
-            key: globalKey,
-            items: <BottomNavigationBarItem>[
-              BottomNavigationBarItem(
-                  icon: Image(image: AssetImage('assets/navbaricon_home.png')),
-                  label: 'Home',
-                  backgroundColor: Colors.white),
-              BottomNavigationBarItem(
-                  icon: Image(image: AssetImage('assets/navbaricon_tasks.png')),
-                  label: 'Tasks',
-                  backgroundColor: Colors.white),
-              BottomNavigationBarItem(
-                  icon: Image(
-                      image: AssetImage('assets/navbaricon_notifications.png')),
-                  label: 'Notifications',
-                  backgroundColor: Colors.white),
-              BottomNavigationBarItem(
-                  icon:
-                      Image(image: AssetImage('assets/navbaricon_account.png')),
-                  label: 'Account',
-                  backgroundColor: Colors.white),
-            ],
-            onTap: (int index) {
-              setState(() {
-                changeTabs(index);
+    return CupertinoTabScaffold(
+        tabBar: CupertinoTabBar(
+          key: globalKey,
+          items: <BottomNavigationBarItem>[
+            BottomNavigationBarItem(
+                icon: Image(image: AssetImage('assets/navbaricon_home.png')),
+                label: 'Home',
+                backgroundColor: Colors.white),
+            BottomNavigationBarItem(
+                icon: Image(image: AssetImage('assets/navbaricon_tasks.png')),
+                label: 'Tasks',
+                backgroundColor: Colors.white),
+            BottomNavigationBarItem(
+                icon: Image(
+                    image: AssetImage('assets/navbaricon_notifications.png')),
+                label: 'Notifications',
+                backgroundColor: Colors.white),
+            BottomNavigationBarItem(
+                icon: Image(image: AssetImage('assets/navbaricon_account.png')),
+                label: 'Account',
+                backgroundColor: Colors.white),
+          ],
+          onTap: (int index) {
+            setState(() {
+              changeTabs(index);
+            });
+          },
+        ),
+        tabBuilder: (context, index) {
+          switch (index) {
+            case 0:
+              return CupertinoTabView(builder: (context) {
+                return CupertinoPageScaffold(child: HomeTab());
               });
-            },
-          ),
-          tabBuilder: (context, index) {
-            switch (index) {
-              case 0:
-                return CupertinoTabView(builder: (context) {
-                  return CupertinoPageScaffold(child: HomeTab());
-                });
-              case 1:
-                return CupertinoTabView(builder: (context) {
-                  return CupertinoPageScaffold(child: TaskTab());
-                });
-              case 2:
-                return CupertinoTabView(builder: (context) {
-                  return CupertinoPageScaffold(
-                    child: NotificationTab(),
-                  );
-                });
-              case 3:
-                return CupertinoTabView(builder: (context) {
-                  return CupertinoPageScaffold(
-                    child: AccountTab(),
-                  );
-                });
-              default:
-                return CupertinoTabView(builder: (context) {
-                  return CupertinoPageScaffold(child: HomeTab());
-                });
-            }
-          }),
-    );
+            case 1:
+              return CupertinoTabView(builder: (context) {
+                return CupertinoPageScaffold(child: TaskTab());
+              });
+            case 2:
+              return CupertinoTabView(builder: (context) {
+                return CupertinoPageScaffold(
+                  child: NotificationTab(),
+                );
+              });
+            case 3:
+              return CupertinoTabView(builder: (context) {
+                return CupertinoPageScaffold(
+                  child: AccountTab(),
+                );
+              });
+            default:
+              return CupertinoTabView(builder: (context) {
+                return CupertinoPageScaffold(child: HomeTab());
+              });
+          }
+        });
   }
 }
 

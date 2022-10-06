@@ -106,7 +106,7 @@ class _AccountTabPageState extends State<AccountTabPage> {
                 ),
               if (orientation == Orientation.portrait)
                 Container(
-                  padding: EdgeInsets.only(left: 40.0, top: 40.0),
+                  padding: EdgeInsets.only(left: 40.0),
                   child: Container(
                       height: 270,
                       width: width * 0.82,
@@ -116,8 +116,8 @@ class _AccountTabPageState extends State<AccountTabPage> {
                       child: showAccountListItems(context)),
                 ),
               Container(
-                margin: EdgeInsets.only(top: 40.0),
-                padding: EdgeInsets.only(left: 40.0, top: 40),
+                margin: EdgeInsets.only(top: 20.0),
+                padding: EdgeInsets.only(left: 40.0),
                 child: SizedBox(
                   width: orientation == Orientation.portrait
                       ? width * 0.82

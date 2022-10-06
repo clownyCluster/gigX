@@ -3,6 +3,7 @@ import 'package:calendar_date_picker2/calendar_date_picker2.dart';
 import 'package:efleet_project_tree/colors.dart';
 import 'package:efleet_project_tree/home.dart';
 import 'package:efleet_project_tree/pages/home.dart';
+import 'package:efleet_project_tree/pages/taskdetails.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/src/widgets/container.dart';
 import 'package:flutter/src/widgets/framework.dart';
@@ -80,7 +81,6 @@ class _ProjectDetailsPageState extends State<ProjectDetailsPage> {
                           Container(
                             child: IconButton(
                                 onPressed: () async {
-                                  this.preferences?.setInt('current_index', 0);
                                   Navigator.of(context).push(MaterialPageRoute(
                                       builder: (context) => Home()));
                                 },
@@ -108,9 +108,14 @@ class _ProjectDetailsPageState extends State<ProjectDetailsPage> {
                           ),
                         ],
                       ),
-                      Container(
-                        child: Image(
-                            image: AssetImage('assets/add_member_icon.png')),
+                      GestureDetector(
+                        onTap: () {
+                          showMemberDialog(context);
+                        },
+                        child: Container(
+                          child: Image(
+                              image: AssetImage('assets/add_member_icon.png')),
+                        ),
                       )
                     ],
                   ),
@@ -277,12 +282,17 @@ class _ProjectDetailsPageState extends State<ProjectDetailsPage> {
                           margin: EdgeInsets.all(10),
                           width: width,
                           child: GestureDetector(
-                            onTap: () {},
+                            onTap: () {
+                              Navigator.of(context, rootNavigator: true).push(
+                                  MaterialPageRoute(
+                                      builder: (context) => TaskDetails()));
+                            },
                             child: Container(
                               height: 180.0,
                               decoration: BoxDecoration(
                                   borderRadius: BorderRadius.circular(20.0),
-                                  border: Border.all(color: Color(0xffEBEBEB))),
+                                  border: Border.all(
+                                      color: Color(0xffEBEBEB), width: 2.0)),
                               child: Column(children: [
                                 Container(
                                   padding: EdgeInsets.all(20.0),
@@ -987,4 +997,42 @@ void _addProjectModalBottomSheet(BuildContext context) async {
           );
         });
       });
+}
+
+Future<dynamic> showMemberDialog(BuildContext context) {
+  return showDialog(
+    context: context,
+    builder: (ctx) => AlertDialog(
+      title: Text(
+        "ADD MEMBER",
+        style: TextStyle(
+            color: Colors.black, fontWeight: FontWeight.w600, fontSize: 14.0),
+      ),
+      content: Container(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            TextField(
+              decoration: InputDecoration(
+                  fillColor: Color(0xffEBEBEB), hintText: "Name or Email"),
+            ),
+          ],
+        ),
+      ),
+      actions: <Widget>[
+        TextButton(
+          onPressed: () {
+            Navigator.of(ctx).pop();
+          },
+          child: Text(
+            "Save",
+            style: TextStyle(
+                fontWeight: FontWeight.w600,
+                fontSize: 16.0,
+                color: ColorsTheme.btnColor),
+          ),
+        ),
+      ],
+    ),
+  );
 }
