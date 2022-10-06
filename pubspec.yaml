@@ -41,6 +41,7 @@ dependencies:
   syncfusion_flutter_calendar: ^20.3.47
   flutter_rounded_date_picker: ^3.0.2
   calendar_date_picker2: ^0.2.5
+  shared_preferences: ^2.0.15
 
 dev_dependencies:
   flutter_test:

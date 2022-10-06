@@ -9,4 +9,7 @@ class ColorsTheme {
   static const Color dangerColor = Color(0xffEE2841);
   static const Color lightGrey = Color(0xffD3D3D3);
   static const Color aptBox = Color(0xff916BFE);
+  static const Color inCompbtnColor = Color(0xffEE2841);
+  static const Color compbtnColor = Color(0xff10A330);
+  static const Color inProgbtnColor = Color(0xffF2994A);
 }

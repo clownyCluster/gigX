@@ -6,12 +6,12 @@ import 'package:efleet_project_tree/pages/account.dart';
 import 'package:efleet_project_tree/pages/home.dart';
 import 'package:efleet_project_tree/pages/notifications.dart';
 import 'package:efleet_project_tree/pages/tasks.dart';
-import 'package:efleet_project_tree/variables.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/src/widgets/container.dart';
 import 'package:flutter/src/widgets/framework.dart';
 import 'package:flutter_rounded_date_picker/flutter_rounded_date_picker.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class Home extends StatelessWidget {
   const Home({super.key});
@@ -32,6 +32,7 @@ class Home extends StatelessWidget {
 
 var height, width;
 int _current_index = 0;
+bool? viewed_project_details = false;
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -42,15 +43,14 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   GlobalKey globalKey = new GlobalKey(debugLabel: 'btm_app_bar');
+  SharedPreferences? preferences;
 
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
     BackButtonInterceptor.add(myInterceptor);
-    setState(() {
-      is_pressed_project_details = false;
-    });
+    initializePrefs();
   }
 
   @override
@@ -65,13 +65,15 @@ class _HomePageState extends State<HomePage> {
   }
 
   void changeTabs(int index) async {
-    if (index == 1) {
-      print('From Sec Screen');
-    }
-
-    // print(index);
     setState(() {
       _current_index = index;
+    });
+  }
+
+  Future<void> initializePrefs() async {
+    this.preferences = await SharedPreferences.getInstance();
+    setState(() {
+      _current_index = 0;
     });
   }
 
@@ -79,7 +81,6 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     height = MediaQuery.of(context).size.height;
     width = MediaQuery.of(context).size.width;
-    ColorsTheme obj = new ColorsTheme();
 
     return Scaffold(
       body: CupertinoTabScaffold(
@@ -139,34 +140,6 @@ class _HomePageState extends State<HomePage> {
                 });
             }
           }),
-      floatingActionButton: GestureDetector(
-        onTap: () {
-          if (_current_index == 0)
-            _addProjectModalBottomSheet(context);
-          else if (_current_index == 1) _addTaskModalBottomSheet(context);
-        },
-        child: Container(
-          margin: EdgeInsets.only(bottom: 40.0),
-          height: 90,
-          width: 90,
-          decoration: is_pressed_project_details == true && _current_index == 0
-              ? BoxDecoration(
-                  image: DecorationImage(
-                      image: AssetImage('assets/plus_floating_button.png')))
-              : BoxDecoration(
-                  image: _current_index == 0 &&
-                          is_pressed_project_details == false
-                      ? DecorationImage(
-                          image: AssetImage('assets/tasks_floating_button.png'),
-                          fit: BoxFit.fill)
-                      : _current_index == 1
-                          ? DecorationImage(
-                              image:
-                                  AssetImage('assets/plus_floating_button.png'),
-                              fit: BoxFit.fill)
-                          : null),
-        ),
-      ),
     );
   }
 }
@@ -608,98 +581,6 @@ void _addTaskModalBottomSheet(BuildContext context) async {
                         ),
                       ),
                     ],
-                  ),
-                )
-              ],
-            ),
-          );
-        });
-      });
-}
-
-void _addProjectModalBottomSheet(BuildContext context) async {
-  showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14.0)),
-      builder: (context) {
-        return StatefulBuilder(builder: (BuildContext context,
-            StateSetter setState /*You can rename this!*/) {
-          return Container(
-            height: 480.0,
-            padding: EdgeInsets.all(20.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Container(
-                  child: Text(
-                    'PROJECT NAME',
-                    style: TextStyle(
-                        color: Colors.black,
-                        fontWeight: FontWeight.w600,
-                        fontSize: 14.0),
-                  ),
-                ),
-                Container(
-                  child: TextField(
-                    decoration: InputDecoration(
-                      hintText: 'Name',
-                    ),
-                  ),
-                ),
-                Container(
-                  margin: EdgeInsets.only(
-                      top: 20.0, left: 5.0, bottom: 20.0, right: 5.0),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    children: [
-                      InkWell(
-                        onTap: () {
-                          print('Add image');
-                        },
-                        child: Container(
-                          padding: EdgeInsets.only(right: 20.0),
-                          child: Image(
-                            image: AssetImage('assets/plus_add_project.png'),
-                          ),
-                        ),
-                      ),
-                      AutoSizeText('Add Project Thumbnail')
-                    ],
-                  ),
-                ),
-                Container(
-                  alignment: Alignment.bottomRight,
-                  child: SizedBox(
-                    width: width * 0.3,
-                    height: 38.0,
-                    child: TextButton(
-                      style: ButtonStyle(
-                        shape: MaterialStateProperty.all(RoundedRectangleBorder(
-                          side: BorderSide(color: ColorsTheme.txtDescColor),
-                          borderRadius: BorderRadius.circular(14.0),
-                        )),
-                        foregroundColor:
-                            MaterialStateProperty.resolveWith<Color>(
-                                (Set<MaterialState> states) {
-                          if (states.contains(MaterialState.hovered) ||
-                              states.contains(MaterialState.focused))
-                            return ColorsTheme.txtDescColor;
-                          return ColorsTheme.txtDescColor;
-                        }),
-                        backgroundColor:
-                            MaterialStateProperty.resolveWith<Color>(
-                                (Set<MaterialState> states) {
-                          if (states.contains(MaterialState.hovered) ||
-                              states.contains(MaterialState.focused))
-                            return ColorsTheme.bgColor;
-
-                          return ColorsTheme.bgColor;
-                        }),
-                      ),
-                      child: Text('Create'),
-                      onPressed: () {},
-                    ),
                   ),
                 )
               ],
