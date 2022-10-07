@@ -270,7 +270,7 @@ class _ProjectDetailsPageState extends State<ProjectDetailsPage> {
                 Container(
                   width: width,
                   height: orientation == Orientation.portrait
-                      ? height * 0.68
+                      ? height * 0.75
                       : height,
                   padding: EdgeInsets.only(left: 15.0),
                   child: ListView.builder(

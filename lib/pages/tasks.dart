@@ -181,90 +181,63 @@ class _TaskTabPageState extends State<TaskTabPage> {
 }
 
 void _addTaskModalBottomSheet(BuildContext context) async {
-  showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      useRootNavigator: true,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14.0)),
-      builder: (context) {
-        return StatefulBuilder(builder: (BuildContext context,
-            StateSetter setState /*You can rename this!*/) {
-          return Container(
-            height: 700.0,
-            padding: EdgeInsets.all(20.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Container(
-                  child: Text(
-                    'Task Name',
-                    style: TextStyle(
-                        color: Colors.black,
-                        fontWeight: FontWeight.w600,
-                        fontSize: 14.0),
-                  ),
-                ),
-                Container(
-                  child: TextField(
-                    decoration: InputDecoration(
-                      hintText: 'Name',
+  Future.delayed(Duration.zero, () {
+    showModalBottomSheet(
+        context: context,
+        isScrollControlled: true,
+        useRootNavigator: true,
+        shape:
+            RoundedRectangleBorder(borderRadius: BorderRadius.circular(14.0)),
+        builder: (context) {
+          return StatefulBuilder(builder: (BuildContext context,
+              StateSetter setState /*You can rename this!*/) {
+            return Container(
+              height: 700.0,
+              padding: EdgeInsets.all(20.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Container(
+                    child: Text(
+                      'Task Name',
+                      style: TextStyle(
+                          color: Colors.black,
+                          fontWeight: FontWeight.w600,
+                          fontSize: 14.0),
                     ),
                   ),
-                ),
-                Container(
-                  margin: EdgeInsets.only(
-                      top: 20.0, left: 5.0, bottom: 20.0, right: 5.0),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    children: [
-                      InkWell(
-                        onTap: () {
-                          print('Add image');
-                        },
-                        child: Container(
-                          padding: EdgeInsets.only(right: 20.0),
-                          child: Image(
-                            image: AssetImage('assets/plus_add_project.png'),
-                          ),
-                        ),
+                  Container(
+                    child: TextField(
+                      decoration: InputDecoration(
+                        hintText: 'Name',
                       ),
-                      AutoSizeText('Add Project')
-                    ],
+                    ),
                   ),
-                ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Container(
-                      margin: EdgeInsets.only(
-                          top: 20.0, left: 5.0, bottom: 20.0, right: 5.0),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        children: [
-                          Container(
+                  Container(
+                    margin: EdgeInsets.only(
+                        top: 20.0, left: 5.0, bottom: 20.0, right: 5.0),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: [
+                        InkWell(
+                          onTap: () {
+                            print('Add image');
+                          },
+                          child: Container(
                             padding: EdgeInsets.only(right: 20.0),
                             child: Image(
-                              image: AssetImage('assets/unassigned_icon.png'),
+                              image: AssetImage('assets/plus_add_project.png'),
                             ),
                           ),
-                          AutoSizeText('Unassigned'),
-                        ],
-                      ),
+                        ),
+                        AutoSizeText('Add Project')
+                      ],
                     ),
-                    GestureDetector(
-                      onTap: () async {
-                        var results = await showCalendarDatePicker2Dialog(
-                          context: context,
-                          config: CalendarDatePicker2WithActionButtonsConfig(
-                              selectedDayHighlightColor: ColorsTheme.btnColor,
-                              cancelButton: null,
-                              shouldCloseDialogAfterCancelTapped: true),
-                          barrierDismissible: false,
-                          dialogSize: const Size(325, 400),
-                          borderRadius: BorderRadius.circular(15),
-                        );
-                      },
-                      child: Container(
+                  ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Container(
                         margin: EdgeInsets.only(
                             top: 20.0, left: 5.0, bottom: 20.0, right: 5.0),
                         child: Row(
@@ -273,356 +246,397 @@ void _addTaskModalBottomSheet(BuildContext context) async {
                             Container(
                               padding: EdgeInsets.only(right: 20.0),
                               child: Image(
-                                image: AssetImage('assets/due_date_icon.png'),
+                                image: AssetImage('assets/unassigned_icon.png'),
                               ),
                             ),
-                            AutoSizeText('Due Date'),
+                            AutoSizeText('Unassigned'),
                           ],
                         ),
                       ),
-                    ),
-                  ],
-                ),
-                Container(
-                  child: Text(
-                    'Description',
-                    style: TextStyle(
-                        color: Colors.black,
-                        fontWeight: FontWeight.w600,
-                        fontSize: 14.0),
-                  ),
-                ),
-                Container(
-                  child: TextField(
-                    decoration: InputDecoration(
-                      hintText: 'Type here',
-                    ),
-                  ),
-                ),
-                Container(
-                  margin: EdgeInsets.only(top: 10.0),
-                  child: Text(
-                    'STATUS',
-                    style: TextStyle(
-                        color: Colors.black,
-                        fontWeight: FontWeight.w600,
-                        fontSize: 14.0),
-                  ),
-                ),
-                Container(
-                  margin: EdgeInsets.only(top: 10.0),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Container(
-                        width: width * 0.45,
-                        height: 38.0,
-                        child: TextButton(
-                          style: ButtonStyle(
-                            shape: MaterialStateProperty.all(
-                                RoundedRectangleBorder(
-                              side: BorderSide(color: ColorsTheme.txtDescColor),
-                              borderRadius: BorderRadius.circular(14.0),
-                            )),
-                            foregroundColor:
-                                MaterialStateProperty.resolveWith<Color>(
-                                    (Set<MaterialState> states) {
-                              if (states.contains(MaterialState.hovered) ||
-                                  states.contains(MaterialState.focused))
-                                return ColorsTheme.txtDescColor;
-                              return ColorsTheme.txtDescColor;
-                            }),
-                            backgroundColor:
-                                MaterialStateProperty.resolveWith<Color>(
-                                    (Set<MaterialState> states) {
-                              if (states.contains(MaterialState.hovered) ||
-                                  states.contains(MaterialState.focused))
-                                return ColorsTheme.bgColor;
-
-                              return ColorsTheme.bgColor;
-                            }),
+                      GestureDetector(
+                        onTap: () async {
+                          var results = await showCalendarDatePicker2Dialog(
+                            context: context,
+                            config: CalendarDatePicker2WithActionButtonsConfig(
+                                selectedDayHighlightColor: ColorsTheme.btnColor,
+                                cancelButton: null,
+                                shouldCloseDialogAfterCancelTapped: true),
+                            barrierDismissible: false,
+                            dialogSize: const Size(325, 400),
+                            borderRadius: BorderRadius.circular(15),
+                          );
+                        },
+                        child: Container(
+                          margin: EdgeInsets.only(
+                              top: 20.0, left: 5.0, bottom: 20.0, right: 5.0),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            children: [
+                              Container(
+                                padding: EdgeInsets.only(right: 20.0),
+                                child: Image(
+                                  image: AssetImage('assets/due_date_icon.png'),
+                                ),
+                              ),
+                              AutoSizeText('Due Date'),
+                            ],
                           ),
-                          child: Text('Incompleted Tasks'),
-                          onPressed: () {},
-                        ),
-                      ),
-                      Container(
-                        width: width * 0.42,
-                        height: 38.0,
-                        child: TextButton(
-                          style: ButtonStyle(
-                            shape: MaterialStateProperty.all(
-                                RoundedRectangleBorder(
-                              side: BorderSide(color: ColorsTheme.txtDescColor),
-                              borderRadius: BorderRadius.circular(14.0),
-                            )),
-                            foregroundColor:
-                                MaterialStateProperty.resolveWith<Color>(
-                                    (Set<MaterialState> states) {
-                              if (states.contains(MaterialState.hovered) ||
-                                  states.contains(MaterialState.focused))
-                                return ColorsTheme.txtDescColor;
-                              return ColorsTheme.txtDescColor;
-                            }),
-                            backgroundColor:
-                                MaterialStateProperty.resolveWith<Color>(
-                                    (Set<MaterialState> states) {
-                              if (states.contains(MaterialState.hovered) ||
-                                  states.contains(MaterialState.focused))
-                                return ColorsTheme.bgColor;
-
-                              return ColorsTheme.bgColor;
-                            }),
-                          ),
-                          child: Text('Completed Tasks'),
-                          onPressed: () {},
                         ),
                       ),
                     ],
                   ),
-                ),
-                Container(
-                  margin: EdgeInsets.only(top: 10.0),
-                  child: TextButton(
-                    style: ButtonStyle(
-                      shape: MaterialStateProperty.all(RoundedRectangleBorder(
-                        side: BorderSide(color: ColorsTheme.txtDescColor),
-                        borderRadius: BorderRadius.circular(14.0),
-                      )),
-                      foregroundColor: MaterialStateProperty.resolveWith<Color>(
-                          (Set<MaterialState> states) {
-                        if (states.contains(MaterialState.hovered) ||
-                            states.contains(MaterialState.focused))
+                  Container(
+                    child: Text(
+                      'Description',
+                      style: TextStyle(
+                          color: Colors.black,
+                          fontWeight: FontWeight.w600,
+                          fontSize: 14.0),
+                    ),
+                  ),
+                  Container(
+                    child: TextField(
+                      decoration: InputDecoration(
+                        hintText: 'Type here',
+                      ),
+                    ),
+                  ),
+                  Container(
+                    margin: EdgeInsets.only(top: 10.0),
+                    child: Text(
+                      'STATUS',
+                      style: TextStyle(
+                          color: Colors.black,
+                          fontWeight: FontWeight.w600,
+                          fontSize: 14.0),
+                    ),
+                  ),
+                  Container(
+                    margin: EdgeInsets.only(top: 10.0),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Container(
+                          width: width * 0.45,
+                          height: 38.0,
+                          child: TextButton(
+                            style: ButtonStyle(
+                              shape: MaterialStateProperty.all(
+                                  RoundedRectangleBorder(
+                                side:
+                                    BorderSide(color: ColorsTheme.txtDescColor),
+                                borderRadius: BorderRadius.circular(14.0),
+                              )),
+                              foregroundColor:
+                                  MaterialStateProperty.resolveWith<Color>(
+                                      (Set<MaterialState> states) {
+                                if (states.contains(MaterialState.hovered) ||
+                                    states.contains(MaterialState.focused))
+                                  return ColorsTheme.txtDescColor;
+                                return ColorsTheme.txtDescColor;
+                              }),
+                              backgroundColor:
+                                  MaterialStateProperty.resolveWith<Color>(
+                                      (Set<MaterialState> states) {
+                                if (states.contains(MaterialState.hovered) ||
+                                    states.contains(MaterialState.focused))
+                                  return ColorsTheme.bgColor;
+
+                                return ColorsTheme.bgColor;
+                              }),
+                            ),
+                            child: Text('Incompleted Tasks'),
+                            onPressed: () {},
+                          ),
+                        ),
+                        Container(
+                          width: width * 0.42,
+                          height: 38.0,
+                          child: TextButton(
+                            style: ButtonStyle(
+                              shape: MaterialStateProperty.all(
+                                  RoundedRectangleBorder(
+                                side:
+                                    BorderSide(color: ColorsTheme.txtDescColor),
+                                borderRadius: BorderRadius.circular(14.0),
+                              )),
+                              foregroundColor:
+                                  MaterialStateProperty.resolveWith<Color>(
+                                      (Set<MaterialState> states) {
+                                if (states.contains(MaterialState.hovered) ||
+                                    states.contains(MaterialState.focused))
+                                  return ColorsTheme.txtDescColor;
+                                return ColorsTheme.txtDescColor;
+                              }),
+                              backgroundColor:
+                                  MaterialStateProperty.resolveWith<Color>(
+                                      (Set<MaterialState> states) {
+                                if (states.contains(MaterialState.hovered) ||
+                                    states.contains(MaterialState.focused))
+                                  return ColorsTheme.bgColor;
+
+                                return ColorsTheme.bgColor;
+                              }),
+                            ),
+                            child: Text('Completed Tasks'),
+                            onPressed: () {},
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  Container(
+                    margin: EdgeInsets.only(top: 10.0),
+                    child: TextButton(
+                      style: ButtonStyle(
+                        shape: MaterialStateProperty.all(RoundedRectangleBorder(
+                          side: BorderSide(color: ColorsTheme.txtDescColor),
+                          borderRadius: BorderRadius.circular(14.0),
+                        )),
+                        foregroundColor:
+                            MaterialStateProperty.resolveWith<Color>(
+                                (Set<MaterialState> states) {
+                          if (states.contains(MaterialState.hovered) ||
+                              states.contains(MaterialState.focused))
+                            return ColorsTheme.txtDescColor;
                           return ColorsTheme.txtDescColor;
-                        return ColorsTheme.txtDescColor;
-                      }),
-                      backgroundColor: MaterialStateProperty.resolveWith<Color>(
-                          (Set<MaterialState> states) {
-                        if (states.contains(MaterialState.hovered) ||
-                            states.contains(MaterialState.focused))
+                        }),
+                        backgroundColor:
+                            MaterialStateProperty.resolveWith<Color>(
+                                (Set<MaterialState> states) {
+                          if (states.contains(MaterialState.hovered) ||
+                              states.contains(MaterialState.focused))
+                            return ColorsTheme.bgColor;
+
                           return ColorsTheme.bgColor;
-
-                        return ColorsTheme.bgColor;
-                      }),
+                        }),
+                      ),
+                      child: Text('In Progress'),
+                      onPressed: () {},
                     ),
-                    child: Text('In Progress'),
-                    onPressed: () {},
                   ),
-                ),
-                Container(
-                  margin: EdgeInsets.only(top: 10.0),
-                  child: Text(
-                    'Project Type',
-                    style: TextStyle(
-                        color: Colors.black,
-                        fontWeight: FontWeight.w600,
-                        fontSize: 14.0),
+                  Container(
+                    margin: EdgeInsets.only(top: 10.0),
+                    child: Text(
+                      'Project Type',
+                      style: TextStyle(
+                          color: Colors.black,
+                          fontWeight: FontWeight.w600,
+                          fontSize: 14.0),
+                    ),
                   ),
-                ),
-                Container(
-                  margin: EdgeInsets.only(top: 10.0),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Container(
-                        width: width * 0.32,
-                        height: 38.0,
-                        child: TextButton(
-                          style: ButtonStyle(
-                            shape: MaterialStateProperty.all(
-                                RoundedRectangleBorder(
-                              side: BorderSide(color: ColorsTheme.txtDescColor),
-                              borderRadius: BorderRadius.circular(14.0),
-                            )),
-                            foregroundColor:
-                                MaterialStateProperty.resolveWith<Color>(
-                                    (Set<MaterialState> states) {
-                              if (states.contains(MaterialState.hovered) ||
-                                  states.contains(MaterialState.focused))
+                  Container(
+                    margin: EdgeInsets.only(top: 10.0),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Container(
+                          width: width * 0.32,
+                          height: 38.0,
+                          child: TextButton(
+                            style: ButtonStyle(
+                              shape: MaterialStateProperty.all(
+                                  RoundedRectangleBorder(
+                                side:
+                                    BorderSide(color: ColorsTheme.txtDescColor),
+                                borderRadius: BorderRadius.circular(14.0),
+                              )),
+                              foregroundColor:
+                                  MaterialStateProperty.resolveWith<Color>(
+                                      (Set<MaterialState> states) {
+                                if (states.contains(MaterialState.hovered) ||
+                                    states.contains(MaterialState.focused))
+                                  return ColorsTheme.txtDescColor;
                                 return ColorsTheme.txtDescColor;
-                              return ColorsTheme.txtDescColor;
-                            }),
-                            backgroundColor:
-                                MaterialStateProperty.resolveWith<Color>(
-                                    (Set<MaterialState> states) {
-                              if (states.contains(MaterialState.hovered) ||
-                                  states.contains(MaterialState.focused))
-                                return ColorsTheme.bgColor;
+                              }),
+                              backgroundColor:
+                                  MaterialStateProperty.resolveWith<Color>(
+                                      (Set<MaterialState> states) {
+                                if (states.contains(MaterialState.hovered) ||
+                                    states.contains(MaterialState.focused))
+                                  return ColorsTheme.bgColor;
 
-                              return ColorsTheme.bgColor;
-                            }),
+                                return ColorsTheme.bgColor;
+                              }),
+                            ),
+                            child: Text('UI/UX Design'),
+                            onPressed: () {},
                           ),
-                          child: Text('UI/UX Design'),
-                          onPressed: () {},
                         ),
-                      ),
-                      Container(
-                        width: width * 0.5,
-                        height: 38.0,
-                        child: TextButton(
-                          style: ButtonStyle(
-                            shape: MaterialStateProperty.all(
-                                RoundedRectangleBorder(
-                              side: BorderSide(color: ColorsTheme.txtDescColor),
-                              borderRadius: BorderRadius.circular(14.0),
-                            )),
-                            foregroundColor:
-                                MaterialStateProperty.resolveWith<Color>(
-                                    (Set<MaterialState> states) {
-                              if (states.contains(MaterialState.hovered) ||
-                                  states.contains(MaterialState.focused))
+                        Container(
+                          width: width * 0.5,
+                          height: 38.0,
+                          child: TextButton(
+                            style: ButtonStyle(
+                              shape: MaterialStateProperty.all(
+                                  RoundedRectangleBorder(
+                                side:
+                                    BorderSide(color: ColorsTheme.txtDescColor),
+                                borderRadius: BorderRadius.circular(14.0),
+                              )),
+                              foregroundColor:
+                                  MaterialStateProperty.resolveWith<Color>(
+                                      (Set<MaterialState> states) {
+                                if (states.contains(MaterialState.hovered) ||
+                                    states.contains(MaterialState.focused))
+                                  return ColorsTheme.txtDescColor;
                                 return ColorsTheme.txtDescColor;
-                              return ColorsTheme.txtDescColor;
-                            }),
-                            backgroundColor:
-                                MaterialStateProperty.resolveWith<Color>(
-                                    (Set<MaterialState> states) {
-                              if (states.contains(MaterialState.hovered) ||
-                                  states.contains(MaterialState.focused))
-                                return ColorsTheme.bgColor;
+                              }),
+                              backgroundColor:
+                                  MaterialStateProperty.resolveWith<Color>(
+                                      (Set<MaterialState> states) {
+                                if (states.contains(MaterialState.hovered) ||
+                                    states.contains(MaterialState.focused))
+                                  return ColorsTheme.bgColor;
 
-                              return ColorsTheme.bgColor;
-                            }),
+                                return ColorsTheme.bgColor;
+                              }),
+                            ),
+                            child: Text('Flutter Development'),
+                            onPressed: () {},
                           ),
-                          child: Text('Flutter Development'),
-                          onPressed: () {},
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
-                ),
-                Container(
-                  margin: EdgeInsets.only(top: 10.0),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Container(
-                        width: width * 0.32,
-                        height: 38.0,
-                        child: TextButton(
-                          style: ButtonStyle(
-                            shape: MaterialStateProperty.all(
-                                RoundedRectangleBorder(
-                              side: BorderSide(color: ColorsTheme.txtDescColor),
-                              borderRadius: BorderRadius.circular(14.0),
-                            )),
-                            foregroundColor:
-                                MaterialStateProperty.resolveWith<Color>(
-                                    (Set<MaterialState> states) {
-                              if (states.contains(MaterialState.hovered) ||
-                                  states.contains(MaterialState.focused))
+                  Container(
+                    margin: EdgeInsets.only(top: 10.0),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Container(
+                          width: width * 0.32,
+                          height: 38.0,
+                          child: TextButton(
+                            style: ButtonStyle(
+                              shape: MaterialStateProperty.all(
+                                  RoundedRectangleBorder(
+                                side:
+                                    BorderSide(color: ColorsTheme.txtDescColor),
+                                borderRadius: BorderRadius.circular(14.0),
+                              )),
+                              foregroundColor:
+                                  MaterialStateProperty.resolveWith<Color>(
+                                      (Set<MaterialState> states) {
+                                if (states.contains(MaterialState.hovered) ||
+                                    states.contains(MaterialState.focused))
+                                  return ColorsTheme.txtDescColor;
                                 return ColorsTheme.txtDescColor;
-                              return ColorsTheme.txtDescColor;
-                            }),
-                            backgroundColor:
-                                MaterialStateProperty.resolveWith<Color>(
-                                    (Set<MaterialState> states) {
-                              if (states.contains(MaterialState.hovered) ||
-                                  states.contains(MaterialState.focused))
-                                return ColorsTheme.bgColor;
+                              }),
+                              backgroundColor:
+                                  MaterialStateProperty.resolveWith<Color>(
+                                      (Set<MaterialState> states) {
+                                if (states.contains(MaterialState.hovered) ||
+                                    states.contains(MaterialState.focused))
+                                  return ColorsTheme.bgColor;
 
-                              return ColorsTheme.bgColor;
-                            }),
+                                return ColorsTheme.bgColor;
+                              }),
+                            ),
+                            child: Text('Web Design'),
+                            onPressed: () {},
                           ),
-                          child: Text('Web Design'),
-                          onPressed: () {},
                         ),
-                      ),
-                      Container(
-                        width: width * 0.5,
-                        height: 38.0,
-                        child: TextButton(
-                          style: ButtonStyle(
-                            shape: MaterialStateProperty.all(
-                                RoundedRectangleBorder(
-                              side: BorderSide(color: ColorsTheme.txtDescColor),
-                              borderRadius: BorderRadius.circular(14.0),
-                            )),
-                            foregroundColor:
-                                MaterialStateProperty.resolveWith<Color>(
-                                    (Set<MaterialState> states) {
-                              if (states.contains(MaterialState.hovered) ||
-                                  states.contains(MaterialState.focused))
+                        Container(
+                          width: width * 0.5,
+                          height: 38.0,
+                          child: TextButton(
+                            style: ButtonStyle(
+                              shape: MaterialStateProperty.all(
+                                  RoundedRectangleBorder(
+                                side:
+                                    BorderSide(color: ColorsTheme.txtDescColor),
+                                borderRadius: BorderRadius.circular(14.0),
+                              )),
+                              foregroundColor:
+                                  MaterialStateProperty.resolveWith<Color>(
+                                      (Set<MaterialState> states) {
+                                if (states.contains(MaterialState.hovered) ||
+                                    states.contains(MaterialState.focused))
+                                  return ColorsTheme.txtDescColor;
                                 return ColorsTheme.txtDescColor;
-                              return ColorsTheme.txtDescColor;
-                            }),
-                            backgroundColor:
-                                MaterialStateProperty.resolveWith<Color>(
-                                    (Set<MaterialState> states) {
-                              if (states.contains(MaterialState.hovered) ||
-                                  states.contains(MaterialState.focused))
-                                return ColorsTheme.bgColor;
+                              }),
+                              backgroundColor:
+                                  MaterialStateProperty.resolveWith<Color>(
+                                      (Set<MaterialState> states) {
+                                if (states.contains(MaterialState.hovered) ||
+                                    states.contains(MaterialState.focused))
+                                  return ColorsTheme.bgColor;
 
-                              return ColorsTheme.bgColor;
-                            }),
+                                return ColorsTheme.bgColor;
+                              }),
+                            ),
+                            child: Text('Laravel Development'),
+                            onPressed: () {},
                           ),
-                          child: Text('Laravel Development'),
-                          onPressed: () {},
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
-                ),
-                Container(
-                  margin: EdgeInsets.only(top: 40.0),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        children: [
-                          IconButton(
-                              onPressed: () {}, icon: Icon(Icons.camera_alt)),
-                          IconButton(onPressed: () {}, icon: Icon(Icons.image)),
-                          IconButton(
-                              onPressed: () {}, icon: Icon(Icons.attach_file)),
-                          GestureDetector(
-                              onTap: () {},
-                              child:
-                                  Image.asset('assets/add_assignee_icon.png'))
-                        ],
-                      ),
-                      Container(
-                        width: width * 0.3,
-                        height: 38.0,
-                        child: TextButton(
-                          style: ButtonStyle(
-                            shape: MaterialStateProperty.all(
-                                RoundedRectangleBorder(
-                              side: BorderSide(color: ColorsTheme.txtDescColor),
-                              borderRadius: BorderRadius.circular(14.0),
-                            )),
-                            foregroundColor:
-                                MaterialStateProperty.resolveWith<Color>(
-                                    (Set<MaterialState> states) {
-                              if (states.contains(MaterialState.hovered) ||
-                                  states.contains(MaterialState.focused))
-                                return ColorsTheme.txtDescColor;
-                              return ColorsTheme.txtDescColor;
-                            }),
-                            backgroundColor:
-                                MaterialStateProperty.resolveWith<Color>(
-                                    (Set<MaterialState> states) {
-                              if (states.contains(MaterialState.hovered) ||
-                                  states.contains(MaterialState.focused))
-                                return ColorsTheme.bgColor;
-
-                              return ColorsTheme.bgColor;
-                            }),
-                          ),
-                          child: Text('Create'),
-                          onPressed: () {},
+                  Container(
+                    margin: EdgeInsets.only(top: 40.0),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          children: [
+                            IconButton(
+                                onPressed: () {}, icon: Icon(Icons.camera_alt)),
+                            IconButton(
+                                onPressed: () {}, icon: Icon(Icons.image)),
+                            IconButton(
+                                onPressed: () {},
+                                icon: Icon(Icons.attach_file)),
+                            GestureDetector(
+                                onTap: () {},
+                                child:
+                                    Image.asset('assets/add_assignee_icon.png'))
+                          ],
                         ),
-                      ),
-                    ],
-                  ),
-                )
-              ],
-            ),
-          );
+                        Container(
+                          width: width * 0.3,
+                          height: 38.0,
+                          child: TextButton(
+                            style: ButtonStyle(
+                              shape: MaterialStateProperty.all(
+                                  RoundedRectangleBorder(
+                                side:
+                                    BorderSide(color: ColorsTheme.txtDescColor),
+                                borderRadius: BorderRadius.circular(14.0),
+                              )),
+                              foregroundColor:
+                                  MaterialStateProperty.resolveWith<Color>(
+                                      (Set<MaterialState> states) {
+                                if (states.contains(MaterialState.hovered) ||
+                                    states.contains(MaterialState.focused))
+                                  return ColorsTheme.txtDescColor;
+                                return ColorsTheme.txtDescColor;
+                              }),
+                              backgroundColor:
+                                  MaterialStateProperty.resolveWith<Color>(
+                                      (Set<MaterialState> states) {
+                                if (states.contains(MaterialState.hovered) ||
+                                    states.contains(MaterialState.focused))
+                                  return ColorsTheme.bgColor;
+
+                                return ColorsTheme.bgColor;
+                              }),
+                            ),
+                            child: Text('Create'),
+                            onPressed: () {},
+                          ),
+                        ),
+                      ],
+                    ),
+                  )
+                ],
+              ),
+            );
+          });
         });
-      });
+  });
 }
