@@ -175,8 +175,8 @@ class _LoginPageState extends State<LoginPage> {
                 height: 48.0,
                 child: TextButton(
                   onPressed: () {
-                    Navigator.of(context)
-                        .push(MaterialPageRoute(builder: (context) => Home()));
+                    Navigator.of(context).push(MaterialPageRoute(
+                        builder: (context) => Home(), fullscreenDialog: true));
                   },
                   style: ButtonStyle(
                       alignment: Alignment.center,
