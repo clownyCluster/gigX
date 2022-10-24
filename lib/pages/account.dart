@@ -4,6 +4,8 @@ import 'package:efleet_project_tree/login.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/src/widgets/container.dart';
 import 'package:flutter/src/widgets/framework.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class AccountTab extends StatelessWidget {
   const AccountTab({super.key});
@@ -32,6 +34,8 @@ class AccountTabPage extends StatefulWidget {
 }
 
 class _AccountTabPageState extends State<AccountTabPage> {
+  SharedPreferences? preferences;
+
   @override
   Widget build(BuildContext context) {
     height = MediaQuery.of(context).size.height;
@@ -124,12 +128,14 @@ class _AccountTabPageState extends State<AccountTabPage> {
                       : width * 0.90,
                   height: 58.0,
                   child: TextButton(
-                    onPressed: () {
+                    onPressed: () async {
                       Navigator.of(context, rootNavigator: true)
                           .pushAndRemoveUntil(
                         MaterialPageRoute(
                           builder: (BuildContext context) {
-                            return Login();
+                            return LoginPage(
+                              is_logged_out: true,
+                            );
                           },
                         ),
                         (_) => false,
