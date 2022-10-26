@@ -83,6 +83,7 @@ class _HomePageState extends State<HomePage> {
     width = MediaQuery.of(context).size.width;
 
     return CupertinoTabScaffold(
+        resizeToAvoidBottomInset: false,
         tabBar: CupertinoTabBar(
           key: globalKey,
           items: <BottomNavigationBarItem>[
