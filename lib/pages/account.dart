@@ -112,7 +112,7 @@ class _AccountTabPageState extends State<AccountTabPage> {
                 Container(
                   padding: EdgeInsets.only(left: 40.0),
                   child: Container(
-                      height: 270,
+                      height: 266,
                       width: width * 0.82,
                       decoration: BoxDecoration(
                           color: Color(0xffD3D3D3),
@@ -180,58 +180,69 @@ class _AccountTabPageState extends State<AccountTabPage> {
 }
 
 Widget showAccountListItems(BuildContext context) {
-  return ListView(
-    physics: NeverScrollableScrollPhysics(),
-    children: [
-      ListTile(
-        leading: Image.asset('assets/language_icon.png'),
-        title: new RichText(
-            text: TextSpan(children: [
-          new TextSpan(
-              text: 'Language \n',
-              style: TextStyle(
-                  fontSize: 16.0,
-                  fontWeight: FontWeight.w600,
-                  color: Colors.black)),
-          new TextSpan(
-              text: 'English',
-              style: TextStyle(
-                  color: ColorsTheme.txtDescColor,
-                  fontWeight: FontWeight.w400,
-                  fontSize: 14.0)),
-        ])),
-        trailing: Image.asset('assets/arrow_right.png'),
-      ),
-      ListTile(
-        leading: Image.asset('assets/privacy_policy_icon.png'),
-        title: Text(
-          'Privacy Policy',
-          style: TextStyle(
-              color: Colors.black, fontWeight: FontWeight.w600, fontSize: 16.0),
+  return MediaQuery.removePadding(
+    context: context,
+    removeTop: true,
+    removeBottom: true,
+    child: ListView(
+      physics: NeverScrollableScrollPhysics(),
+      children: [
+        ListTile(
+          leading: Image.asset('assets/language_icon.png'),
+          title: new RichText(
+              text: TextSpan(children: [
+            new TextSpan(
+                text: 'Language \n',
+                style: TextStyle(
+                    fontSize: 16.0,
+                    fontWeight: FontWeight.w600,
+                    color: Colors.black)),
+            new TextSpan(
+                text: 'English',
+                style: TextStyle(
+                    color: ColorsTheme.txtDescColor,
+                    fontWeight: FontWeight.w400,
+                    fontSize: 14.0)),
+          ])),
+          trailing: Image.asset('assets/arrow_right.png'),
         ),
-        trailing: Image.asset('assets/arrow_right.png'),
-      ),
-      ListTile(
-        leading: Image.asset('assets/terms_conditions_icon.png'),
-        title: Text(
-          'Terms & Conditions',
-          style: TextStyle(
-              color: Colors.black, fontWeight: FontWeight.w600, fontSize: 16.0),
+        ListTile(
+          leading: Image.asset('assets/privacy_policy_icon.png'),
+          title: Text(
+            'Privacy Policy',
+            style: TextStyle(
+                color: Colors.black,
+                fontWeight: FontWeight.w600,
+                fontSize: 16.0),
+          ),
+          trailing: Image.asset('assets/arrow_right.png'),
         ),
-        trailing: Image.asset('assets/arrow_right.png'),
-      ),
-      ListTile(
-        leading: Image(
-          image: AssetImage('assets/change_password_icon.png'),
+        ListTile(
+          leading: Image.asset('assets/terms_conditions_icon.png'),
+          title: Text(
+            'Terms & Conditions',
+            style: TextStyle(
+                color: Colors.black,
+                fontWeight: FontWeight.w600,
+                fontSize: 16.0),
+          ),
+          trailing: Image.asset('assets/arrow_right.png'),
         ),
-        title: Text(
-          'Change Password',
-          style: TextStyle(
-              color: Colors.black, fontWeight: FontWeight.w600, fontSize: 16.0),
+        ListTile(
+          leading: Image(
+            image: AssetImage('assets/change_password_icon.png'),
+          ),
+          title: Text(
+            'Change Password',
+            style: TextStyle(
+                color: Colors.black,
+                fontWeight: FontWeight.w600,
+                fontSize: 16.0),
+          ),
+          trailing: GestureDetector(
+              onTap: () {}, child: Image.asset('assets/arrow_right.png')),
         ),
-        trailing: GestureDetector(
-            onTap: () {}, child: Image.asset('assets/arrow_right.png')),
-      ),
-    ],
+      ],
+    ),
   );
 }

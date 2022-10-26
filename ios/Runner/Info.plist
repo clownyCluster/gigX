@@ -34,6 +34,12 @@
 	<string>LaunchScreen</string>
 	<key>UIMainStoryboardFile</key>
 	<string>Main</string>
+	<key>NSCameraUsageDescription</key>
+	<string>Granting access will allow you to add profile picture.</string>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>Allow access to microphone</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>Allow access to photo library to add profile picture</string>
 	<key>UISupportedInterfaceOrientations</key>
 	<array>
 		<string>UIInterfaceOrientationPortrait</string>
