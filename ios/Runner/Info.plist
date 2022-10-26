@@ -40,7 +40,10 @@
 	<string>Allow access to microphone</string>
 	<key>NSPhotoLibraryUsageDescription</key>
 	<string>Allow access to photo library to add profile picture</string>
+	<key>NSFaceIDUsageDescription</key>
+    <string>Authnticating for login in using face id?</string>
 	<key>UISupportedInterfaceOrientations</key>
+	
 	<array>
 		<string>UIInterfaceOrientationPortrait</string>
 		<string>UIInterfaceOrientationLandscapeLeft</string>

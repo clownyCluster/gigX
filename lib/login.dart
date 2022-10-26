@@ -1,4 +1,5 @@
 import 'dart:developer';
+import 'dart:io';
 
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:dio/dio.dart';
@@ -7,10 +8,12 @@ import 'package:efleet_project_tree/colors.dart';
 import 'package:efleet_project_tree/home.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter/src/widgets/container.dart';
 import 'package:flutter/src/widgets/framework.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:local_auth/local_auth.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class Login extends StatelessWidget {
@@ -52,6 +55,7 @@ class _LoginPageState extends State<LoginPage> {
   TextEditingController txtEmailController = new TextEditingController();
   TextEditingController txtPasswordController = new TextEditingController();
   final storage = new FlutterSecureStorage();
+  final LocalAuthentication auth = LocalAuthentication();
 
   @override
   void initState() {
@@ -139,6 +143,105 @@ class _LoginPageState extends State<LoginPage> {
         widget.is_logged_out == false) {
       Navigator.of(context).push(MaterialPageRoute(
           builder: (context) => Home(), fullscreenDialog: true));
+    }
+  }
+
+  Future<void> authenticateFaceID() async {
+    List<BiometricType> availableBiometrics =
+        await auth.getAvailableBiometrics();
+
+    bool isBiometricSupported = await auth.isDeviceSupported();
+
+    bool canCheckBiometrics = await auth.canCheckBiometrics;
+
+    try {
+      if (isBiometricSupported) {
+        print(isBiometricSupported);
+        print(canCheckBiometrics);
+
+        if (Platform.isIOS) {
+          bool pass = await auth.authenticate(
+              localizedReason: 'Authenticate with fingerprint',
+              options: AuthenticationOptions(
+                  biometricOnly: true,
+                  stickyAuth: true,
+                  useErrorDialogs: true));
+
+          if (pass) {
+            bool result;
+
+            result = await login();
+
+            if (result == true) {
+              Navigator.of(context, rootNavigator: true).pushAndRemoveUntil(
+                MaterialPageRoute(
+                  builder: (BuildContext context) {
+                    return const Home();
+                  },
+                ),
+                (_) => false,
+              );
+            } else
+              Fluttertoast.showToast(
+                  msg: "Something went wrong!",
+                  toastLength: Toast.LENGTH_SHORT,
+                  gravity: ToastGravity.CENTER,
+                  timeInSecForIosWeb: 1,
+                  backgroundColor: ColorsTheme.bgColor,
+                  textColor: Colors.white,
+                  fontSize: 16.0);
+          }
+        } else {
+          bool pass = await auth.authenticate(
+              localizedReason: 'Authenticate with fingerprint/face',
+              options: AuthenticationOptions(
+                  biometricOnly: true,
+                  stickyAuth: true,
+                  useErrorDialogs: true));
+          if (pass) {
+            bool result;
+
+            txtEmailController.text = await storage.read(key: 'email') ?? '';
+            txtPasswordController.text =
+                await storage.read(key: 'password') ?? '';
+
+            result = await login();
+
+            print(result);
+
+            if (result == true) {
+              Navigator.of(context, rootNavigator: true).pushAndRemoveUntil(
+                MaterialPageRoute(
+                  builder: (BuildContext context) {
+                    return const Home();
+                  },
+                ),
+                (_) => false,
+              );
+            }
+          } else {
+            Fluttertoast.showToast(
+                msg: "Something went wrong!",
+                toastLength: Toast.LENGTH_SHORT,
+                gravity: ToastGravity.CENTER,
+                timeInSecForIosWeb: 1,
+                backgroundColor: ColorsTheme.bgColor,
+                textColor: Colors.white,
+                fontSize: 16.0);
+          }
+        }
+      } else {
+        Fluttertoast.showToast(
+            msg: "Sorry! your device doesn't support face id",
+            toastLength: Toast.LENGTH_SHORT,
+            gravity: ToastGravity.BOTTOM,
+            timeInSecForIosWeb: 1,
+            backgroundColor: ColorsTheme.bgColor,
+            textColor: Colors.white,
+            fontSize: 16.0);
+      }
+    } on PlatformException catch (e) {
+      print('denied');
     }
   }
 
@@ -370,8 +473,13 @@ class _LoginPageState extends State<LoginPage> {
                       )
                     ]),
               ),
-              Center(
-                child: Image(image: AssetImage('assets/face_id_icon.png')),
+              GestureDetector(
+                onTap: () {
+                  authenticateFaceID();
+                },
+                child: Center(
+                  child: Image(image: AssetImage('assets/face_id_icon.png')),
+                ),
               )
             ]),
           ),
