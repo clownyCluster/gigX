@@ -58,8 +58,9 @@ class _TaskDetailsPageState extends State<TaskDetailsPage> {
                     Container(
                       child: IconButton(
                           onPressed: () async {
-                            Navigator.of(context).push(MaterialPageRoute(
-                                builder: (context) => ProjectDetails()));
+                            Navigator.of(context, rootNavigator: false).push(
+                                MaterialPageRoute(
+                                    builder: (context) => ProjectDetails()));
                           },
                           icon: Icon(
                             Icons.arrow_back,

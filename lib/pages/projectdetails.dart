@@ -9,10 +9,12 @@ import 'package:efleet_project_tree/pages/home.dart';
 import 'package:efleet_project_tree/pages/taskdetails.dart';
 import 'package:f_datetimerangepicker/f_datetimerangepicker.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:intl/intl.dart';
 import 'package:flutter/src/widgets/container.dart';
 import 'package:flutter/src/widgets/framework.dart';
+import 'package:lazy_load_scrollview/lazy_load_scrollview.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:syncfusion_flutter_sliders/sliders.dart';
 
@@ -43,10 +45,12 @@ var projects = [];
 var tasks = [];
 var tasks_duplicate = [];
 var project = [];
+var users = [];
 String _currentItemSelected = "Select Project";
 int project_id = 0;
 int priority_id = 0;
 int status_id = 0;
+int user_id = 0;
 String task_name = "";
 String task_desc = "";
 String start_date = "";
@@ -67,18 +71,44 @@ class ProjectDetailsPage extends StatefulWidget {
 class _ProjectDetailsPageState extends State<ProjectDetailsPage> {
   SharedPreferences? preferences;
   var formatted_end_date_with_month;
+  bool keyboardVisible = false;
+
+  List list = [];
+  int current_max = 4;
+  late ScrollController controller;
+
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
     pref();
     getTasks();
+    getUsers();
     getProjects();
+    KeyboardVisibilityController().onChange.listen((isVisible) {
+      setState(() {
+        keyboardVisible = isVisible;
+      });
+    });
     setState(() {
       inCompColor = Colors.black;
       compColor = Colors.black;
       inprogColor = Colors.black;
       todoColor = Colors.black;
+    });
+    controller = ScrollController();
+
+    list = List.generate(4, (index) => null);
+
+    controller.addListener(() {
+      if (controller.position.pixels == controller.position.maxScrollExtent) {
+        // pageNumber++;
+
+        setState(() {
+          getProjects();
+        }); // if add this, Reload your futurebuilder and load more data
+
+      }
     });
   }
 
@@ -140,6 +170,103 @@ class _ProjectDetailsPageState extends State<ProjectDetailsPage> {
     }
   }
 
+  show_loading() async {
+    setState(() {
+      is_loading = true;
+    });
+    Future.delayed(const Duration(seconds: 4), () {
+      setState(() {
+        is_loading = false;
+      });
+    });
+  }
+
+  Future<void> refreshAddTaskModal() async {
+    _addTaskModalBottomSheet(context);
+  }
+
+  int? selectedIndex;
+  Widget setupSelectProjectDialog() {
+    return Container(
+      height: 300.0, // Change as per your requirement
+      width: 300.0, // Change as per your requirement
+      child: Scrollbar(
+        thumbVisibility: true,
+        child: ListView.builder(
+          shrinkWrap: true,
+          itemCount: projects.length,
+          itemBuilder: (BuildContext context, int index) {
+            return InkWell(
+              onTap: () {
+                print(projects[index]['id']);
+                setState(() {
+                  selectedIndex = index;
+                  project_id = projects[index]['id'];
+                });
+                Navigator.of(context).pop();
+                Navigator.of(context).pop();
+                refreshAddTaskModal();
+              },
+              child: Container(
+                color: selectedIndex == index ? ColorsTheme.btnColor : null,
+                child: ListTile(
+                  title: Text(
+                    projects[index]['title'],
+                    style: TextStyle(
+                        color: selectedIndex == index
+                            ? Colors.white
+                            : Colors.black),
+                  ),
+                ),
+              ),
+            );
+          },
+        ),
+      ),
+    );
+  }
+
+  int? selectedIndex2;
+  Widget setupSelectUserDialog() {
+    return Container(
+      height: 300.0, // Change as per your requirement
+      width: 300.0, // Change as per your requirement
+      child: Scrollbar(
+        thumbVisibility: true,
+        child: ListView.builder(
+          shrinkWrap: true,
+          itemCount: users.length,
+          itemBuilder: (BuildContext context, int index) {
+            return InkWell(
+              onTap: () {
+                print(users[index]['id']);
+                setState(() {
+                  selectedIndex2 = index;
+                  user_id = users[index]['id'];
+                });
+                Navigator.of(context).pop();
+                Navigator.of(context).pop();
+                refreshAddTaskModal();
+              },
+              child: Container(
+                color: selectedIndex2 == index ? ColorsTheme.btnColor : null,
+                child: ListTile(
+                  title: Text(
+                    users[index]['username'],
+                    style: TextStyle(
+                        color: selectedIndex2 == index
+                            ? Colors.white
+                            : Colors.black),
+                  ),
+                ),
+              ),
+            );
+          },
+        ),
+      ),
+    );
+  }
+
   Future<void> getTasks() async {
     final _dio = Dio();
     is_loading = true;
@@ -168,6 +295,57 @@ class _ProjectDetailsPageState extends State<ProjectDetailsPage> {
             formatted_end_date_with_month = format.parse(element['end_date']);
             print(formatted_end_date_with_month);
           });
+        });
+      } else if (response.statusCode == 401) {
+        await this.preferences?.remove('access_token');
+        Navigator.of(context, rootNavigator: true).pushAndRemoveUntil(
+          MaterialPageRoute(
+            builder: (BuildContext context) {
+              return const Login();
+            },
+          ),
+          (_) => false,
+        );
+      }
+
+      return null;
+    } on DioError catch (e) {
+      if (e.response?.statusCode == 401) {
+        this.preferences?.setBool('someoneLoggedIn', true);
+        await this.preferences?.remove('access_token');
+        Navigator.of(context, rootNavigator: true).pushAndRemoveUntil(
+          MaterialPageRoute(
+            builder: (BuildContext context) {
+              return const Login();
+            },
+          ),
+          (_) => false,
+        );
+      }
+      return null;
+    }
+  }
+
+  Future<void> getUsers() async {
+    final _dio = Dio();
+
+    String? access_token;
+    this.preferences = await SharedPreferences.getInstance();
+    setState(() {
+      access_token = this.preferences?.getString('access_token');
+    });
+
+    try {
+      Response response = await _dio.get(API.base_url + 'users/select2',
+          options: Options(headers: {"authorization": "Bearer $access_token"}));
+      Map result = response.data;
+      print('Status Code ' + response.statusCode.toString());
+
+      if (response.statusCode == 200) {
+        this.preferences?.setBool('someoneLoggedIn', false);
+        setState(() {
+          users = response.data['data'];
+          print('These are users' + users.toString());
         });
       } else if (response.statusCode == 401) {
         await this.preferences?.remove('access_token');
@@ -251,52 +429,20 @@ class _ProjectDetailsPageState extends State<ProjectDetailsPage> {
                                   builder: (BuildContext context,
                                       StateSetter setState) {
                                     return AlertDialog(
-                                      // title:
-                                      //     new Text("Decline Appointment Request"),
                                       content: Column(
-                                          mainAxisSize: MainAxisSize.min,
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
-                                          children: <Widget>[
-                                            new Text(
-                                                "Please select a project."),
-                                            PopupMenuButton<dynamic>(
-                                              itemBuilder: (context) {
-                                                return projects.map((str) {
-                                                  return PopupMenuItem(
-                                                    value: str['id'],
-                                                    child: Text(str['title']),
-                                                  );
-                                                }).toList();
-                                              },
-                                              child: Row(
-                                                mainAxisSize: MainAxisSize.min,
-                                                children: <Widget>[
-                                                  Text(_currentItemSelected),
-                                                  Icon(Icons.arrow_drop_down),
-                                                ],
-                                              ),
-                                              onSelected: (v) {
-                                                setState(() {
-                                                  project_id = v;
-
-                                                  project = projects
-                                                      .where((element) =>
-                                                          element['id'] ==
-                                                          project_id)
-                                                      .toList();
-                                                  project.forEach((element) =>
-                                                      _currentItemSelected =
-                                                          element['title']);
-                                                  print(project_id);
-                                                  // projects.forEach((element) {
-                                                  //   _currentItemSelected =
-                                                  //       element['title'];
-                                                  // });
-                                                });
-                                              },
-                                            ),
-                                          ]),
+                                        mainAxisSize: MainAxisSize.min,
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          Text(
+                                            'Please select a project.',
+                                            style: TextStyle(
+                                                color: Colors.black,
+                                                fontWeight: FontWeight.w700),
+                                          ),
+                                          setupSelectProjectDialog(),
+                                        ],
+                                      ),
                                       actions: <Widget>[
                                         // usually buttons at the bottom of the dialog
                                         new TextButton(
@@ -319,7 +465,9 @@ class _ProjectDetailsPageState extends State<ProjectDetailsPage> {
                             ),
                           ),
                         ),
-                        AutoSizeText('Add Project')
+                        selectedIndex != null
+                            ? AutoSizeText('Project Selected')
+                            : AutoSizeText('Add Project')
                       ],
                     ),
                   ),
@@ -332,13 +480,56 @@ class _ProjectDetailsPageState extends State<ProjectDetailsPage> {
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.start,
                           children: [
-                            Container(
-                              padding: EdgeInsets.only(right: 20.0),
-                              child: Image(
-                                image: AssetImage('assets/unassigned_icon.png'),
+                            InkWell(
+                              onTap: () {
+                                showDialog(
+                                  context: context,
+                                  builder: (BuildContext context) {
+                                    return StatefulBuilder(
+                                      builder: (BuildContext context,
+                                          StateSetter setState) {
+                                        return AlertDialog(
+                                          content: Column(
+                                            mainAxisSize: MainAxisSize.min,
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: [
+                                              Text(
+                                                'Please select a user.',
+                                                style: TextStyle(
+                                                    color: Colors.black,
+                                                    fontWeight:
+                                                        FontWeight.w700),
+                                              ),
+                                              setupSelectUserDialog(),
+                                            ],
+                                          ),
+                                          actions: <Widget>[
+                                            // usually buttons at the bottom of the dialog
+                                            new TextButton(
+                                              child: new Text("Close"),
+                                              onPressed: () {
+                                                Navigator.of(context).pop();
+                                              },
+                                            ),
+                                          ],
+                                        );
+                                      },
+                                    );
+                                  },
+                                );
+                              },
+                              child: Container(
+                                padding: EdgeInsets.only(right: 20.0),
+                                child: Image(
+                                  image:
+                                      AssetImage('assets/unassigned_icon.png'),
+                                ),
                               ),
                             ),
-                            AutoSizeText('Unassigned'),
+                            selectedIndex2 != null
+                                ? AutoSizeText('Assigned')
+                                : AutoSizeText('Unassigned'),
                           ],
                         ),
                       ),
@@ -926,6 +1117,7 @@ class _ProjectDetailsPageState extends State<ProjectDetailsPage> {
     height = MediaQuery.of(context).size.height;
     width = MediaQuery.of(context).size.width;
     return Scaffold(
+      resizeToAvoidBottomInset: false,
       body: OrientationBuilder(builder: (context, orientation) {
         return SingleChildScrollView(
           child: Container(
@@ -1211,224 +1403,248 @@ class _ProjectDetailsPageState extends State<ProjectDetailsPage> {
                         ? height * 0.75
                         : height,
                     padding: EdgeInsets.only(left: 15.0),
-                    child: ListView.builder(
-                        itemCount: tasks.length,
-                        shrinkWrap: true,
-                        itemExtent: 300.0,
-                        itemBuilder: (BuildContext context, index) {
-                          return Container(
-                            margin: EdgeInsets.all(10),
-                            width: width,
-                            child: GestureDetector(
-                              onTap: () {
-                                Navigator.of(context, rootNavigator: true).push(
-                                    MaterialPageRoute(
-                                        builder: (context) => TaskDetails()));
-                              },
-                              child: Container(
-                                height: 180.0,
-                                decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(20.0),
-                                    border: Border.all(
-                                        color: Color(0xffEBEBEB), width: 2.0)),
-                                child: Column(children: [
-                                  Container(
-                                    padding: EdgeInsets.all(20.0),
-                                    child: Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.start,
-                                      children: [
-                                        SizedBox(
-                                          width: width * 0.4,
-                                          height: 40.0,
-                                          child: TextButton(
-                                            style: ButtonStyle(
-                                              shape: MaterialStateProperty.all(
-                                                  RoundedRectangleBorder(
-                                                borderRadius:
-                                                    BorderRadius.circular(30.0),
-                                              )),
-                                              foregroundColor:
-                                                  MaterialStateProperty
-                                                      .resolveWith<Color>((Set<
-                                                              MaterialState>
-                                                          states) {
-                                                if (states.contains(
-                                                        MaterialState
-                                                            .hovered) ||
-                                                    states.contains(
-                                                        MaterialState.focused))
+                    child: LazyLoadScrollView(
+                      onEndOfPage: () => show_loading(),
+                      child: ListView.builder(
+                          controller: controller,
+                          itemCount: list.length < tasks.length
+                              ? list.length + 1
+                              : tasks.length,
+                          shrinkWrap: true,
+                          itemExtent: 300.0,
+                          itemBuilder: (BuildContext context, index) {
+                            return Container(
+                              margin: EdgeInsets.all(10),
+                              width: width,
+                              child: GestureDetector(
+                                onTap: () {
+                                  Navigator.of(context, rootNavigator: true)
+                                      .push(MaterialPageRoute(
+                                          builder: (context) => TaskDetails()));
+                                },
+                                child: Container(
+                                  height: 180.0,
+                                  decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.circular(20.0),
+                                      border: Border.all(
+                                          color: Color(0xffEBEBEB),
+                                          width: 2.0)),
+                                  child: Column(children: [
+                                    Container(
+                                      padding: EdgeInsets.all(20.0),
+                                      child: Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.start,
+                                        children: [
+                                          SizedBox(
+                                            width: width * 0.4,
+                                            height: 40.0,
+                                            child: TextButton(
+                                              style: ButtonStyle(
+                                                shape:
+                                                    MaterialStateProperty.all(
+                                                        RoundedRectangleBorder(
+                                                  borderRadius:
+                                                      BorderRadius.circular(
+                                                          30.0),
+                                                )),
+                                                foregroundColor:
+                                                    MaterialStateProperty
+                                                        .resolveWith<Color>(
+                                                            (Set<MaterialState>
+                                                                states) {
+                                                  if (states.contains(
+                                                          MaterialState
+                                                              .hovered) ||
+                                                      states.contains(
+                                                          MaterialState
+                                                              .focused))
+                                                    return ColorsTheme
+                                                        .uIUxColor;
                                                   return ColorsTheme.uIUxColor;
-                                                return ColorsTheme.uIUxColor;
-                                              }),
-                                              backgroundColor:
-                                                  MaterialStateProperty
-                                                      .resolveWith<Color>((Set<
-                                                              MaterialState>
-                                                          states) {
-                                                if (states.contains(
-                                                        MaterialState
-                                                            .hovered) ||
-                                                    states.contains(
-                                                        MaterialState.focused))
+                                                }),
+                                                backgroundColor:
+                                                    MaterialStateProperty
+                                                        .resolveWith<Color>(
+                                                            (Set<MaterialState>
+                                                                states) {
+                                                  if (states.contains(
+                                                          MaterialState
+                                                              .hovered) ||
+                                                      states.contains(
+                                                          MaterialState
+                                                              .focused))
+                                                    return Colors
+                                                        .purple.shade100;
+
                                                   return Colors.purple.shade100;
-
-                                                return Colors.purple.shade100;
-                                              }),
+                                                }),
+                                              ),
+                                              child: Text(
+                                                tasks[index]['title'],
+                                                style: TextStyle(
+                                                    color:
+                                                        ColorsTheme.uIUxColor,
+                                                    fontSize: 12.0,
+                                                    fontWeight:
+                                                        FontWeight.w400),
+                                              ),
+                                              onPressed: () {},
                                             ),
-                                            child: Text(
-                                              tasks[index]['title'],
-                                              style: TextStyle(
-                                                  color: ColorsTheme.uIUxColor,
-                                                  fontSize: 12.0,
-                                                  fontWeight: FontWeight.w400),
-                                            ),
-                                            onPressed: () {},
                                           ),
-                                        ),
-                                        SizedBox(
-                                          width: 10.0,
-                                        ),
-                                        SizedBox(
-                                          width: width * 0.2,
-                                          height: 40.0,
-                                          child: TextButton(
-                                            style: ButtonStyle(
-                                              shape: MaterialStateProperty.all(
-                                                  RoundedRectangleBorder(
-                                                borderRadius:
-                                                    BorderRadius.circular(30.0),
-                                              )),
-                                              foregroundColor:
-                                                  MaterialStateProperty
-                                                      .resolveWith<Color>((Set<
-                                                              MaterialState>
-                                                          states) {
-                                                if (states.contains(
-                                                        MaterialState
-                                                            .hovered) ||
-                                                    states.contains(
-                                                        MaterialState.focused))
-                                                  return tasks[index]
-                                                              ['priority'] ==
-                                                          0
-                                                      ? ColorsTheme.compbtnColor
-                                                      : tasks[index][
-                                                                  'priority'] ==
-                                                              1
-                                                          ? ColorsTheme
-                                                              .inCompbtnColor
-                                                          : ColorsTheme
-                                                              .inProgbtnColor;
-                                                return ColorsTheme.uIUxColor;
-                                              }),
-                                              backgroundColor:
-                                                  MaterialStateProperty
-                                                      .resolveWith<Color>((Set<
-                                                              MaterialState>
-                                                          states) {
-                                                if (states.contains(
-                                                        MaterialState
-                                                            .hovered) ||
-                                                    states.contains(
-                                                        MaterialState.focused))
-                                                  return tasks[index]
-                                                              ['priority'] ==
-                                                          0
-                                                      ? ColorsTheme.compbtnColor
-                                                      : tasks[index][
-                                                                  'priority'] ==
-                                                              1
-                                                          ? ColorsTheme
-                                                              .inCompbtnColor
-                                                          : ColorsTheme
-                                                              .inProgbtnColor;
-                                                ;
+                                          SizedBox(
+                                            width: 10.0,
+                                          ),
+                                          SizedBox(
+                                            width: width * 0.2,
+                                            height: 40.0,
+                                            child: TextButton(
+                                              style: ButtonStyle(
+                                                shape:
+                                                    MaterialStateProperty.all(
+                                                        RoundedRectangleBorder(
+                                                  borderRadius:
+                                                      BorderRadius.circular(
+                                                          30.0),
+                                                )),
+                                                foregroundColor:
+                                                    MaterialStateProperty
+                                                        .resolveWith<Color>(
+                                                            (Set<MaterialState>
+                                                                states) {
+                                                  if (states.contains(
+                                                          MaterialState
+                                                              .hovered) ||
+                                                      states.contains(
+                                                          MaterialState
+                                                              .focused))
+                                                    return tasks[index]
+                                                                ['priority'] ==
+                                                            0
+                                                        ? ColorsTheme
+                                                            .compbtnColor
+                                                        : tasks[index][
+                                                                    'priority'] ==
+                                                                1
+                                                            ? ColorsTheme
+                                                                .inCompbtnColor
+                                                            : ColorsTheme
+                                                                .inProgbtnColor;
+                                                  return ColorsTheme.uIUxColor;
+                                                }),
+                                                backgroundColor:
+                                                    MaterialStateProperty
+                                                        .resolveWith<Color>(
+                                                            (Set<MaterialState>
+                                                                states) {
+                                                  if (states.contains(
+                                                          MaterialState
+                                                              .hovered) ||
+                                                      states.contains(
+                                                          MaterialState
+                                                              .focused))
+                                                    return tasks[index]
+                                                                ['priority'] ==
+                                                            0
+                                                        ? ColorsTheme
+                                                            .compbtnColor
+                                                        : tasks[index][
+                                                                    'priority'] ==
+                                                                1
+                                                            ? ColorsTheme
+                                                                .inCompbtnColor
+                                                            : ColorsTheme
+                                                                .inProgbtnColor;
+                                                  ;
 
-                                                return tasks[index]
-                                                            ['priority'] ==
-                                                        0
-                                                    ? Colors.green.shade100
+                                                  return tasks[index]
+                                                              ['priority'] ==
+                                                          0
+                                                      ? Colors.green.shade100
+                                                      : tasks[index][
+                                                                  'priority'] ==
+                                                              1
+                                                          ? Colors.red.shade100
+                                                          : Colors
+                                                              .orange.shade100;
+                                                }),
+                                              ),
+                                              child: Text(
+                                                tasks[index]['priority'] == 0
+                                                    ? 'Low'
                                                     : tasks[index]
                                                                 ['priority'] ==
                                                             1
-                                                        ? Colors.red.shade100
-                                                        : Colors
-                                                            .orange.shade100;
-                                              }),
+                                                        ? 'High'
+                                                        : 'Urgent',
+                                                style: TextStyle(
+                                                    color: tasks[index]
+                                                                ['priority'] ==
+                                                            0
+                                                        ? ColorsTheme
+                                                            .compbtnColor
+                                                        : tasks[index][
+                                                                    'priority'] ==
+                                                                1
+                                                            ? ColorsTheme
+                                                                .inCompbtnColor
+                                                            : ColorsTheme
+                                                                .inProgbtnColor,
+                                                    fontSize: 12.0,
+                                                    fontWeight:
+                                                        FontWeight.w400),
+                                              ),
+                                              onPressed: () {},
                                             ),
-                                            child: Text(
-                                              tasks[index]['priority'] == 0
-                                                  ? 'Low'
-                                                  : tasks[index]['priority'] ==
-                                                          1
-                                                      ? 'High'
-                                                      : 'Urgent',
-                                              style: TextStyle(
-                                                  color: tasks[index]
-                                                              ['priority'] ==
-                                                          0
-                                                      ? ColorsTheme.compbtnColor
-                                                      : tasks[index][
-                                                                  'priority'] ==
-                                                              1
-                                                          ? ColorsTheme
-                                                              .inCompbtnColor
-                                                          : ColorsTheme
-                                                              .inProgbtnColor,
-                                                  fontSize: 12.0,
-                                                  fontWeight: FontWeight.w400),
-                                            ),
-                                            onPressed: () {},
+                                          )
+                                        ],
+                                      ),
+                                    ),
+                                    Container(
+                                      alignment: Alignment.centerLeft,
+                                      margin: EdgeInsets.all(20.0),
+                                      height: 60,
+                                      decoration: BoxDecoration(
+                                          border: Border(
+                                              bottom: BorderSide(
+                                                  color: Colors.black))),
+                                      child: Text(
+                                        tasks[index]['description'],
+                                        style: TextStyle(
+                                            fontWeight: FontWeight.w600,
+                                            fontSize: 18.0),
+                                      ),
+                                    ),
+                                    Row(
+                                      children: [
+                                        Container(
+                                          padding: EdgeInsets.all(20.0),
+                                          child: Row(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.start,
+                                            children: [
+                                              Image.asset(
+                                                  'assets/due_date_icon.png'),
+                                              SizedBox(
+                                                width: 10.0,
+                                              ),
+                                              if (formatted_end_date_with_month !=
+                                                  null)
+                                                Text(DateFormat(
+                                                        'EEEE, d MMM, yyyy')
+                                                    .format(
+                                                        formatted_end_date_with_month!))
+                                            ],
                                           ),
                                         )
                                       ],
-                                    ),
-                                  ),
-                                  Container(
-                                    alignment: Alignment.centerLeft,
-                                    margin: EdgeInsets.all(20.0),
-                                    height: 60,
-                                    decoration: BoxDecoration(
-                                        border: Border(
-                                            bottom: BorderSide(
-                                                color: Colors.black))),
-                                    child: Text(
-                                      tasks[index]['description'],
-                                      style: TextStyle(
-                                          fontWeight: FontWeight.w600,
-                                          fontSize: 18.0),
-                                    ),
-                                  ),
-                                  Row(
-                                    children: [
-                                      Container(
-                                        padding: EdgeInsets.all(20.0),
-                                        child: Row(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.start,
-                                          children: [
-                                            Image.asset(
-                                                'assets/due_date_icon.png'),
-                                            SizedBox(
-                                              width: 10.0,
-                                            ),
-                                            if (formatted_end_date_with_month !=
-                                                null)
-                                              Text(DateFormat(
-                                                      'EEEE, d MMM, yyyy')
-                                                  .format(
-                                                      formatted_end_date_with_month!))
-                                          ],
-                                        ),
-                                      )
-                                    ],
-                                  )
-                                ]),
+                                    )
+                                  ]),
+                                ),
                               ),
-                            ),
-                          );
-                        }),
+                            );
+                          }),
+                    ),
                   ),
                 if (is_loading == true && tasks.isEmpty)
                   Container(
@@ -1454,17 +1670,20 @@ class _ProjectDetailsPageState extends State<ProjectDetailsPage> {
           ),
         );
       }),
-      floatingActionButton: GestureDetector(
-        onTap: () {
-          _addTaskModalBottomSheet(context);
-        },
-        child: Container(
-          margin: EdgeInsets.only(bottom: 40.0),
-          height: 90,
-          width: 90,
-          decoration: BoxDecoration(
-              image: DecorationImage(
-                  image: AssetImage('assets/plus_floating_button.png'))),
+      floatingActionButton: Visibility(
+        visible: !keyboardVisible,
+        child: GestureDetector(
+          onTap: () {
+            _addTaskModalBottomSheet(context);
+          },
+          child: Container(
+            margin: EdgeInsets.only(bottom: 40.0),
+            height: 90,
+            width: 90,
+            decoration: BoxDecoration(
+                image: DecorationImage(
+                    image: AssetImage('assets/plus_floating_button.png'))),
+          ),
         ),
       ),
     );
@@ -1614,7 +1833,8 @@ Future<bool> saveTask() async {
       'percent_done': _percent,
       'project_id': project_id,
       'priority': priority_id,
-      'category': status_id
+      'category': status_id,
+      'assign_to': user_id
     });
     Response response = await _dio.post(API.base_url + 'todos',
         data: formData,

@@ -32,7 +32,9 @@ class TaskTab extends StatelessWidget {
   }
 }
 
-String subject = "Create a Landing Page";
+String subject = "";
+String formatted_start_time = "";
+String formatted_end_time = "";
 final CalendarController _controller = CalendarController();
 String _text = '';
 final DateTime today = DateTime.now();
@@ -50,14 +52,28 @@ class TaskTabPage extends StatefulWidget {
 List<Appointment> getAppointments() {
   List<Appointment> meetings = <Appointment>[];
 
-  meetings.add(Appointment(
-      startTime: startTime,
-      endTime: endTime,
-      subject: subject,
-      color: ColorsTheme.aptBox,
+  tasks.forEach((element) {
+    // DateTime startDate = DateTime.parse(element['start_date']);
+    DateTime tempStartDateTime =
+        new DateFormat("dd/MM/yyyy HH:mm").parse(element['start_date']);
 
-      // recurrenceRule: 'FREQ=DAILY;COUNT=10',
-      isAllDay: false));
+    subject = element['title'];
+
+    DateTime tempEndDateTime =
+        new DateFormat("dd/MM/yyyy HH:mm").parse(element['end_date']);
+    formatted_start_time = DateFormat.Hm().format(tempStartDateTime);
+    formatted_end_time = DateFormat.Hm().format(tempEndDateTime);
+    print(formatted_start_time);
+    meetings.add(Appointment(
+        startTime: DateFormat("dd/MM/yyyy HH:mm").parse(element['start_date']),
+        endTime: DateFormat("dd/MM/yyyy HH:mm").parse(element['end_date']),
+        subject: element['title'],
+        color: ColorsTheme.aptBox,
+        id: element['id'],
+
+        // recurrenceRule: 'FREQ=DAILY;COUNT=10',
+        isAllDay: false));
+  });
 
   return meetings;
 }
@@ -75,12 +91,13 @@ Color inprogColor = Colors.black;
 double _percent = 40.0;
 var projects = [];
 var project = [];
-
+var users = [];
 var tasks = [];
 String _currentItemSelected = "Select Project";
 int project_id = 0;
 int priority_id = 0;
 int status_id = 0;
+int user_id = 0;
 String task_name = "";
 String task_desc = "";
 String start_date = "";
@@ -99,7 +116,8 @@ class _TaskTabPageState extends State<TaskTabPage> {
     super.initState();
     pref();
     getProjects();
-    getTasks();
+    getUsers();
+    getUserTasks();
     setState(() {
       inCompColor = Colors.black;
       compColor = Colors.black;
@@ -112,7 +130,7 @@ class _TaskTabPageState extends State<TaskTabPage> {
     access_token = this.preferences?.getString('access_token');
   }
 
-  Future<void> getTasks() async {
+  Future<void> getUserTasks() async {
     final _dio = Dio();
     is_loading = true;
     String? access_token;
@@ -123,8 +141,7 @@ class _TaskTabPageState extends State<TaskTabPage> {
     });
 
     try {
-      Response response = await _dio.get(
-          API.base_url + 'todos/',
+      Response response = await _dio.get(API.base_url + 'my/todos',
           options: Options(headers: {"authorization": "Bearer $access_token"}));
       Map result = response.data;
 
@@ -136,6 +153,8 @@ class _TaskTabPageState extends State<TaskTabPage> {
           tasks.forEach((element) {
             print(element['end_date']);
           });
+
+          print('These are user tasks' + tasks.toString());
         });
       } else if (response.statusCode == 401) {
         await this.preferences?.remove('access_token');
@@ -167,8 +186,12 @@ class _TaskTabPageState extends State<TaskTabPage> {
     }
   }
 
+  Future<void> refreshAddTaskModal() async {
+    _addTaskModalBottomSheet(context);
+  }
+
   int? selectedIndex;
-  Widget setupAlertDialoadContainer() {
+  Widget setupSelectProjectDialog() {
     return Container(
       height: 300.0, // Change as per your requirement
       width: 300.0, // Change as per your requirement
@@ -186,6 +209,8 @@ class _TaskTabPageState extends State<TaskTabPage> {
                   project_id = projects[index]['id'];
                 });
                 Navigator.of(context).pop();
+                Navigator.of(context).pop();
+                refreshAddTaskModal();
               },
               child: Container(
                 color: selectedIndex == index ? ColorsTheme.btnColor : null,
@@ -194,6 +219,47 @@ class _TaskTabPageState extends State<TaskTabPage> {
                     projects[index]['title'],
                     style: TextStyle(
                         color: selectedIndex == index
+                            ? Colors.white
+                            : Colors.black),
+                  ),
+                ),
+              ),
+            );
+          },
+        ),
+      ),
+    );
+  }
+
+  int? selectedIndex2;
+  Widget setupSelectUserDialog() {
+    return Container(
+      height: 300.0, // Change as per your requirement
+      width: 300.0, // Change as per your requirement
+      child: Scrollbar(
+        thumbVisibility: true,
+        child: ListView.builder(
+          shrinkWrap: true,
+          itemCount: users.length,
+          itemBuilder: (BuildContext context, int index) {
+            return InkWell(
+              onTap: () {
+                print(users[index]['id']);
+                setState(() {
+                  selectedIndex2 = index;
+                  user_id = users[index]['id'];
+                });
+                Navigator.of(context).pop();
+                Navigator.of(context).pop();
+                refreshAddTaskModal();
+              },
+              child: Container(
+                color: selectedIndex2 == index ? ColorsTheme.btnColor : null,
+                child: ListTile(
+                  title: Text(
+                    users[index]['username'],
+                    style: TextStyle(
+                        color: selectedIndex2 == index
                             ? Colors.white
                             : Colors.black),
                   ),
@@ -226,7 +292,6 @@ class _TaskTabPageState extends State<TaskTabPage> {
         setState(() {
           projects = response.data['data'];
         });
-        print(projects);
       } else if (response.statusCode == 401) {
         await this.preferences?.remove('access_token');
         Navigator.of(context, rootNavigator: true).pushAndRemoveUntil(
@@ -254,6 +319,65 @@ class _TaskTabPageState extends State<TaskTabPage> {
         );
       }
       return null;
+    }
+  }
+
+  Future<void> getUsers() async {
+    final _dio = Dio();
+
+    String? access_token;
+    this.preferences = await SharedPreferences.getInstance();
+    setState(() {
+      access_token = this.preferences?.getString('access_token');
+    });
+
+    try {
+      Response response = await _dio.get(API.base_url + 'users/select2',
+          options: Options(headers: {"authorization": "Bearer $access_token"}));
+      Map result = response.data;
+      print('Status Code ' + response.statusCode.toString());
+
+      if (response.statusCode == 200) {
+        this.preferences?.setBool('someoneLoggedIn', false);
+        setState(() {
+          users = response.data['data'];
+        });
+      } else if (response.statusCode == 401) {
+        await this.preferences?.remove('access_token');
+        Navigator.of(context, rootNavigator: true).pushAndRemoveUntil(
+          MaterialPageRoute(
+            builder: (BuildContext context) {
+              return const Login();
+            },
+          ),
+          (_) => false,
+        );
+      }
+
+      return null;
+    } on DioError catch (e) {
+      if (e.response?.statusCode == 401) {
+        this.preferences?.setBool('someoneLoggedIn', true);
+        await this.preferences?.remove('access_token');
+        Navigator.of(context, rootNavigator: true).pushAndRemoveUntil(
+          MaterialPageRoute(
+            builder: (BuildContext context) {
+              return const Login();
+            },
+          ),
+          (_) => false,
+        );
+      }
+      return null;
+    }
+  }
+
+  void calendarTapped(CalendarTapDetails calendarTapDetails) {
+    if (calendarTapDetails.targetElement == CalendarElement.appointment) {
+      Appointment appointment = calendarTapDetails.appointments![0];
+      int task_id = appointment.id as int;
+      print(task_id);
+      _updateTaskModalBottomSheet(context, task_id);
     }
   }
 
@@ -321,7 +445,7 @@ class _TaskTabPageState extends State<TaskTabPage> {
                                                   color: Colors.black,
                                                   fontWeight: FontWeight.w700),
                                             ),
-                                            setupAlertDialoadContainer(),
+                                            setupSelectProjectDialog(),
                                           ],
                                         ),
                                         // content: Column(
@@ -388,7 +512,9 @@ class _TaskTabPageState extends State<TaskTabPage> {
                               ),
                             ),
                           ),
-                          AutoSizeText('Add Project')
+                          project_id != 0
+                              ? AutoSizeText('Project Selected')
+                              : AutoSizeText('Add Project')
                         ],
                       ),
                     ),
@@ -401,14 +527,56 @@ class _TaskTabPageState extends State<TaskTabPage> {
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.start,
                             children: [
-                              Container(
-                                padding: EdgeInsets.only(right: 20.0),
-                                child: Image(
-                                  image:
-                                      AssetImage('assets/unassigned_icon.png'),
+                              InkWell(
+                                onTap: () {
+                                  showDialog(
+                                    context: context,
+                                    builder: (BuildContext context) {
+                                      return StatefulBuilder(
+                                        builder: (BuildContext context,
+                                            StateSetter setState) {
+                                          return AlertDialog(
+                                            content: Column(
+                                              mainAxisSize: MainAxisSize.min,
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
+                                              children: [
+                                                Text(
+                                                  'Please select a user.',
+                                                  style: TextStyle(
+                                                      color: Colors.black,
+                                                      fontWeight:
+                                                          FontWeight.w700),
+                                                ),
+                                                setupSelectUserDialog(),
+                                              ],
+                                            ),
+                                            actions: <Widget>[
+                                              // usually buttons at the bottom of the dialog
+                                              new TextButton(
+                                                child: new Text("Close"),
+                                                onPressed: () {
+                                                  Navigator.of(context).pop();
+                                                },
+                                              ),
+                                            ],
+                                          );
+                                        },
+                                      );
+                                    },
+                                  );
+                                },
+                                child: Container(
+                                  padding: EdgeInsets.only(right: 20.0),
+                                  child: Image(
+                                    image: AssetImage(
+                                        'assets/unassigned_icon.png'),
+                                  ),
                                 ),
                               ),
-                              AutoSizeText('Unassigned'),
+                              user_id != 0
+                                  ? AutoSizeText('Assigned')
+                                  : AutoSizeText('Unassigned'),
                             ],
                           ),
                         ),
@@ -954,9 +1122,751 @@ class _TaskTabPageState extends State<TaskTabPage> {
                                       formatted_end_date = '';
                                     });
                                     Navigator.of(context).pop();
-                                    // getTasks();
+                                    getUserTasks();
                                     Fluttertoast.showToast(
                                         msg: "Task Added!",
+                                        toastLength: Toast.LENGTH_SHORT,
+                                        gravity: ToastGravity.CENTER,
+                                        timeInSecForIosWeb: 1,
+                                        backgroundColor: ColorsTheme.btnColor,
+                                        textColor: Colors.white,
+                                        fontSize: 16.0);
+                                  } else
+                                    Fluttertoast.showToast(
+                                        msg: "Something went wrong!",
+                                        toastLength: Toast.LENGTH_SHORT,
+                                        gravity: ToastGravity.CENTER,
+                                        timeInSecForIosWeb: 1,
+                                        backgroundColor:
+                                            ColorsTheme.dangerColor,
+                                        textColor: Colors.white,
+                                        fontSize: 16.0);
+                                } else
+                                  Fluttertoast.showToast(
+                                      msg: "Any field is missing!",
+                                      toastLength: Toast.LENGTH_SHORT,
+                                      gravity: ToastGravity.CENTER,
+                                      timeInSecForIosWeb: 1,
+                                      backgroundColor: ColorsTheme.dangerColor,
+                                      textColor: Colors.white,
+                                      fontSize: 16.0);
+                              },
+                            ),
+                          ),
+                        ],
+                      ),
+                    )
+                  ],
+                ),
+              );
+            });
+          });
+    });
+  }
+
+  void _updateTaskModalBottomSheet(BuildContext context, int task_id) async {
+    Future.delayed(Duration.zero, () {
+      showModalBottomSheet(
+          context: context,
+          isScrollControlled: true,
+          useRootNavigator: true,
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(14.0)),
+          builder: (context) {
+            return StatefulBuilder(builder: (BuildContext context,
+                StateSetter setState /*You can rename this!*/) {
+              return Container(
+                height: 700.0,
+                padding: EdgeInsets.all(20.0),
+                child: ListView(
+                  // crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Container(
+                      child: Text(
+                        'Task Name',
+                        style: TextStyle(
+                            color: Colors.black,
+                            fontWeight: FontWeight.w600,
+                            fontSize: 14.0),
+                      ),
+                    ),
+                    Container(
+                      child: TextField(
+                        onChanged: (value) {
+                          setState(() {
+                            task_name = value.toString();
+                          });
+                        },
+                        decoration: InputDecoration(
+                          hintText: 'Name',
+                        ),
+                      ),
+                    ),
+                    Container(
+                      margin: EdgeInsets.only(
+                          top: 20.0, left: 5.0, bottom: 20.0, right: 5.0),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        children: [
+                          InkWell(
+                            onTap: () {
+                              showDialog(
+                                context: context,
+                                builder: (BuildContext context) {
+                                  return StatefulBuilder(
+                                    builder: (BuildContext context,
+                                        StateSetter setState) {
+                                      return AlertDialog(
+                                        content: Column(
+                                          mainAxisSize: MainAxisSize.min,
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            Text(
+                                              'Please select a project.',
+                                              style: TextStyle(
+                                                  color: Colors.black,
+                                                  fontWeight: FontWeight.w700),
+                                            ),
+                                            setupSelectProjectDialog(),
+                                          ],
+                                        ),
+                                        actions: <Widget>[
+                                          // usually buttons at the bottom of the dialog
+                                          new TextButton(
+                                            child: new Text("Close"),
+                                            onPressed: () {
+                                              Navigator.of(context).pop();
+                                            },
+                                          ),
+                                        ],
+                                      );
+                                    },
+                                  );
+                                },
+                              );
+                            },
+                            child: Container(
+                              padding: EdgeInsets.only(right: 20.0),
+                              child: Image(
+                                image:
+                                    AssetImage('assets/plus_add_project.png'),
+                              ),
+                            ),
+                          ),
+                          project_id != 0
+                              ? AutoSizeText('Project Selected')
+                              : AutoSizeText('Add Project')
+                        ],
+                      ),
+                    ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Container(
+                          margin: EdgeInsets.only(
+                              top: 20.0, left: 5.0, bottom: 20.0, right: 5.0),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            children: [
+                              InkWell(
+                                onTap: () {
+                                  showDialog(
+                                    context: context,
+                                    builder: (BuildContext context) {
+                                      return StatefulBuilder(
+                                        builder: (BuildContext context,
+                                            StateSetter setState) {
+                                          return AlertDialog(
+                                            content: Column(
+                                              mainAxisSize: MainAxisSize.min,
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
+                                              children: [
+                                                Text(
+                                                  'Please select a user.',
+                                                  style: TextStyle(
+                                                      color: Colors.black,
+                                                      fontWeight:
+                                                          FontWeight.w700),
+                                                ),
+                                                setupSelectUserDialog(),
+                                              ],
+                                            ),
+                                            actions: <Widget>[
+                                              // usually buttons at the bottom of the dialog
+                                              new TextButton(
+                                                child: new Text("Close"),
+                                                onPressed: () {
+                                                  Navigator.of(context).pop();
+                                                },
+                                              ),
+                                            ],
+                                          );
+                                        },
+                                      );
+                                    },
+                                  );
+                                },
+                                child: Container(
+                                  padding: EdgeInsets.only(right: 20.0),
+                                  child: Image(
+                                    image: AssetImage(
+                                        'assets/unassigned_icon.png'),
+                                  ),
+                                ),
+                              ),
+                              user_id != 0
+                                  ? AutoSizeText('Assigned')
+                                  : AutoSizeText('Unassigned'),
+                            ],
+                          ),
+                        ),
+                        GestureDetector(
+                          onTap: () async {
+                            DateTimeRangePicker(
+                                startText: "From",
+                                endText: "To",
+                                doneText: "Yes",
+                                cancelText: "Cancel",
+                                interval: 5,
+                                initialStartTime: DateTime.now(),
+                                initialEndTime:
+                                    DateTime.now().add(Duration(days: 20)),
+                                mode: DateTimeRangePickerMode.dateAndTime,
+                                minimumTime: DateTime.now()
+                                    .subtract(Duration(days: 120)),
+                                maximumTime:
+                                    DateTime.now().add(Duration(days: 365)),
+                                use24hFormat: false,
+                                onConfirm: (start, end) {
+                                  formatted_start_date =
+                                      DateFormat('dd/MM/yyyy HH:mm')
+                                          .format(start);
+                                  formatted_end_date =
+                                      DateFormat('dd/MM/yyyy HH:mm')
+                                          .format(end);
+                                  print(formatted_start_date);
+                                  print(formatted_end_date);
+                                }).showPicker(context);
+                          },
+                          child: Container(
+                            margin: EdgeInsets.only(
+                                top: 20.0, left: 5.0, bottom: 20.0, right: 5.0),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              children: [
+                                Container(
+                                  padding: EdgeInsets.only(right: 20.0),
+                                  child: Image(
+                                    image:
+                                        AssetImage('assets/due_date_icon.png'),
+                                  ),
+                                ),
+                                AutoSizeText('Due Date'),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    Container(
+                      child: Text(
+                        'Description',
+                        style: TextStyle(
+                            color: Colors.black,
+                            fontWeight: FontWeight.w600,
+                            fontSize: 14.0),
+                      ),
+                    ),
+                    Container(
+                      child: TextField(
+                        onChanged: (value) {
+                          setState(() {
+                            task_desc = value.toString();
+                          });
+                        },
+                        decoration: InputDecoration(
+                          hintText: 'Type here',
+                        ),
+                      ),
+                    ),
+                    Container(
+                      child: Text(
+                        'Percent Done',
+                        style: TextStyle(
+                            color: Colors.black,
+                            fontWeight: FontWeight.w600,
+                            fontSize: 14.0),
+                      ),
+                    ),
+                    Container(
+                      child: SfSlider(
+                        min: 0.0,
+                        max: 100.0,
+                        value: _percent,
+                        activeColor: ColorsTheme.btnColor,
+                        interval: 20,
+                        showTicks: true,
+                        showLabels: true,
+                        enableTooltip: true,
+                        minorTicksPerInterval: 1,
+                        onChanged: (dynamic value) {
+                          setState(() {
+                            // print(value);
+                            _percent = value;
+                          });
+                        },
+                      ),
+                    ),
+                    Container(
+                      margin: EdgeInsets.only(top: 10.0),
+                      child: Text(
+                        'Priority',
+                        style: TextStyle(
+                            color: Colors.black,
+                            fontWeight: FontWeight.w600,
+                            fontSize: 14.0),
+                      ),
+                    ),
+                    Container(
+                      margin: EdgeInsets.only(top: 10.0),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Container(
+                            width: width * 0.23,
+                            height: 38.0,
+                            child: TextButton(
+                              style: ButtonStyle(
+                                shape: MaterialStateProperty.all(
+                                    RoundedRectangleBorder(
+                                  side: BorderSide(
+                                      color: priority_id == 0
+                                          ? Colors.white
+                                          : ColorsTheme.txtDescColor),
+                                  borderRadius: BorderRadius.circular(14.0),
+                                )),
+                                foregroundColor:
+                                    MaterialStateProperty.resolveWith<Color>(
+                                        (Set<MaterialState> states) {
+                                  if (states.contains(MaterialState.hovered) ||
+                                      states.contains(MaterialState.focused))
+                                    return priority_id == 0
+                                        ? Colors.white
+                                        : ColorsTheme.txtDescColor;
+                                  return priority_id == 0
+                                      ? Colors.white
+                                      : ColorsTheme.txtDescColor;
+                                }),
+                                backgroundColor:
+                                    MaterialStateProperty.resolveWith<Color>(
+                                        (Set<MaterialState> states) {
+                                  if (states.contains(MaterialState.hovered) ||
+                                      states.contains(MaterialState.focused))
+                                    return priority_id == 0
+                                        ? ColorsTheme.compbtnColor
+                                        : ColorsTheme.bgColor;
+
+                                  return priority_id == 0
+                                      ? ColorsTheme.compbtnColor
+                                      : ColorsTheme.bgColor;
+                                }),
+                              ),
+                              child: Text('Low'),
+                              onPressed: () {
+                                setState(() {
+                                  priority_id = 0;
+                                });
+                              },
+                            ),
+                          ),
+                          Container(
+                            width: width * 0.23,
+                            height: 38.0,
+                            child: TextButton(
+                              style: ButtonStyle(
+                                shape: MaterialStateProperty.all(
+                                    RoundedRectangleBorder(
+                                  side: BorderSide(
+                                      color: priority_id == 1
+                                          ? Colors.white
+                                          : ColorsTheme.txtDescColor),
+                                  borderRadius: BorderRadius.circular(14.0),
+                                )),
+                                foregroundColor:
+                                    MaterialStateProperty.resolveWith<Color>(
+                                        (Set<MaterialState> states) {
+                                  if (states.contains(MaterialState.hovered) ||
+                                      states.contains(MaterialState.focused))
+                                    return priority_id == 1
+                                        ? Colors.white
+                                        : ColorsTheme.txtDescColor;
+                                  return priority_id == 1
+                                      ? Colors.white
+                                      : ColorsTheme.txtDescColor;
+                                }),
+                                backgroundColor:
+                                    MaterialStateProperty.resolveWith<Color>(
+                                        (Set<MaterialState> states) {
+                                  if (states.contains(MaterialState.hovered) ||
+                                      states.contains(MaterialState.focused))
+                                    return priority_id == 1
+                                        ? ColorsTheme.inCompbtnColor
+                                        : ColorsTheme.bgColor;
+
+                                  return priority_id == 1
+                                      ? ColorsTheme.inCompbtnColor
+                                      : ColorsTheme.bgColor;
+                                }),
+                              ),
+                              child: Text('High'),
+                              onPressed: () {
+                                setState(() {
+                                  priority_id = 1;
+                                });
+                              },
+                            ),
+                          ),
+                          Container(
+                            width: width * 0.23,
+                            height: 38.0,
+                            child: TextButton(
+                              style: ButtonStyle(
+                                shape: MaterialStateProperty.all(
+                                    RoundedRectangleBorder(
+                                  side: BorderSide(
+                                      color: priority_id == 2
+                                          ? Colors.white
+                                          : ColorsTheme.txtDescColor),
+                                  borderRadius: BorderRadius.circular(14.0),
+                                )),
+                                foregroundColor:
+                                    MaterialStateProperty.resolveWith<Color>(
+                                        (Set<MaterialState> states) {
+                                  if (states.contains(MaterialState.hovered) ||
+                                      states.contains(MaterialState.focused))
+                                    return priority_id == 2
+                                        ? Colors.white
+                                        : ColorsTheme.txtDescColor;
+                                  return priority_id == 2
+                                      ? Colors.white
+                                      : ColorsTheme.txtDescColor;
+                                }),
+                                backgroundColor:
+                                    MaterialStateProperty.resolveWith<Color>(
+                                        (Set<MaterialState> states) {
+                                  if (states.contains(MaterialState.hovered) ||
+                                      states.contains(MaterialState.focused))
+                                    return priority_id == 2
+                                        ? ColorsTheme.inProgbtnColor
+                                        : ColorsTheme.bgColor;
+
+                                  return priority_id == 2
+                                      ? ColorsTheme.inProgbtnColor
+                                      : ColorsTheme.bgColor;
+                                }),
+                              ),
+                              child: Text('Urgent'),
+                              onPressed: () {
+                                setState(() {
+                                  priority_id = 2;
+                                });
+                              },
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    Container(
+                      margin: EdgeInsets.only(top: 10.0),
+                      child: Text(
+                        'Status',
+                        style: TextStyle(
+                            color: Colors.black,
+                            fontWeight: FontWeight.w600,
+                            fontSize: 14.0),
+                      ),
+                    ),
+                    Container(
+                      margin: EdgeInsets.only(top: 10.0),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Container(
+                            width: width * 0.32,
+                            height: 38.0,
+                            child: TextButton(
+                              style: ButtonStyle(
+                                shape: MaterialStateProperty.all(
+                                    RoundedRectangleBorder(
+                                  side: BorderSide(
+                                      color: status_id == 0
+                                          ? Colors.white
+                                          : ColorsTheme.txtDescColor),
+                                  borderRadius: BorderRadius.circular(14.0),
+                                )),
+                                foregroundColor:
+                                    MaterialStateProperty.resolveWith<Color>(
+                                        (Set<MaterialState> states) {
+                                  if (states.contains(MaterialState.hovered) ||
+                                      states.contains(MaterialState.focused))
+                                    return status_id == 0
+                                        ? Colors.white
+                                        : ColorsTheme.txtDescColor;
+                                  return status_id == 0
+                                      ? Colors.white
+                                      : ColorsTheme.txtDescColor;
+                                }),
+                                backgroundColor:
+                                    MaterialStateProperty.resolveWith<Color>(
+                                        (Set<MaterialState> states) {
+                                  if (states.contains(MaterialState.hovered) ||
+                                      states.contains(MaterialState.focused))
+                                    return status_id == 0
+                                        ? ColorsTheme.uIUxColor
+                                        : ColorsTheme.bgColor;
+
+                                  return status_id == 0
+                                      ? ColorsTheme.uIUxColor
+                                      : ColorsTheme.bgColor;
+                                }),
+                              ),
+                              child: Text('Todo'),
+                              onPressed: () {
+                                setState(() {
+                                  status_id = 0;
+                                });
+                              },
+                            ),
+                          ),
+                          Container(
+                            width: width * 0.5,
+                            height: 38.0,
+                            child: TextButton(
+                              style: ButtonStyle(
+                                shape: MaterialStateProperty.all(
+                                    RoundedRectangleBorder(
+                                  side: BorderSide(
+                                      color: status_id == 1
+                                          ? Colors.white
+                                          : ColorsTheme.txtDescColor),
+                                  borderRadius: BorderRadius.circular(14.0),
+                                )),
+                                foregroundColor:
+                                    MaterialStateProperty.resolveWith<Color>(
+                                        (Set<MaterialState> states) {
+                                  if (states.contains(MaterialState.hovered) ||
+                                      states.contains(MaterialState.focused))
+                                    return status_id == 1
+                                        ? Colors.white
+                                        : ColorsTheme.txtDescColor;
+                                  return status_id == 1
+                                      ? Colors.white
+                                      : ColorsTheme.txtDescColor;
+                                }),
+                                backgroundColor:
+                                    MaterialStateProperty.resolveWith<Color>(
+                                        (Set<MaterialState> states) {
+                                  if (states.contains(MaterialState.hovered) ||
+                                      states.contains(MaterialState.focused))
+                                    return status_id == 1
+                                        ? ColorsTheme.inProgbtnColor
+                                        : ColorsTheme.bgColor;
+
+                                  return status_id == 1
+                                      ? ColorsTheme.inProgbtnColor
+                                      : ColorsTheme.bgColor;
+                                }),
+                              ),
+                              child: Text('Progress'),
+                              onPressed: () {
+                                setState(() {
+                                  status_id = 1;
+                                });
+                              },
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    Container(
+                      margin: EdgeInsets.only(top: 10.0),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Container(
+                            width: width * 0.32,
+                            height: 38.0,
+                            child: TextButton(
+                              style: ButtonStyle(
+                                shape: MaterialStateProperty.all(
+                                    RoundedRectangleBorder(
+                                  side: BorderSide(
+                                      color: status_id == 2
+                                          ? Colors.white
+                                          : ColorsTheme.txtDescColor),
+                                  borderRadius: BorderRadius.circular(14.0),
+                                )),
+                                foregroundColor:
+                                    MaterialStateProperty.resolveWith<Color>(
+                                        (Set<MaterialState> states) {
+                                  if (states.contains(MaterialState.hovered) ||
+                                      states.contains(MaterialState.focused))
+                                    return status_id == 2
+                                        ? Colors.white
+                                        : ColorsTheme.txtDescColor;
+                                  return status_id == 2
+                                      ? Colors.white
+                                      : ColorsTheme.txtDescColor;
+                                }),
+                                backgroundColor:
+                                    MaterialStateProperty.resolveWith<Color>(
+                                        (Set<MaterialState> states) {
+                                  if (states.contains(MaterialState.hovered) ||
+                                      states.contains(MaterialState.focused))
+                                    return status_id == 2
+                                        ? ColorsTheme.inCompbtnColor
+                                        : ColorsTheme.bgColor;
+
+                                  return status_id == 2
+                                      ? ColorsTheme.inCompbtnColor
+                                      : ColorsTheme.bgColor;
+                                }),
+                              ),
+                              child: Text('Pending'),
+                              onPressed: () {
+                                setState(() {
+                                  status_id = 2;
+                                });
+                              },
+                            ),
+                          ),
+                          Container(
+                            width: width * 0.5,
+                            height: 38.0,
+                            child: TextButton(
+                              style: ButtonStyle(
+                                shape: MaterialStateProperty.all(
+                                    RoundedRectangleBorder(
+                                  side: BorderSide(
+                                      color: status_id == 3
+                                          ? Colors.white
+                                          : ColorsTheme.txtDescColor),
+                                  borderRadius: BorderRadius.circular(14.0),
+                                )),
+                                foregroundColor:
+                                    MaterialStateProperty.resolveWith<Color>(
+                                        (Set<MaterialState> states) {
+                                  if (states.contains(MaterialState.hovered) ||
+                                      states.contains(MaterialState.focused))
+                                    return status_id == 3
+                                        ? Colors.white
+                                        : ColorsTheme.txtDescColor;
+                                  return status_id == 3
+                                      ? Colors.white
+                                      : ColorsTheme.txtDescColor;
+                                }),
+                                backgroundColor:
+                                    MaterialStateProperty.resolveWith<Color>(
+                                        (Set<MaterialState> states) {
+                                  if (states.contains(MaterialState.hovered) ||
+                                      states.contains(MaterialState.focused))
+                                    return status_id == 3
+                                        ? ColorsTheme.compbtnColor
+                                        : ColorsTheme.bgColor;
+
+                                  return status_id == 3
+                                      ? ColorsTheme.compbtnColor
+                                      : ColorsTheme.bgColor;
+                                }),
+                              ),
+                              child: Text('Complete'),
+                              onPressed: () {
+                                setState(() {
+                                  status_id = 3;
+                                });
+                              },
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    Container(
+                      margin: EdgeInsets.only(top: 40.0),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            children: [
+                              IconButton(
+                                  onPressed: () {},
+                                  icon: Icon(Icons.camera_alt)),
+                              IconButton(
+                                  onPressed: () {}, icon: Icon(Icons.image)),
+                              IconButton(
+                                  onPressed: () {},
+                                  icon: Icon(Icons.attach_file)),
+                              GestureDetector(
+                                  onTap: () {},
+                                  child: Image.asset(
+                                      'assets/add_assignee_icon.png'))
+                            ],
+                          ),
+                          Container(
+                            width: width * 0.3,
+                            height: 38.0,
+                            child: TextButton(
+                              style: ButtonStyle(
+                                shape: MaterialStateProperty.all(
+                                    RoundedRectangleBorder(
+                                  side: BorderSide(
+                                      color: ColorsTheme.txtDescColor),
+                                  borderRadius: BorderRadius.circular(14.0),
+                                )),
+                                foregroundColor:
+                                    MaterialStateProperty.resolveWith<Color>(
+                                        (Set<MaterialState> states) {
+                                  if (states.contains(MaterialState.hovered) ||
+                                      states.contains(MaterialState.focused))
+                                    return Colors.white;
+                                  return Colors.white;
+                                }),
+                                backgroundColor:
+                                    MaterialStateProperty.resolveWith<Color>(
+                                        (Set<MaterialState> states) {
+                                  if (states.contains(MaterialState.hovered) ||
+                                      states.contains(MaterialState.focused))
+                                    return ColorsTheme.btnColor;
+
+                                  return ColorsTheme.btnColor;
+                                }),
+                              ),
+                              child: Text('Update'),
+                              onPressed: () async {
+                                bool result = false;
+
+                                if (task_name.isNotEmpty &&
+                                    task_desc.isNotEmpty &&
+                                    formatted_start_date.isNotEmpty &&
+                                    formatted_end_date.isNotEmpty &&
+                                    project_id != 0) {
+                                  result = await updateTask(task_id);
+                                  if (result == true) {
+                                    setState(() {
+                                      task_name = '';
+                                      task_desc = '';
+                                      formatted_end_date = '';
+                                      formatted_end_date = '';
+                                    });
+                                    Navigator.of(context).pop();
+                                    getUserTasks();
+                                    Fluttertoast.showToast(
+                                        msg: "Task Updated!",
                                         toastLength: Toast.LENGTH_SHORT,
                                         gravity: ToastGravity.CENTER,
                                         timeInSecForIosWeb: 1,
@@ -1023,12 +1933,15 @@ class _TaskTabPageState extends State<TaskTabPage> {
                   initialSelectedDate: DateTime.now(),
                   cellBorderColor: Colors.transparent,
                   todayHighlightColor: ColorsTheme.btnColor,
-                  showNavigationArrow: true,
+                  showNavigationArrow: false,
+                  onTap: calendarTapped,
                   dataSource: MeetingDataSource(getAppointments()),
                   timeSlotViewSettings: TimeSlotViewSettings(
                       timeIntervalHeight: 200.0, timeIntervalWidth: 100),
                   appointmentBuilder: (BuildContext context,
                       CalendarAppointmentDetails calendarAppointmentDetails) {
+                    final Appointment meeting =
+                        calendarAppointmentDetails.appointments.first;
                     return Container(
                       decoration: BoxDecoration(color: ColorsTheme.aptBox),
                       padding: EdgeInsets.all(10.0),
@@ -1036,23 +1949,27 @@ class _TaskTabPageState extends State<TaskTabPage> {
                           mainAxisAlignment: MainAxisAlignment.start,
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                AutoSizeText(
-                                  subject,
-                                  style: TextStyle(
-                                      color: Colors.white,
-                                      fontWeight: FontWeight.w600,
-                                      fontSize: 18.0),
-                                ),
-                                IconButton(
-                                    onPressed: () {},
-                                    icon: Icon(
-                                      Icons.notifications,
-                                      color: Colors.white,
-                                    ))
-                              ],
+                            FittedBox(
+                              fit: BoxFit.contain,
+                              child: Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  AutoSizeText(
+                                    meeting.subject,
+                                    style: TextStyle(
+                                        color: Colors.white,
+                                        fontWeight: FontWeight.w600,
+                                        fontSize: 18.0),
+                                  ),
+                                  IconButton(
+                                      onPressed: () {},
+                                      icon: Icon(
+                                        Icons.notifications,
+                                        color: Colors.white,
+                                      ))
+                                ],
+                              ),
                             ),
                             Container(
                               child: Text(
@@ -1067,26 +1984,25 @@ class _TaskTabPageState extends State<TaskTabPage> {
                               thickness: 1.0,
                               color: Colors.white,
                             ),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.start,
-                              children: [
-                                IconButton(
-                                    onPressed: () {},
-                                    icon: Icon(
-                                      Icons.alarm,
-                                      color: Colors.white,
-                                    )),
-                                Text(
-                                  DateFormat.Hms()
-                                          .format(startTime)
-                                          .toString() +
-                                      ' - ' +
-                                      DateFormat.Hms()
-                                          .format(endTime)
-                                          .toString(),
-                                  style: TextStyle(color: Colors.white),
-                                )
-                              ],
+                            FittedBox(
+                              fit: BoxFit.contain,
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                children: [
+                                  IconButton(
+                                      onPressed: () {},
+                                      icon: Icon(
+                                        Icons.alarm,
+                                        color: Colors.white,
+                                      )),
+                                  Text(
+                                    meeting.startTime.toString() +
+                                        ' - ' +
+                                        meeting.endTime.toString(),
+                                    style: TextStyle(color: Colors.white),
+                                  )
+                                ],
+                              ),
                             )
                           ]),
                     );
@@ -1126,9 +2042,42 @@ Future<bool> saveTask() async {
       'percent_done': _percent,
       'project_id': project_id,
       'priority': priority_id,
-      'category': status_id
+      'category': status_id,
+      'assign_to': user_id
     });
     Response response = await _dio.post(API.base_url + 'todos',
+        data: formData,
+        options: Options(headers: {
+          "Content-type": "multipart/form-data",
+          "authorization": "Bearer " + access_token.toString()
+        }));
+    print(response.data);
+    if (response.statusCode == 200) {
+      return true;
+    } else
+      return false;
+  } on DioError catch (e) {
+    print(e.message);
+    return false;
+  }
+}
+
+Future<bool> updateTask(int task_id) async {
+  final _dio = new Dio();
+
+  try {
+    final formData = FormData.fromMap({
+      'title': task_name,
+      'description': task_desc,
+      'start_date': formatted_start_date,
+      'end_date': formatted_end_date,
+      'percent_done': _percent,
+      'project_id': project_id,
+      'priority': priority_id,
+      'category': status_id,
+      'assign_to': user_id
+    });
+    Response response = await _dio.post(API.base_url + 'todos/$task_id',
         data: formData,
         options: Options(headers: {
           "Content-type": "multipart/form-data",
