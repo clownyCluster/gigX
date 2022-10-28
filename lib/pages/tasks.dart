@@ -4,7 +4,9 @@ import 'package:dio/dio.dart';
 import 'package:dropdown_button2/dropdown_button2.dart';
 import 'package:efleet_project_tree/api.dart';
 import 'package:efleet_project_tree/colors.dart';
+import 'package:efleet_project_tree/home.dart';
 import 'package:efleet_project_tree/login.dart';
+import 'package:efleet_project_tree/pages/projectdetails.dart';
 import 'package:f_datetimerangepicker/f_datetimerangepicker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/src/widgets/container.dart';
@@ -36,6 +38,7 @@ String subject = "";
 String formatted_start_time = "";
 String formatted_end_time = "";
 final CalendarController _controller = CalendarController();
+CalendarView? view;
 String _text = '';
 final DateTime today = DateTime.now();
 final DateTime startTime =
@@ -107,6 +110,7 @@ String formatted_end_date = "";
 String? access_token;
 int? selected_project_id = 0;
 bool is_loading = false;
+Map result = new Map();
 
 class _TaskTabPageState extends State<TaskTabPage> {
   SharedPreferences? preferences;
@@ -114,14 +118,18 @@ class _TaskTabPageState extends State<TaskTabPage> {
   void initState() {
     // TODO: implement initState
     super.initState();
-    pref();
-    getProjects();
-    getUsers();
-    getUserTasks();
-    setState(() {
-      inCompColor = Colors.black;
-      compColor = Colors.black;
-      inprogColor = Colors.black;
+
+    WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
+      print('testing here so');
+      pref();
+      getProjects();
+      getUsers();
+      getUserTasks();
+      setState(() {
+        inCompColor = Colors.black;
+        compColor = Colors.black;
+        inprogColor = Colors.black;
+      });
     });
   }
 
@@ -143,7 +151,6 @@ class _TaskTabPageState extends State<TaskTabPage> {
     try {
       Response response = await _dio.get(API.base_url + 'my/todos',
           options: Options(headers: {"authorization": "Bearer $access_token"}));
-      Map result = response.data;
 
       if (response.statusCode == 200) {
         this.preferences?.setBool('someoneLoggedIn', false);
@@ -151,9 +158,11 @@ class _TaskTabPageState extends State<TaskTabPage> {
           tasks = response.data['data'];
           is_loading = false;
           tasks.forEach((element) {
-            print(element['end_date']);
+            var len = [];
+            len = element['end_date'];
+            print(len.length);
           });
-
+          result = response.data;
           print('These are user tasks' + tasks.toString());
         });
       } else if (response.statusCode == 401) {
@@ -190,8 +199,15 @@ class _TaskTabPageState extends State<TaskTabPage> {
     _addTaskModalBottomSheet(context);
   }
 
+  Future<void> refreshUpdateTaskModal() async {
+    CalendarTapDetails? calendarTapDetails;
+    Appointment appointment = calendarTapDetails!.appointments![0];
+    int task_id = appointment.id as int;
+    _updateTaskModalBottomSheet(context, task_id);
+  }
+
   int? selectedIndex;
-  Widget setupSelectProjectDialog() {
+  Widget setupAddSelectProjectDialog() {
     return Container(
       height: 300.0, // Change as per your requirement
       width: 300.0, // Change as per your requirement
@@ -260,6 +276,88 @@ class _TaskTabPageState extends State<TaskTabPage> {
                     users[index]['username'],
                     style: TextStyle(
                         color: selectedIndex2 == index
+                            ? Colors.white
+                            : Colors.black),
+                  ),
+                ),
+              ),
+            );
+          },
+        ),
+      ),
+    );
+  }
+
+  int? selectedIndex3;
+  Widget setupUpdateSelectProjectDialog() {
+    return Container(
+      height: 300.0, // Change as per your requirement
+      width: 300.0, // Change as per your requirement
+      child: Scrollbar(
+        thumbVisibility: true,
+        child: ListView.builder(
+          shrinkWrap: true,
+          itemCount: projects.length,
+          itemBuilder: (BuildContext context, int index) {
+            return InkWell(
+              onTap: () {
+                print(projects[index]['id']);
+                setState(() {
+                  selectedIndex3 = index;
+                  project_id = projects[index]['id'];
+                });
+                Navigator.of(context).pop();
+                // Navigator.of(context).pop();
+                refreshUpdateTaskModal();
+              },
+              child: Container(
+                color: selectedIndex3 == index ? ColorsTheme.btnColor : null,
+                child: ListTile(
+                  title: Text(
+                    projects[index]['title'],
+                    style: TextStyle(
+                        color: selectedIndex3 == index
+                            ? Colors.white
+                            : Colors.black),
+                  ),
+                ),
+              ),
+            );
+          },
+        ),
+      ),
+    );
+  }
+
+  int? selectedIndex4;
+  Widget setupUpdateSelectUserDialog() {
+    return Container(
+      height: 300.0, // Change as per your requirement
+      width: 300.0, // Change as per your requirement
+      child: Scrollbar(
+        thumbVisibility: true,
+        child: ListView.builder(
+          shrinkWrap: true,
+          itemCount: users.length,
+          itemBuilder: (BuildContext context, int index) {
+            return InkWell(
+              onTap: () {
+                print(users[index]['id']);
+                setState(() {
+                  selectedIndex4 = index;
+                  user_id = users[index]['id'];
+                });
+                Navigator.of(context).pop();
+                // Navigator.of(context).pop();
+                refreshUpdateTaskModal();
+              },
+              child: Container(
+                color: selectedIndex4 == index ? ColorsTheme.btnColor : null,
+                child: ListTile(
+                  title: Text(
+                    users[index]['username'],
+                    style: TextStyle(
+                        color: selectedIndex4 == index
                             ? Colors.white
                             : Colors.black),
                   ),
@@ -445,7 +543,7 @@ class _TaskTabPageState extends State<TaskTabPage> {
                                                   color: Colors.black,
                                                   fontWeight: FontWeight.w700),
                                             ),
-                                            setupSelectProjectDialog(),
+                                            setupAddSelectProjectDialog(),
                                           ],
                                         ),
                                         // content: Column(
@@ -1169,14 +1267,16 @@ class _TaskTabPageState extends State<TaskTabPage> {
       showModalBottomSheet(
           context: context,
           isScrollControlled: true,
-          useRootNavigator: true,
-          shape:
-              RoundedRectangleBorder(borderRadius: BorderRadius.circular(14.0)),
+          // useRootNavigator: false,
+          shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.only(
+                  topLeft: Radius.circular(14.0),
+                  topRight: Radius.circular(14.0))),
           builder: (context) {
             return StatefulBuilder(builder: (BuildContext context,
                 StateSetter setState /*You can rename this!*/) {
               return Container(
-                height: 700.0,
+                height: 650.0,
                 padding: EdgeInsets.all(20.0),
                 child: ListView(
                   // crossAxisAlignment: CrossAxisAlignment.start,
@@ -1228,7 +1328,7 @@ class _TaskTabPageState extends State<TaskTabPage> {
                                                   color: Colors.black,
                                                   fontWeight: FontWeight.w700),
                                             ),
-                                            setupSelectProjectDialog(),
+                                            setupUpdateSelectProjectDialog(),
                                           ],
                                         ),
                                         actions: <Widget>[
@@ -1290,7 +1390,7 @@ class _TaskTabPageState extends State<TaskTabPage> {
                                                       fontWeight:
                                                           FontWeight.w700),
                                                 ),
-                                                setupSelectUserDialog(),
+                                                setupUpdateSelectUserDialog(),
                                               ],
                                             ),
                                             actions: <Widget>[
@@ -1865,6 +1965,7 @@ class _TaskTabPageState extends State<TaskTabPage> {
                                     });
                                     Navigator.of(context).pop();
                                     getUserTasks();
+
                                     Fluttertoast.showToast(
                                         msg: "Task Updated!",
                                         toastLength: Toast.LENGTH_SHORT,
@@ -1873,6 +1974,14 @@ class _TaskTabPageState extends State<TaskTabPage> {
                                         backgroundColor: ColorsTheme.btnColor,
                                         textColor: Colors.white,
                                         fontSize: 16.0);
+
+                                    getAppointments();
+
+                                    Navigator.of(context, rootNavigator: false)
+                                        .push(MaterialPageRoute(
+                                            builder: (context) =>
+                                                const TaskTab(),
+                                            fullscreenDialog: true));
                                   } else
                                     Fluttertoast.showToast(
                                         msg: "Something went wrong!",
@@ -1910,6 +2019,7 @@ class _TaskTabPageState extends State<TaskTabPage> {
   Widget build(BuildContext context) {
     height = MediaQuery.of(context).size.height;
     width = MediaQuery.of(context).size.width;
+
     return Scaffold(
       body: OrientationBuilder(builder: (context, orientation) {
         return SingleChildScrollView(
@@ -1925,86 +2035,102 @@ class _TaskTabPageState extends State<TaskTabPage> {
                   )),
               Container(
                 width: width,
-                height: height * 0.85,
+                height: height * 1.9,
                 child: SfCalendar(
                   controller: _controller,
-                  view: CalendarView.day,
+                  key: ValueKey(view),
+                  view: CalendarView.timelineDay,
                   firstDayOfWeek: 6,
                   initialSelectedDate: DateTime.now(),
                   cellBorderColor: Colors.transparent,
                   todayHighlightColor: ColorsTheme.btnColor,
-                  showNavigationArrow: false,
+                  showNavigationArrow: true,
                   onTap: calendarTapped,
                   dataSource: MeetingDataSource(getAppointments()),
                   timeSlotViewSettings: TimeSlotViewSettings(
-                      timeIntervalHeight: 200.0, timeIntervalWidth: 100),
+                      timeIntervalHeight: 600,
+                      timeIntervalWidth: 80,
+                      timelineAppointmentHeight: 800),
                   appointmentBuilder: (BuildContext context,
                       CalendarAppointmentDetails calendarAppointmentDetails) {
                     final Appointment meeting =
                         calendarAppointmentDetails.appointments.first;
-                    return Container(
-                      decoration: BoxDecoration(color: ColorsTheme.aptBox),
-                      padding: EdgeInsets.all(10.0),
-                      child: Column(
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            FittedBox(
-                              fit: BoxFit.contain,
-                              child: Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  AutoSizeText(
-                                    meeting.subject,
-                                    style: TextStyle(
-                                        color: Colors.white,
-                                        fontWeight: FontWeight.w600,
-                                        fontSize: 18.0),
-                                  ),
-                                  IconButton(
-                                      onPressed: () {},
-                                      icon: Icon(
-                                        Icons.notifications,
-                                        color: Colors.white,
-                                      ))
-                                ],
+                    // DateFormat format = DateFormat("dd/MM/yyyy");
+
+                    return SingleChildScrollView(
+                      scrollDirection: Axis.vertical,
+                      physics: NeverScrollableScrollPhysics(),
+                      child: Container(
+                        decoration: BoxDecoration(color: ColorsTheme.aptBox),
+                        padding: EdgeInsets.all(10.0),
+                        height: 300,
+                        child: Column(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              FittedBox(
+                                fit: BoxFit.contain,
+                                child: Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    AutoSizeText(
+                                      meeting.subject,
+                                      style: TextStyle(
+                                          color: Colors.white,
+                                          fontWeight: FontWeight.w600,
+                                          fontSize: 18.0),
+                                    ),
+                                    IconButton(
+                                        onPressed: () {},
+                                        icon: Icon(
+                                          Icons.notifications,
+                                          color: Colors.white,
+                                        ))
+                                  ],
+                                ),
                               ),
-                            ),
-                            Container(
-                              child: Text(
-                                'eFleetPass',
-                                style: TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 12.0,
-                                    fontWeight: FontWeight.w400),
+                              Container(
+                                child: Text(
+                                  'eFleetPass',
+                                  style: TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 12.0,
+                                      fontWeight: FontWeight.w400),
+                                ),
                               ),
-                            ),
-                            Divider(
-                              thickness: 1.0,
-                              color: Colors.white,
-                            ),
-                            FittedBox(
-                              fit: BoxFit.contain,
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.start,
-                                children: [
-                                  IconButton(
-                                      onPressed: () {},
-                                      icon: Icon(
-                                        Icons.alarm,
-                                        color: Colors.white,
-                                      )),
-                                  Text(
-                                    meeting.startTime.toString() +
-                                        ' - ' +
-                                        meeting.endTime.toString(),
-                                    style: TextStyle(color: Colors.white),
-                                  )
-                                ],
+                              Divider(
+                                thickness: 1.0,
+                                color: Colors.white,
                               ),
-                            )
-                          ]),
+                              FittedBox(
+                                fit: BoxFit.contain,
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.start,
+                                  children: [
+                                    IconButton(
+                                        onPressed: () {},
+                                        icon: Icon(
+                                          Icons.alarm,
+                                          color: Colors.white,
+                                        )),
+                                    Text(
+                                      meeting.startTime
+                                              .toString()
+                                              .substring(0, 16)
+                                              .replaceAll('-', '/') +
+                                          ' - ' +
+                                          meeting.endTime
+                                              .toString()
+                                              .substring(0, 16)
+                                              .replaceAll('-', '/'),
+                                      style: TextStyle(color: Colors.white),
+                                    )
+                                  ],
+                                ),
+                              )
+                            ]),
+                      ),
                     );
                   },
                 ),
@@ -2065,6 +2191,11 @@ Future<bool> saveTask() async {
 Future<bool> updateTask(int task_id) async {
   final _dio = new Dio();
 
+  DateTime stDate = DateFormat('d/MM/yyyy HH:mm').parse(formatted_start_date);
+  DateTime edDate = DateFormat('d/MM/yyyy HH:mm').parse(formatted_end_date);
+  // print(stDate);
+  // print(edDate);
+  // return false;
   try {
     final formData = FormData.fromMap({
       'title': task_name,
@@ -2085,6 +2216,17 @@ Future<bool> updateTask(int task_id) async {
         }));
     print(response.data);
     if (response.statusCode == 200) {
+      List<Appointment> meetings = <Appointment>[];
+      meetings.add(Appointment(
+          startTime: stDate,
+          endTime: edDate,
+          subject: task_name,
+          color: ColorsTheme.aptBox,
+          id: task_id,
+
+          // recurrenceRule: 'FREQ=DAILY;COUNT=10',
+          isAllDay: false));
+
       return true;
     } else
       return false;

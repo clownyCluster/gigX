@@ -293,7 +293,6 @@ class _ProjectDetailsPageState extends State<ProjectDetailsPage> {
             DateFormat format = DateFormat("dd/MM/yyyy");
 
             formatted_end_date_with_month = format.parse(element['end_date']);
-            print(formatted_end_date_with_month);
           });
         });
       } else if (response.statusCode == 401) {
@@ -1630,8 +1629,7 @@ class _ProjectDetailsPageState extends State<ProjectDetailsPage> {
                                               ),
                                               if (formatted_end_date_with_month !=
                                                   null)
-                                                Text(DateFormat(
-                                                        'EEEE, d MMM, yyyy')
+                                                Text(DateFormat('MMMM dd, yyyy')
                                                     .format(
                                                         formatted_end_date_with_month!))
                                             ],
