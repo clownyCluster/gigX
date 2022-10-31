@@ -1267,6 +1267,7 @@ class _TaskTabPageState extends State<TaskTabPage> {
       showModalBottomSheet(
           context: context,
           isScrollControlled: true,
+          isDismissible: true,
           // useRootNavigator: false,
           shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.only(
@@ -1276,10 +1277,11 @@ class _TaskTabPageState extends State<TaskTabPage> {
             return StatefulBuilder(builder: (BuildContext context,
                 StateSetter setState /*You can rename this!*/) {
               return Container(
-                height: 650.0,
+                height: 620.0,
                 padding: EdgeInsets.all(20.0),
                 child: ListView(
                   // crossAxisAlignment: CrossAxisAlignment.start,
+
                   children: [
                     Container(
                       child: Text(

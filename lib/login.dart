@@ -135,10 +135,20 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   Future<void> checkIfLoggedIn() async {
+    bool? some_one_logged_in = false;
     this.preferences = await SharedPreferences.getInstance();
+    some_one_logged_in = this.preferences?.getBool('someoneLoggedIn');
     print(this.preferences?.getBool('stay_logged_in'));
 
-    this.preferences = await SharedPreferences.getInstance();
+    if (some_one_logged_in == true)
+      Fluttertoast.showToast(
+          msg:
+              'You are trying to login into an account that is currently in used!',
+          gravity: ToastGravity.CENTER,
+          backgroundColor: ColorsTheme.btnColor,
+          timeInSecForIosWeb: 3,
+          textColor: Colors.white);
+
     if (this.preferences?.getBool('stay_logged_in') == true &&
         widget.is_logged_out == false) {
       Navigator.of(context).push(MaterialPageRoute(

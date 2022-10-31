@@ -60,6 +60,7 @@ class _HomeTabPageState extends State<HomeTabPage> {
   TextEditingController txtProjectNameController = new TextEditingController();
   TextEditingController txtProjectDescController = new TextEditingController();
   String? access_token;
+  String search_query = "";
 
   @override
   void initState() {
@@ -221,6 +222,24 @@ class _HomeTabPageState extends State<HomeTabPage> {
       print(e);
       return false;
     }
+  }
+
+  void setSearchResults(String query) {
+    setState(() {
+      is_loading = true;
+      projects = projects
+          .where((elem) =>
+              elem['title']
+                  .toString()
+                  .toLowerCase()
+                  .contains(query.toLowerCase()) ||
+              elem['description']
+                  .toString()
+                  .toLowerCase()
+                  .contains(query.toLowerCase()))
+          .toList();
+      is_loading = false;
+    });
   }
 
   void _addProjectModalBottomSheet(BuildContext context) async {
@@ -495,7 +514,7 @@ class _HomeTabPageState extends State<HomeTabPage> {
           return SingleChildScrollView(
             child: Container(
               height: orientation == Orientation.portrait
-                  ? height * 1.1
+                  ? height * 0.9
                   : height * 2.6,
               width: width,
               child: Column(children: <Widget>[
@@ -525,12 +544,13 @@ class _HomeTabPageState extends State<HomeTabPage> {
                             ),
                             GestureDetector(
                               onTap: () {
-                                setState(() {
-                                  if (is_search_visible == true)
-                                    setState(() {
-                                      is_search_visible = false;
-                                    });
-                                });
+                                if (this.mounted)
+                                  setState(() {
+                                    if (is_search_visible == true)
+                                      setState(() {
+                                        is_search_visible = false;
+                                      });
+                                  });
                               },
                               child: Container(
                                 child: Image(
@@ -554,13 +574,22 @@ class _HomeTabPageState extends State<HomeTabPage> {
                               child: TextField(
                                 decoration:
                                     InputDecoration(hintText: 'Search here'),
+                                onChanged: (value) {
+                                  if (this.mounted)
+                                    setState(() {
+                                      search_query = value.toString();
+                                    });
+                                },
                               ),
                             ),
                             GestureDetector(
                               onTap: () {
-                                setState(() {
-                                  is_search_visible = true;
-                                });
+                                if (this.mounted)
+                                  setState(() {
+                                    is_search_visible = true;
+                                  });
+                                print(search_query);
+                                setSearchResults(search_query);
                               },
                               child: Container(
                                 child: Image(
@@ -580,7 +609,7 @@ class _HomeTabPageState extends State<HomeTabPage> {
                       child: ListView.builder(
                           controller: controller,
                           itemCount: list.length < projects.length
-                              ? list.length + 1
+                              ? list.length + 2
                               : projects.length,
                           shrinkWrap: true,
                           itemExtent: 120.0,
@@ -591,6 +620,8 @@ class _HomeTabPageState extends State<HomeTabPage> {
                                     await SharedPreferences.getInstance();
                                 this.preferences?.setInt(
                                     'project_id', projects[index]['id']);
+                                this.preferences?.setString(
+                                    'logo_url', projects[index]['logo_url']);
 
                                 Navigator.of(context).push(MaterialPageRoute(
                                     builder: (context) => ProjectDetails()));
@@ -638,7 +669,9 @@ class _HomeTabPageState extends State<HomeTabPage> {
                                                     fontSize: 12.0),
                                               ),
                                               AutoSizeText(
-                                                'data',
+                                                projects[index]['description'],
+                                                maxLines: 1,
+                                                overflow: TextOverflow.ellipsis,
                                                 style: TextStyle(
                                                     color: Colors.black),
                                               ),

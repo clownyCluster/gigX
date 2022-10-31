@@ -1,12 +1,17 @@
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:calendar_date_picker2/calendar_date_picker2.dart';
+import 'package:dio/dio.dart';
 import 'package:dotted_border/dotted_border.dart';
+import 'package:efleet_project_tree/api.dart';
 import 'package:efleet_project_tree/colors.dart';
 import 'package:efleet_project_tree/home.dart';
+import 'package:efleet_project_tree/login.dart';
 import 'package:efleet_project_tree/pages/projectdetails.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/src/widgets/container.dart';
+import 'package:intl/intl.dart';
 import 'package:flutter/src/widgets/framework.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class TaskDetails extends StatelessWidget {
   const TaskDetails({super.key});
@@ -34,7 +39,134 @@ class TaskDetailsPage extends StatefulWidget {
   State<TaskDetailsPage> createState() => _TaskDetailsPageState();
 }
 
+int? selected_project_id = 0;
+bool is_loading = false;
+int? task_id = 0;
+int priority = 0;
+int category_id = 0;
+int assign_to_id = 0;
+String? logo_url = "";
+var tasks = [];
+var user = [];
+String title = "", desc = "", assigned_to = "";
+
 class _TaskDetailsPageState extends State<TaskDetailsPage> {
+  SharedPreferences? preferences;
+  var formatted_end_date_with_month;
+  String? access_token = "";
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    pref();
+    getTasks();
+  }
+
+  Future<void> pref() async {
+    this.preferences = await SharedPreferences.getInstance();
+    selected_project_id = this.preferences?.getInt('project_id');
+    task_id = this.preferences?.getInt('task_id');
+    logo_url = this.preferences?.getString('logo_url');
+  }
+
+  Future<void> getTasks() async {
+    final _dio = Dio();
+    is_loading = true;
+    String? access_token;
+
+    this.preferences = await SharedPreferences.getInstance();
+    setState(() {
+      access_token = this.preferences?.getString('access_token');
+    });
+
+    try {
+      Response response = await _dio.get(
+          API.base_url + 'todos/$selected_project_id/0',
+          options: Options(headers: {"authorization": "Bearer $access_token"}));
+      Map result = response.data;
+      DateFormat format = DateFormat("dd/MM/yyyy");
+
+      if (response.statusCode == 200) {
+        this.preferences?.setBool('someoneLoggedIn', false);
+        setState(() {
+          tasks = response.data['data'];
+          tasks_duplicate = response.data['data'];
+          is_loading = false;
+          tasks.where((element) => element['id'] == task_id).forEach((element) {
+            title = element['title'];
+            desc = element['description'];
+            priority = element['priority'];
+            category_id = element['category'];
+            assign_to_id = element['assign_to'];
+
+            formatted_end_date_with_month = format.parse(element['end_date']);
+          });
+          getAssignedToUser();
+        });
+      } else if (response.statusCode == 401) {
+        await this.preferences?.remove('access_token');
+        Navigator.of(context, rootNavigator: true).pushAndRemoveUntil(
+          MaterialPageRoute(
+            builder: (BuildContext context) {
+              return const Login();
+            },
+          ),
+          (_) => false,
+        );
+      }
+
+      return null;
+    } on DioError catch (e) {
+      if (e.response?.statusCode == 401) {
+        this.preferences?.setBool('someoneLoggedIn', true);
+        await this.preferences?.remove('access_token');
+        Navigator.of(context, rootNavigator: true).pushAndRemoveUntil(
+          MaterialPageRoute(
+            builder: (BuildContext context) {
+              return const Login();
+            },
+          ),
+          (_) => false,
+        );
+      }
+      return null;
+    }
+  }
+
+  Future<void> getAssignedToUser() async {
+    final _dio = Dio();
+
+    print('Task assigned to ' + assign_to_id.toString());
+
+    this.preferences = await SharedPreferences.getInstance();
+    setState(() {
+      access_token = this.preferences?.getString('access_token');
+    });
+
+    try {
+      Response response = await _dio.get(API.base_url + 'users/select2',
+          options: Options(headers: {"authorization": "Bearer $access_token"}));
+      Map result = response.data;
+      DateFormat format = DateFormat("dd/MM/yyyy");
+
+      if (response.statusCode == 200) {
+        setState(() {
+          user = response.data['data'];
+          user
+              .where((element) => element['id'] == assign_to_id)
+              .forEach((element) {
+            assigned_to = element['username'];
+          });
+        });
+      }
+
+      return null;
+    } on DioError catch (e) {
+      return null;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     height = MediaQuery.of(context).size.height;
@@ -84,7 +216,7 @@ class _TaskDetailsPageState extends State<TaskDetailsPage> {
                         width: width * 0.55,
                         margin: EdgeInsets.only(left: 10.0),
                         child: AutoSizeText(
-                          'Create a Landing Page',
+                          title.toString(),
                           maxLines: 1,
                           style: TextStyle(
                               color: Colors.black,
@@ -101,7 +233,13 @@ class _TaskDetailsPageState extends State<TaskDetailsPage> {
                               shape: MaterialStateProperty.all(
                                   RoundedRectangleBorder(
                                 side: BorderSide(
-                                    color: ColorsTheme.inProgbtnColor),
+                                    color: category_id == 0
+                                        ? ColorsTheme.uIUxColor
+                                        : category_id == 1
+                                            ? ColorsTheme.inProgbtnColor
+                                            : category_id == 2
+                                                ? ColorsTheme.dangerColor
+                                                : ColorsTheme.compbtnColor),
                                 borderRadius: BorderRadius.circular(14.0),
                               )),
                               foregroundColor:
@@ -123,9 +261,21 @@ class _TaskDetailsPageState extends State<TaskDetailsPage> {
                               }),
                             ),
                             child: Text(
-                              'Inprogress',
+                              category_id == 0
+                                  ? 'Todo'
+                                  : category_id == 1
+                                      ? 'In Progress'
+                                      : category_id == 2
+                                          ? 'Pending'
+                                          : 'Complete',
                               style: TextStyle(
-                                  color: ColorsTheme.inProgbtnColor,
+                                  color: category_id == 0
+                                      ? ColorsTheme.uIUxColor
+                                      : category_id == 1
+                                          ? ColorsTheme.inProgbtnColor
+                                          : category_id == 2
+                                              ? ColorsTheme.dangerColor
+                                              : ColorsTheme.compbtnColor,
                                   fontSize: 12.0,
                                   fontWeight: FontWeight.w400),
                             )),
@@ -138,7 +288,14 @@ class _TaskDetailsPageState extends State<TaskDetailsPage> {
                 padding: EdgeInsets.all(30.0),
                 child:
                     Row(mainAxisAlignment: MainAxisAlignment.start, children: [
-                  Image.asset('assets/sample_logo.png'),
+                  logo_url?.isEmpty == true
+                      ? Image.asset('assets/sample_logo.png')
+                      : Image.network(
+                          logo_url.toString(),
+                          width: 60,
+                          height: 60,
+                          fit: BoxFit.fill,
+                        ),
                   SizedBox(
                     width: 10.0,
                   ),
@@ -159,7 +316,7 @@ class _TaskDetailsPageState extends State<TaskDetailsPage> {
                   children: [
                     GestureDetector(
                       onTap: () {
-                        showAssigneeDialog(context);
+                        // showAssigneeDialog(context);
                       },
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.start,
@@ -180,7 +337,9 @@ class _TaskDetailsPageState extends State<TaskDetailsPage> {
                                     fontSize: 10.0,
                                     fontWeight: FontWeight.w400)),
                             new TextSpan(
-                                text: 'Anil Shrestha',
+                                text: assign_to_id == 0
+                                    ? 'Unassigned'
+                                    : assigned_to,
                                 style: TextStyle(
                                     color: Colors.black,
                                     fontSize: 12.0,
@@ -191,22 +350,22 @@ class _TaskDetailsPageState extends State<TaskDetailsPage> {
                     ),
                     GestureDetector(
                       onTap: () async {
-                        var results = await showCalendarDatePicker2Dialog(
-                          context: context,
-                          barrierLabel: 'Date',
-                          config: CalendarDatePicker2WithActionButtonsConfig(
-                              selectedDayHighlightColor: ColorsTheme.btnColor,
-                              okButton: Text(
-                                'Done',
-                                style: TextStyle(
-                                    color: ColorsTheme.btnColor,
-                                    fontWeight: FontWeight.w600,
-                                    fontSize: 16.0),
-                              ),
-                              shouldCloseDialogAfterCancelTapped: true),
-                          dialogSize: const Size(325, 400),
-                          borderRadius: BorderRadius.circular(15),
-                        );
+                        // var results = await showCalendarDatePicker2Dialog(
+                        //   context: context,
+                        //   barrierLabel: 'Date',
+                        //   config: CalendarDatePicker2WithActionButtonsConfig(
+                        //       selectedDayHighlightColor: ColorsTheme.btnColor,
+                        //       okButton: Text(
+                        //         'Done',
+                        //         style: TextStyle(
+                        //             color: ColorsTheme.btnColor,
+                        //             fontWeight: FontWeight.w600,
+                        //             fontSize: 16.0),
+                        //       ),
+                        //       shouldCloseDialogAfterCancelTapped: true),
+                        //   dialogSize: const Size(325, 400),
+                        //   borderRadius: BorderRadius.circular(15),
+                        // );
                       },
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.start,
@@ -226,12 +385,14 @@ class _TaskDetailsPageState extends State<TaskDetailsPage> {
                                     color: ColorsTheme.txtDescColor,
                                     fontSize: 10.0,
                                     fontWeight: FontWeight.w400)),
-                            new TextSpan(
-                                text: 'Anil Shrestha',
-                                style: TextStyle(
-                                    color: ColorsTheme.compbtnColor,
-                                    fontSize: 12.0,
-                                    fontWeight: FontWeight.w600)),
+                            if (formatted_end_date_with_month != null)
+                              new TextSpan(
+                                  text: DateFormat('MMMM dd, yyyy')
+                                      .format(formatted_end_date_with_month!),
+                                  style: TextStyle(
+                                      color: ColorsTheme.compbtnColor,
+                                      fontSize: 12.0,
+                                      fontWeight: FontWeight.w600)),
                           ]))
                         ],
                       ),
@@ -263,6 +424,10 @@ class _TaskDetailsPageState extends State<TaskDetailsPage> {
                           shape:
                               MaterialStateProperty.all(RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(30.0),
+                            side: BorderSide(
+                                color: priority == 1
+                                    ? ColorsTheme.bgColor
+                                    : Colors.black),
                           )),
                           foregroundColor:
                               MaterialStateProperty.resolveWith<Color>(
@@ -277,15 +442,21 @@ class _TaskDetailsPageState extends State<TaskDetailsPage> {
                                   (Set<MaterialState> states) {
                             if (states.contains(MaterialState.hovered) ||
                                 states.contains(MaterialState.focused))
-                              return Colors.red.shade100;
+                              return priority == 1
+                                  ? Colors.red.shade100
+                                  : ColorsTheme.bgColor;
 
-                            return Colors.red.shade100;
+                            return priority == 1
+                                ? Colors.red.shade100
+                                : ColorsTheme.bgColor;
                           }),
                         ),
                         child: Text(
                           'High',
                           style: TextStyle(
-                              color: ColorsTheme.inCompbtnColor,
+                              color: priority == 1
+                                  ? ColorsTheme.inCompbtnColor
+                                  : Colors.black,
                               fontSize: 12.0,
                               fontWeight: FontWeight.w400),
                         )),
@@ -303,7 +474,10 @@ class _TaskDetailsPageState extends State<TaskDetailsPage> {
                         style: ButtonStyle(
                           shape:
                               MaterialStateProperty.all(RoundedRectangleBorder(
-                            side: BorderSide(color: Colors.black),
+                            side: BorderSide(
+                                color: priority == 2
+                                    ? ColorsTheme.bgColor
+                                    : Colors.black),
                             borderRadius: BorderRadius.circular(30.0),
                           )),
                           foregroundColor:
@@ -319,15 +493,21 @@ class _TaskDetailsPageState extends State<TaskDetailsPage> {
                                   (Set<MaterialState> states) {
                             if (states.contains(MaterialState.hovered) ||
                                 states.contains(MaterialState.focused))
-                              return ColorsTheme.bgColor;
+                              return priority == 2
+                                  ? Colors.orange.shade100
+                                  : ColorsTheme.bgColor;
 
-                            return ColorsTheme.bgColor;
+                            return priority == 2
+                                ? Colors.orange.shade100
+                                : ColorsTheme.bgColor;
                           }),
                         ),
                         child: Text(
-                          'Medium',
+                          'Urgent',
                           style: TextStyle(
-                              color: Colors.black,
+                              color: priority == 2
+                                  ? ColorsTheme.inProgbtnColor
+                                  : Colors.black,
                               fontSize: 12.0,
                               fontWeight: FontWeight.w400),
                         )),
@@ -345,7 +525,10 @@ class _TaskDetailsPageState extends State<TaskDetailsPage> {
                         style: ButtonStyle(
                           shape:
                               MaterialStateProperty.all(RoundedRectangleBorder(
-                            side: BorderSide(color: Colors.black),
+                            side: BorderSide(
+                                color: priority == 0
+                                    ? ColorsTheme.bgColor
+                                    : Colors.black),
                             borderRadius: BorderRadius.circular(30.0),
                           )),
                           foregroundColor:
@@ -361,15 +544,21 @@ class _TaskDetailsPageState extends State<TaskDetailsPage> {
                                   (Set<MaterialState> states) {
                             if (states.contains(MaterialState.hovered) ||
                                 states.contains(MaterialState.focused))
-                              return ColorsTheme.bgColor;
+                              return priority == 0
+                                  ? Colors.green.shade100
+                                  : ColorsTheme.bgColor;
 
-                            return ColorsTheme.bgColor;
+                            return priority == 0
+                                ? Colors.green.shade100
+                                : ColorsTheme.bgColor;
                           }),
                         ),
                         child: Text(
                           'Low',
                           style: TextStyle(
-                              color: Colors.black,
+                              color: priority == 0
+                                  ? ColorsTheme.compbtnColor
+                                  : Colors.black,
                               fontSize: 12.0,
                               fontWeight: FontWeight.w400),
                         )),
@@ -390,7 +579,8 @@ class _TaskDetailsPageState extends State<TaskDetailsPage> {
                 margin: EdgeInsets.only(left: 20.0),
                 width: width * 0.95,
                 child: AutoSizeText(
-                  'Lorem ipsum dolor sit amet, consectetur adipiscing elit. ',
+                  desc.toString(),
+                  maxLines: 3,
                   style: TextStyle(
                       color: ColorsTheme.txtDescColor,
                       fontSize: 15.0,

@@ -1416,8 +1416,13 @@ class _ProjectDetailsPageState extends State<ProjectDetailsPage> {
                               margin: EdgeInsets.all(10),
                               width: width,
                               child: GestureDetector(
-                                onTap: () {
-                                  Navigator.of(context, rootNavigator: true)
+                                onTap: () async {
+                                  this.preferences =
+                                      await SharedPreferences.getInstance();
+                                  this
+                                      .preferences
+                                      ?.setInt('task_id', tasks[index]['id']);
+                                  Navigator.of(context, rootNavigator: false)
                                       .push(MaterialPageRoute(
                                           builder: (context) => TaskDetails()));
                                 },
@@ -1607,8 +1612,10 @@ class _ProjectDetailsPageState extends State<ProjectDetailsPage> {
                                           border: Border(
                                               bottom: BorderSide(
                                                   color: Colors.black))),
-                                      child: Text(
+                                      child: AutoSizeText(
                                         tasks[index]['description'],
+                                        overflow: TextOverflow.ellipsis,
+                                        maxLines: 1,
                                         style: TextStyle(
                                             fontWeight: FontWeight.w600,
                                             fontSize: 18.0),
