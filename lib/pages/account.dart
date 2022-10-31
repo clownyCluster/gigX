@@ -1,4 +1,6 @@
 import 'package:auto_size_text/auto_size_text.dart';
+import 'package:dio/dio.dart';
+import 'package:efleet_project_tree/api.dart';
 import 'package:efleet_project_tree/colors.dart';
 import 'package:efleet_project_tree/login.dart';
 import 'package:flutter/material.dart';
@@ -25,6 +27,9 @@ class AccountTab extends StatelessWidget {
 }
 
 var height, width;
+Map<String, dynamic> user = new Map<String, dynamic>();
+String? access_token = "";
+String userEmail = "", userName = "";
 
 class AccountTabPage extends StatefulWidget {
   const AccountTabPage({super.key});
@@ -35,6 +40,133 @@ class AccountTabPage extends StatefulWidget {
 
 class _AccountTabPageState extends State<AccountTabPage> {
   SharedPreferences? preferences;
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      getUserProfile();
+    });
+  }
+
+  Future<void> getUserProfile() async {
+    final _dio = new Dio();
+    this.preferences = await SharedPreferences.getInstance();
+    setState(() {
+      access_token = this.preferences?.getString('access_token');
+    });
+    try {
+      Response response = await _dio.get(API.base_url + 'me',
+          options: Options(headers: {"authorization": "Bearer $access_token"}));
+
+      if (response.statusCode == 200) {
+        this.preferences?.setBool('someoneLoggedIn', false);
+        setState(() {
+          user = response.data;
+          userName = user['username'];
+          userEmail = user['email'];
+
+          // user.forEach((element) {
+          //   userName = element['username'];
+          //   userEmail = element['email'];
+          // });
+        });
+      } else if (response.statusCode == 401) {
+        await this.preferences?.remove('access_token');
+        Navigator.of(context, rootNavigator: true).pushAndRemoveUntil(
+          MaterialPageRoute(
+            builder: (BuildContext context) {
+              return const Login();
+            },
+          ),
+          (_) => false,
+        );
+      }
+    } on DioError catch (e) {
+      print(e);
+      if (e.response?.statusCode == 401) {
+        this.preferences?.setBool('someoneLoggedIn', true);
+        await this.preferences?.remove('access_token');
+        Navigator.of(context, rootNavigator: true).pushAndRemoveUntil(
+          MaterialPageRoute(
+            builder: (BuildContext context) {
+              return const Login();
+            },
+          ),
+          (_) => false,
+        );
+      }
+    }
+  }
+
+  Widget showAccountListItems(BuildContext context) {
+    return MediaQuery.removePadding(
+      context: context,
+      removeTop: true,
+      removeBottom: true,
+      child: ListView(
+        physics: NeverScrollableScrollPhysics(),
+        children: [
+          ListTile(
+            leading: Image.asset('assets/language_icon.png'),
+            title: new RichText(
+                text: TextSpan(children: [
+              new TextSpan(
+                  text: 'Language \n',
+                  style: TextStyle(
+                      fontSize: 16.0,
+                      fontWeight: FontWeight.w600,
+                      color: Colors.black)),
+              new TextSpan(
+                  text: 'English',
+                  style: TextStyle(
+                      color: ColorsTheme.txtDescColor,
+                      fontWeight: FontWeight.w400,
+                      fontSize: 14.0)),
+            ])),
+            trailing: Image.asset('assets/arrow_right.png'),
+          ),
+          ListTile(
+            leading: Image.asset('assets/privacy_policy_icon.png'),
+            title: Text(
+              'Privacy Policy',
+              style: TextStyle(
+                  color: Colors.black,
+                  fontWeight: FontWeight.w600,
+                  fontSize: 16.0),
+            ),
+            trailing: Image.asset('assets/arrow_right.png'),
+          ),
+          ListTile(
+            leading: Image.asset('assets/terms_conditions_icon.png'),
+            title: Text(
+              'Terms & Conditions',
+              style: TextStyle(
+                  color: Colors.black,
+                  fontWeight: FontWeight.w600,
+                  fontSize: 16.0),
+            ),
+            trailing: Image.asset('assets/arrow_right.png'),
+          ),
+          ListTile(
+            leading: Image(
+              image: AssetImage('assets/change_password_icon.png'),
+            ),
+            title: Text(
+              'Change Password',
+              style: TextStyle(
+                  color: Colors.black,
+                  fontWeight: FontWeight.w600,
+                  fontSize: 16.0),
+            ),
+            trailing: GestureDetector(
+                onTap: () {}, child: Image.asset('assets/arrow_right.png')),
+          ),
+        ],
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -72,23 +204,23 @@ class _AccountTabPageState extends State<AccountTabPage> {
                           backgroundImage: AssetImage('assets/profile.png'),
                         ),
                         Container(
+                          width: width * 0.40,
                           margin: EdgeInsets.only(left: 10.0),
-                          child: new RichText(
-                            text: TextSpan(children: [
-                              new TextSpan(
-                                  text: 'Anil Shrestha \n',
-                                  style: TextStyle(
-                                      color: Colors.black,
-                                      fontWeight: FontWeight.w600,
-                                      fontSize: 16.0)),
-                              new TextSpan(
-                                  text: 'anil@efleetpass.com.au',
-                                  style: TextStyle(
-                                      color: ColorsTheme.txtColor,
-                                      fontWeight: FontWeight.w400,
-                                      fontSize: 14.0)),
-                            ]),
-                          ),
+                          child: new Column(children: [
+                            new AutoSizeText('$userName \n',
+                                maxLines: 2,
+                                style: TextStyle(
+                                    color: Colors.black,
+                                    fontWeight: FontWeight.w600,
+                                    fontSize: 16.0)),
+                            new AutoSizeText(userEmail,
+                                maxLines: 2,
+                                style: TextStyle(
+                                    color: ColorsTheme.txtColor,
+                                    fontWeight: FontWeight.w400,
+                                    letterSpacing: -0.9,
+                                    fontSize: 6.0)),
+                          ]),
                         ),
                       ],
                     ),
@@ -177,72 +309,4 @@ class _AccountTabPageState extends State<AccountTabPage> {
       }),
     );
   }
-}
-
-Widget showAccountListItems(BuildContext context) {
-  return MediaQuery.removePadding(
-    context: context,
-    removeTop: true,
-    removeBottom: true,
-    child: ListView(
-      physics: NeverScrollableScrollPhysics(),
-      children: [
-        ListTile(
-          leading: Image.asset('assets/language_icon.png'),
-          title: new RichText(
-              text: TextSpan(children: [
-            new TextSpan(
-                text: 'Language \n',
-                style: TextStyle(
-                    fontSize: 16.0,
-                    fontWeight: FontWeight.w600,
-                    color: Colors.black)),
-            new TextSpan(
-                text: 'English',
-                style: TextStyle(
-                    color: ColorsTheme.txtDescColor,
-                    fontWeight: FontWeight.w400,
-                    fontSize: 14.0)),
-          ])),
-          trailing: Image.asset('assets/arrow_right.png'),
-        ),
-        ListTile(
-          leading: Image.asset('assets/privacy_policy_icon.png'),
-          title: Text(
-            'Privacy Policy',
-            style: TextStyle(
-                color: Colors.black,
-                fontWeight: FontWeight.w600,
-                fontSize: 16.0),
-          ),
-          trailing: Image.asset('assets/arrow_right.png'),
-        ),
-        ListTile(
-          leading: Image.asset('assets/terms_conditions_icon.png'),
-          title: Text(
-            'Terms & Conditions',
-            style: TextStyle(
-                color: Colors.black,
-                fontWeight: FontWeight.w600,
-                fontSize: 16.0),
-          ),
-          trailing: Image.asset('assets/arrow_right.png'),
-        ),
-        ListTile(
-          leading: Image(
-            image: AssetImage('assets/change_password_icon.png'),
-          ),
-          title: Text(
-            'Change Password',
-            style: TextStyle(
-                color: Colors.black,
-                fontWeight: FontWeight.w600,
-                fontSize: 16.0),
-          ),
-          trailing: GestureDetector(
-              onTap: () {}, child: Image.asset('assets/arrow_right.png')),
-        ),
-      ],
-    ),
-  );
 }

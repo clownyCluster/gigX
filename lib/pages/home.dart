@@ -655,7 +655,6 @@ class _HomeTabPageState extends State<HomeTabPage> {
                                       Container(
                                         padding: EdgeInsets.all(10.0),
                                         margin: EdgeInsets.only(top: 15.0),
-
                                         width: width * 0.4,
                                         child: Column(
                                             crossAxisAlignment:
@@ -676,15 +675,6 @@ class _HomeTabPageState extends State<HomeTabPage> {
                                                     color: Colors.black),
                                               ),
                                             ]),
-                                        // child: new RichText(
-                                        //     text: new TextSpan(children: [
-                                        //   new TextSpan(
-                                        //       text: projects[index]['title'] + ' \n',
-                                        //       style: TextStyle(color: Colors.black)),
-                                        //   new TextSpan(
-                                        //       text: '6 Members \n',
-                                        //       style: TextStyle(color: Colors.black)),
-                                        // ])),
                                       ),
                                       SizedBox(
                                         width:
