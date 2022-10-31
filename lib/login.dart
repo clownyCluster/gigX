@@ -63,6 +63,7 @@ class _LoginPageState extends State<LoginPage> {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       initializePrefs();
+      checkIfOtherLoggedIn();
       checkIfLoggedIn();
     });
   }
@@ -134,13 +135,13 @@ class _LoginPageState extends State<LoginPage> {
     print(email);
   }
 
-  Future<void> checkIfLoggedIn() async {
+  Future<void> checkIfOtherLoggedIn() async {
     bool? some_one_logged_in = false;
     this.preferences = await SharedPreferences.getInstance();
     some_one_logged_in = this.preferences?.getBool('someoneLoggedIn');
-    print(this.preferences?.getBool('stay_logged_in'));
+    if (some_one_logged_in == true) {
+      this.preferences?.setBool('someoneLoggedIn', false);
 
-    if (some_one_logged_in == true)
       Fluttertoast.showToast(
           msg:
               'You are trying to login into an account that is currently in used!',
@@ -148,6 +149,11 @@ class _LoginPageState extends State<LoginPage> {
           backgroundColor: ColorsTheme.btnColor,
           timeInSecForIosWeb: 3,
           textColor: Colors.white);
+    }
+  }
+
+  Future<void> checkIfLoggedIn() async {
+    print(this.preferences?.getBool('stay_logged_in'));
 
     if (this.preferences?.getBool('stay_logged_in') == true &&
         widget.is_logged_out == false) {
