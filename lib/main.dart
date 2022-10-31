@@ -1,7 +1,12 @@
 import 'package:efleet_project_tree/login.dart';
+import 'package:efleet_project_tree/pages/notifications.dart';
+import 'package:efleet_project_tree/utils/notification_service.dart';
 import 'package:flutter/material.dart';
 
 void main() {
+  WidgetsFlutterBinding.ensureInitialized();
+  NotificationService().initNotification();
+  NotificationService().requestIOSPermissions();
   runApp(const MyApp());
 }
 

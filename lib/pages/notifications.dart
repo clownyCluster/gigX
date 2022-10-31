@@ -1,7 +1,10 @@
 import 'package:efleet_project_tree/colors.dart';
+import 'package:efleet_project_tree/utils/notification_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/src/widgets/container.dart';
 import 'package:flutter/src/widgets/framework.dart';
+import 'package:timezone/timezone.dart' as tz;
+import 'package:timezone/data/latest.dart' as tz;
 
 class NotificationTab extends StatelessWidget {
   const NotificationTab({super.key});
@@ -30,6 +33,14 @@ class NotificationTabPage extends StatefulWidget {
 }
 
 class _NotificationTabPageState extends State<NotificationTabPage> {
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    tz.initializeTimeZones();
+    NotificationService().showNotification(1, 'title', 'body', 5);
+  }
+
   @override
   Widget build(BuildContext context) {
     height = MediaQuery.of(context).size.height;
