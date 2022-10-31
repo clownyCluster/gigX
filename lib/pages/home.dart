@@ -690,7 +690,7 @@ class _HomeTabPageState extends State<HomeTabPage> {
                                         width:
                                             orientation == Orientation.portrait
                                                 ? width * 0.18
-                                                : width * 0.6,
+                                                : width * 0.3,
                                       ),
                                       GestureDetector(
                                         onTap: () {},
