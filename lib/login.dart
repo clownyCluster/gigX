@@ -203,7 +203,7 @@ class _LoginPageState extends State<LoginPage> {
                   toastLength: Toast.LENGTH_SHORT,
                   gravity: ToastGravity.CENTER,
                   timeInSecForIosWeb: 1,
-                  backgroundColor: ColorsTheme.bgColor,
+                  backgroundColor: ColorsTheme.dangerColor,
                   textColor: Colors.white,
                   fontSize: 16.0);
           }
@@ -241,7 +241,7 @@ class _LoginPageState extends State<LoginPage> {
                 toastLength: Toast.LENGTH_SHORT,
                 gravity: ToastGravity.CENTER,
                 timeInSecForIosWeb: 1,
-                backgroundColor: ColorsTheme.bgColor,
+                backgroundColor: ColorsTheme.dangerColor,
                 textColor: Colors.white,
                 fontSize: 16.0);
           }
@@ -252,7 +252,7 @@ class _LoginPageState extends State<LoginPage> {
             toastLength: Toast.LENGTH_SHORT,
             gravity: ToastGravity.BOTTOM,
             timeInSecForIosWeb: 1,
-            backgroundColor: ColorsTheme.bgColor,
+            backgroundColor: ColorsTheme.dangerColor,
             textColor: Colors.white,
             fontSize: 16.0);
       }
