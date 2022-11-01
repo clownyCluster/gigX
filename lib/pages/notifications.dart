@@ -38,7 +38,7 @@ class _NotificationTabPageState extends State<NotificationTabPage> {
     // TODO: implement initState
     super.initState();
     tz.initializeTimeZones();
-    NotificationService().showNotification(1, 'title', 'body', 5);
+
   }
 
   @override
