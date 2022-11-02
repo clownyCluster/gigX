@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:auto_size_text/auto_size_text.dart';
@@ -7,10 +8,13 @@ import 'package:efleet_project_tree/colors.dart';
 import 'package:efleet_project_tree/home.dart';
 import 'package:efleet_project_tree/login.dart';
 import 'package:efleet_project_tree/pages/projectdetails.dart';
+import 'package:efleet_project_tree/utils/notification_service.dart';
 import 'package:f_datetimerangepicker/f_datetimerangepicker.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_image_compress/flutter_image_compress.dart';
 import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
@@ -51,6 +55,7 @@ class _HomeTabPageState extends State<HomeTabPage> {
   bool is_search_visible = true;
   bool keyboardVisible = false;
   var projects = [];
+  var notifications = [];
   List list = [];
   int current_max = 4;
   late ScrollController controller;
@@ -61,6 +66,16 @@ class _HomeTabPageState extends State<HomeTabPage> {
   TextEditingController txtProjectDescController = new TextEditingController();
   String? access_token;
   String search_query = "";
+  AndroidNotificationChannel channel = AndroidNotificationChannel(
+      'high_importance_channel', // id
+      'High Importance Notifications', // title
+      description:
+          'This channel is used for important notifications.', // description
+      importance: Importance.high,
+      playSound: true);
+
+  final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
+      FlutterLocalNotificationsPlugin();
 
   @override
   void initState() {
@@ -86,6 +101,175 @@ class _HomeTabPageState extends State<HomeTabPage> {
 
       }
     });
+
+    final AndroidInitializationSettings initializationSettingsAndroid =
+        AndroidInitializationSettings('@mipmap/ic_logo');
+
+    final InitializationSettings initializationSettings =
+        InitializationSettings(
+      android: initializationSettingsAndroid,
+    );
+    FirebaseMessaging.onMessage.listen((RemoteMessage message) {
+      RemoteNotification? notification = message.notification;
+      AndroidNotification? android = message.notification?.android;
+      if (notification != null && android != null) {
+        flutterLocalNotificationsPlugin.initialize(initializationSettings,
+            onDidReceiveNotificationResponse: (details) {
+          BottomNavigationBar navigationBar =
+              bottomWidgetKey.currentWidget as BottomNavigationBar;
+          navigationBar.onTap!(2);
+        });
+        flutterLocalNotificationsPlugin.show(
+            notification.hashCode,
+            notification.title,
+            notification.body,
+            NotificationDetails(
+              android: AndroidNotificationDetails(
+                channel.id,
+                channel.name,
+                channelDescription: channel.description,
+                color: Colors.blue,
+                playSound: true,
+                icon: '@mipmap/ic_logo',
+              ),
+            ));
+      }
+    });
+
+    FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
+      print('A new onMessageOpenedApp event was published!');
+      RemoteNotification? notification = message.notification;
+      AndroidNotification? android = message.notification?.android;
+      if (notification != null && android != null) {
+        print('Tapped');
+
+        showDialog(
+            context: context,
+            builder: (_) {
+              return AlertDialog(
+                title: Text(notification.title!),
+                content: SingleChildScrollView(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [Text(notification.body!)],
+                  ),
+                ),
+              );
+            });
+      }
+    });
+
+    init();
+    getNotifications();
+    // sendNotification();
+  }
+
+  init() async {
+    String deviceToken = await getDeviceToken();
+    print("###### PRINT DEVICE TOKEN TO USE FOR PUSH NOTIFCIATION ######");
+    print(deviceToken);
+    print("############################################################");
+
+    // listen for user to click on notification
+    FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage remoteMessage) {
+      String? title = remoteMessage.notification!.title;
+      String? description = remoteMessage.notification!.body;
+      BottomNavigationBar navigationBar =
+          bottomWidgetKey.currentWidget as BottomNavigationBar;
+      navigationBar.onTap!(2);
+    });
+  }
+
+  Future<void> getNotifications() async {
+    final _dio = Dio();
+    String? access_token;
+    DateTime? formatted_updated_at;
+
+    DateFormat format = DateFormat("yyyy-MM-dd hh:mm:ss");
+
+    this.preferences = await SharedPreferences.getInstance();
+    setState(() {
+      access_token = this.preferences?.getString('access_token');
+    });
+
+    try {
+      Response response = await _dio.get(API.base_url + 'my/todo-notifications',
+          options: Options(headers: {"authorization": "Bearer $access_token"}));
+      Map result = response.data;
+
+      if (response.statusCode == 200) {
+        setState(() {
+          notifications = response.data['data'];
+
+          notifications.forEach((element) {
+            formatted_updated_at = format.parse(element['updated_at']);
+            final difference = formatted_updated_at
+                ?.difference(DateTime.now())
+                .inMinutes
+                .abs();
+            print('The difference is ' + difference.toString());
+            if (difference! < 700) {
+              sendNotification(element['todo_id'], element['notification']);
+            }
+          });
+        });
+      }
+
+      return null;
+    } on DioError catch (e) {
+      return null;
+    }
+  }
+
+  Future<void> sendNotification(int id, String notification) async {
+    var postUrl = "https://fcm.googleapis.com/fcm/send";
+
+    var token = await getDeviceToken();
+
+    final data = {
+      "notification": {"body": "Tap to view details", "title": notification},
+      "priority": "high",
+      "data": {
+        "click_action": "FLUTTER_NOTIFICATION_CLICK",
+        "id": id,
+        "status": "done"
+      },
+      "to": "$token"
+    };
+
+    final headers = {
+      'content-type': 'application/json',
+      'Authorization':
+          'key=AAAAzR_avwc:APA91bGrP4kJz4VYR3X4nRCPJJ-Oun1QoFHnH4jLw_fIvOL68aZVmhUO8ln6tknyfcbE-W18JHJa3WawH3nWNPFywLKbShQa8krWa0o4YJIuDVe6OFNEXD3_QLkEOuRtXTRT7v86Wun8'
+    };
+
+    BaseOptions options = new BaseOptions(
+      connectTimeout: 5000,
+      receiveTimeout: 3000,
+      headers: headers,
+    );
+
+    try {
+      final response = await Dio(options).post(postUrl, data: data);
+
+      if (response.statusCode == 200) {
+        // Fluttertoast.showToast(msg: 'Request Sent To Driver');
+      } else {
+        print('notification sending failed');
+        // on failure do sth
+      }
+    } catch (e) {
+      print('exception $e');
+    }
+  }
+
+  //get device token to use for push notification
+  Future getDeviceToken() async {
+    //request user permission for push notification
+    FirebaseMessaging.instance.requestPermission();
+    FirebaseMessaging _firebaseMessage = FirebaseMessaging.instance;
+    String? deviceToken = await _firebaseMessage.getToken();
+    return (deviceToken == null) ? "" : deviceToken;
   }
 
   Future<void> getProjects() async {

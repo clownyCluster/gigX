@@ -13,6 +13,7 @@ import 'package:f_datetimerangepicker/f_datetimerangepicker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/src/widgets/container.dart';
 import 'package:flutter/src/widgets/framework.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:syncfusion_flutter_calendar/calendar.dart';
@@ -118,6 +119,7 @@ String formatted_start_date = "";
 String formatted_end_date = "";
 String? access_token;
 int? selected_project_id = 0;
+int logged_in_user_id = 0;
 bool is_loading = false;
 Map result = new Map();
 
@@ -427,6 +429,8 @@ class _TaskTabPageState extends State<TaskTabPage> {
 
   Future<void> getUsers() async {
     final _dio = Dio();
+    final storage = new FlutterSecureStorage();
+    email = await storage.read(key: 'email') ?? '';
 
     String? access_token;
     this.preferences = await SharedPreferences.getInstance();
@@ -444,6 +448,11 @@ class _TaskTabPageState extends State<TaskTabPage> {
         this.preferences?.setBool('someoneLoggedIn', false);
         setState(() {
           users = response.data['data'];
+          users
+              .where((element) => element['email'] == email)
+              .forEach((element) {
+            logged_in_user_id = element['id'];
+          });
         });
       } else if (response.statusCode == 401) {
         await this.preferences?.remove('access_token');
@@ -486,6 +495,8 @@ class _TaskTabPageState extends State<TaskTabPage> {
 
   Future<bool> saveTask() async {
     final _dio = new Dio();
+    DateTime stDate = DateFormat('d/MM/yyyy HH:mm').parse(formatted_start_date);
+    DateTime edDate = DateFormat('d/MM/yyyy HH:mm').parse(formatted_end_date);
     Map<String, dynamic> result = Map<String, dynamic>();
 
     try {
@@ -512,6 +523,17 @@ class _TaskTabPageState extends State<TaskTabPage> {
         setState(() {
           created_task_id = result['id'];
         });
+        List<Appointment> meetings = <Appointment>[];
+        meetings.add(Appointment(
+            startTime: stDate,
+            endTime: edDate,
+            subject: task_name,
+            color: ColorsTheme.aptBox,
+            id: result['id'],
+
+            // recurrenceRule: 'FREQ=DAILY;COUNT=10',
+            isAllDay: false));
+
         return true;
       } else
         return false;
@@ -1297,11 +1319,12 @@ class _TaskTabPageState extends State<TaskTabPage> {
                                           builder: (context) => const TaskTab(),
                                           fullscreenDialog: true));
 
-                                  NotificationService().showNotification(
-                                      created_task_id,
-                                      'Task Added Successfully!',
-                                      'Tap to view details',
-                                      10);
+                                  // NotificationService().showNotification(
+                                  //     created_task_id,
+                                  //     'Task Added Successfully!',
+                                  //     'Tap to view details',
+                                  //     10,
+                                  //     logged_in_user_id);
                                 } else
                                   Fluttertoast.showToast(
                                       msg: "Something went wrong!",
@@ -2058,11 +2081,11 @@ class _TaskTabPageState extends State<TaskTabPage> {
                                                 const TaskTab(),
                                             fullscreenDialog: true));
 
-                                    NotificationService().showNotification(
-                                        created_task_id,
-                                        'Task Updated Successfully!',
-                                        'Tap to view details',
-                                        10);
+                                    // NotificationService().showNotification(
+                                    //     created_task_id,
+                                    //     'Task Updated Successfully!',
+                                    //     'Tap to view details',
+                                    //     10);
                                   } else
                                     Fluttertoast.showToast(
                                         msg: "Something went wrong!",
@@ -2102,6 +2125,7 @@ class _TaskTabPageState extends State<TaskTabPage> {
     width = MediaQuery.of(context).size.width;
 
     return Scaffold(
+      resizeToAvoidBottomInset: false,
       body: OrientationBuilder(builder: (context, orientation) {
         return SingleChildScrollView(
             child: Container(

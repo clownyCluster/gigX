@@ -206,21 +206,23 @@ class _AccountTabPageState extends State<AccountTabPage> {
                         Container(
                           width: width * 0.40,
                           margin: EdgeInsets.only(left: 10.0),
-                          child: new Column(children: [
-                            new AutoSizeText('$userName \n',
-                                maxLines: 2,
-                                style: TextStyle(
-                                    color: Colors.black,
-                                    fontWeight: FontWeight.w600,
-                                    fontSize: 16.0)),
-                            new AutoSizeText(userEmail,
-                                maxLines: 2,
-                                style: TextStyle(
-                                    color: ColorsTheme.txtColor,
-                                    fontWeight: FontWeight.w400,
-                                    letterSpacing: -0.9,
-                                    fontSize: 6.0)),
-                          ]),
+                          child: new Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                new AutoSizeText('$userName',
+                                    maxLines: 2,
+                                    style: TextStyle(
+                                        color: Colors.black,
+                                        fontWeight: FontWeight.w600,
+                                        fontSize: 16.0)),
+                                new AutoSizeText(userEmail,
+                                    maxLines: 2,
+                                    style: TextStyle(
+                                        color: ColorsTheme.txtColor,
+                                        fontWeight: FontWeight.w400,
+                                        letterSpacing: -0.9,
+                                        fontSize: 6.0)),
+                              ]),
                         ),
                       ],
                     ),

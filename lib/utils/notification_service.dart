@@ -1,10 +1,16 @@
+import 'package:dio/dio.dart';
+import 'package:efleet_project_tree/api.dart';
 import 'package:efleet_project_tree/home.dart';
 import 'package:efleet_project_tree/main.dart';
 import 'package:efleet_project_tree/pages/notifications.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:timezone/timezone.dart' as tz;
 import 'package:timezone/data/latest.dart' as tz;
+
+SharedPreferences? preferences;
+bool is_read = false;
 
 class NotificationService {
   static final NotificationService _notificationService =
@@ -37,7 +43,7 @@ class NotificationService {
 
     await flutterLocalNotificationsPlugin.initialize(
       initializationSettings,
-      onDidReceiveNotificationResponse: (details) {
+      onDidReceiveNotificationResponse: (details) async {
         BottomNavigationBar navigationBar =
             bottomWidgetKey.currentWidget as BottomNavigationBar;
         navigationBar.onTap!(2);

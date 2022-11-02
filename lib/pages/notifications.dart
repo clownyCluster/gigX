@@ -1,10 +1,15 @@
+import 'package:dio/dio.dart';
+import 'package:efleet_project_tree/api.dart';
 import 'package:efleet_project_tree/colors.dart';
+import 'package:efleet_project_tree/login.dart';
 import 'package:efleet_project_tree/utils/notification_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/src/widgets/container.dart';
 import 'package:flutter/src/widgets/framework.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:timezone/timezone.dart' as tz;
 import 'package:timezone/data/latest.dart' as tz;
+import 'package:intl/intl.dart';
 
 class NotificationTab extends StatelessWidget {
   const NotificationTab({super.key});
@@ -33,12 +38,86 @@ class NotificationTabPage extends StatefulWidget {
 }
 
 class _NotificationTabPageState extends State<NotificationTabPage> {
+  SharedPreferences? preferences;
+  String? access_token = "";
+  bool is_loading = false;
+  var notifications = [];
+  DateTime? formatted_updated_at;
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
     tz.initializeTimeZones();
+    pref();
+    getNotifications();
+  }
 
+  Future<void> pref() async {
+    this.preferences = await SharedPreferences.getInstance();
+
+    access_token = this.preferences?.getString('access_token');
+  }
+
+  Future<void> getNotifications() async {
+    final _dio = Dio();
+    is_loading = true;
+    String? access_token;
+    DateFormat format = DateFormat("yyyy-MM-dd hh:mm:ss");
+
+    this.preferences = await SharedPreferences.getInstance();
+    setState(() {
+      access_token = this.preferences?.getString('access_token');
+    });
+
+    try {
+      Response response = await _dio.get(API.base_url + 'my/todo-notifications',
+          options: Options(headers: {"authorization": "Bearer $access_token"}));
+      Map result = response.data;
+
+      if (response.statusCode == 200) {
+        this.preferences?.setBool('someoneLoggedIn', false);
+        setState(() {
+          notifications = response.data['data'];
+          is_loading = false;
+          notifications.forEach((element) {
+            formatted_updated_at = format.parse(element['updated_at']);
+
+            element['updated_at'] =
+                DateFormat('MMMM dd, yyyy hh:mm').format(formatted_updated_at!);
+
+            // if (notifications.isNotEmpty == true)
+            //   NotificationService().showNotification(element['todo_id'],
+            //       element['notification'], 'Tap to view details', 10);
+          });
+        });
+      } else if (response.statusCode == 401) {
+        await this.preferences?.remove('access_token');
+        Navigator.of(context, rootNavigator: true).pushAndRemoveUntil(
+          MaterialPageRoute(
+            builder: (BuildContext context) {
+              return const Login();
+            },
+          ),
+          (_) => false,
+        );
+      }
+
+      return null;
+    } on DioError catch (e) {
+      if (e.response?.statusCode == 401) {
+        this.preferences?.setBool('someoneLoggedIn', true);
+        await this.preferences?.remove('access_token');
+        Navigator.of(context, rootNavigator: true).pushAndRemoveUntil(
+          MaterialPageRoute(
+            builder: (BuildContext context) {
+              return const Login();
+            },
+          ),
+          (_) => false,
+        );
+      }
+      return null;
+    }
   }
 
   @override
@@ -82,7 +161,7 @@ class _NotificationTabPageState extends State<NotificationTabPage> {
                     ? EdgeInsets.all(10.0)
                     : EdgeInsets.all(20.0),
                 child: ListView.builder(
-                    itemCount: 8,
+                    itemCount: notifications.length,
                     shrinkWrap: true,
                     itemExtent: 100.0,
                     itemBuilder: (BuildContext context, index) {
@@ -99,14 +178,14 @@ class _NotificationTabPageState extends State<NotificationTabPage> {
                           title: new RichText(
                             text: TextSpan(children: [
                               new TextSpan(
-                                  text:
-                                      'Leonardo De La Vega created this task \n',
+                                  text: notifications[index]['notification'] +
+                                      '\n',
                                   style: TextStyle(
                                       fontWeight: FontWeight.w600,
                                       fontSize: 13.0,
                                       color: Colors.black)),
                               new TextSpan(
-                                  text: 'Yesterday at 01:23 PM',
+                                  text: notifications[index]['updated_at'],
                                   style: TextStyle(
                                       fontWeight: FontWeight.w400,
                                       fontSize: 12,

@@ -293,6 +293,9 @@ class _ProjectDetailsPageState extends State<ProjectDetailsPage> {
             DateFormat format = DateFormat("dd/MM/yyyy");
 
             formatted_end_date_with_month = format.parse(element['end_date']);
+
+            element['end_date'] = DateFormat('MMMM dd, yyyy')
+                .format(formatted_end_date_with_month!);
           });
         });
       } else if (response.statusCode == 401) {
@@ -1407,7 +1410,7 @@ class _ProjectDetailsPageState extends State<ProjectDetailsPage> {
                       child: ListView.builder(
                           controller: controller,
                           itemCount: list.length < tasks.length
-                              ? list.length + 1
+                              ? list.length + 2
                               : tasks.length,
                           shrinkWrap: true,
                           itemExtent: 300.0,
@@ -1634,11 +1637,8 @@ class _ProjectDetailsPageState extends State<ProjectDetailsPage> {
                                               SizedBox(
                                                 width: 10.0,
                                               ),
-                                              if (formatted_end_date_with_month !=
-                                                  null)
-                                                Text(DateFormat('MMMM dd, yyyy')
-                                                    .format(
-                                                        formatted_end_date_with_month!))
+                                              Text(tasks[index]['end_date']
+                                                  .toString())
                                             ],
                                           ),
                                         )
