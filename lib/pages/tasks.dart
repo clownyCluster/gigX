@@ -29,9 +29,9 @@ class TaskTab extends StatelessWidget {
       title: 'Task Tab',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
-          primarySwatch: Colors.blue,
-          fontFamily: 'Poppins',
-          scaffoldBackgroundColor: ColorsTheme.bgColor),
+        primarySwatch: Colors.blue,
+        fontFamily: 'Poppins',
+      ),
       home: const TaskTabPage(),
     );
   }

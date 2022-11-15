@@ -849,14 +849,15 @@ class _HomeTabPageState extends State<HomeTabPage> {
                                                 maxLines: 1,
                                                 style: TextStyle(
                                                     color: Colors.black,
-                                                    fontSize: 12.0),
+                                                    fontSize: 18.0),
                                               ),
                                               AutoSizeText(
                                                 projects[index]['description'],
                                                 maxLines: 1,
                                                 overflow: TextOverflow.ellipsis,
                                                 style: TextStyle(
-                                                    color: Colors.black),
+                                                    color: Colors.black,
+                                                    fontSize: 12.0),
                                               ),
                                             ]),
                                       ),

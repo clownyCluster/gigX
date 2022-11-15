@@ -115,7 +115,7 @@ class _AccountTabPageState extends State<AccountTabPage> {
               new TextSpan(
                   text: 'Language \n',
                   style: TextStyle(
-                      fontSize: 16.0,
+                      fontSize: 20.0,
                       fontWeight: FontWeight.w600,
                       color: Colors.black)),
               new TextSpan(
@@ -246,7 +246,7 @@ class _AccountTabPageState extends State<AccountTabPage> {
                 Container(
                   padding: EdgeInsets.only(left: 40.0),
                   child: Container(
-                      height: 266,
+                      height: 226,
                       width: width * 0.82,
                       decoration: BoxDecoration(
                           color: Color(0xffD3D3D3),

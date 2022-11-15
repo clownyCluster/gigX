@@ -1188,7 +1188,7 @@ class _ProjectDetailsPageState extends State<ProjectDetailsPage> {
                     child: Row(
                       children: [
                         SizedBox(
-                          width: width * 0.4,
+                          width: width * 0.2,
                           height: 38.0,
                           child: TextButton(
                               onPressed: () {
@@ -1240,7 +1240,7 @@ class _ProjectDetailsPageState extends State<ProjectDetailsPage> {
                           width: 10.0,
                         ),
                         SizedBox(
-                          width: width * 0.4,
+                          width: width * 0.15,
                           height: 38.0,
                           child: TextButton(
                               onPressed: () {
@@ -1293,7 +1293,7 @@ class _ProjectDetailsPageState extends State<ProjectDetailsPage> {
                           width: 10.0,
                         ),
                         SizedBox(
-                          width: width * 0.4,
+                          width: width * 0.3,
                           height: 38.0,
                           child: TextButton(
                               onPressed: () {
@@ -1334,7 +1334,7 @@ class _ProjectDetailsPageState extends State<ProjectDetailsPage> {
                                 }),
                               ),
                               child: Text(
-                                'Completed Tasks',
+                                'Completed',
                                 style: TextStyle(
                                     color: compColor,
                                     fontSize: 12.0,
@@ -1345,7 +1345,7 @@ class _ProjectDetailsPageState extends State<ProjectDetailsPage> {
                           width: 10.0,
                         ),
                         SizedBox(
-                          width: width * 0.4,
+                          width: width * 0.25,
                           height: 38.0,
                           child: TextButton(
                               onPressed: () {
@@ -1387,7 +1387,7 @@ class _ProjectDetailsPageState extends State<ProjectDetailsPage> {
                                 }),
                               ),
                               child: Text(
-                                'Inprogress',
+                                'In Progress',
                                 style: TextStyle(
                                     color: inprogColor,
                                     fontSize: 12.0,

@@ -212,17 +212,21 @@ class _TaskDetailsPageState extends State<TaskDetailsPage> {
   Future<bool> saveComment() async {
     final _dio = new Dio();
     Map<String, dynamic> result = Map<String, dynamic>();
+    final bytes;
+    final compressed_bytes;
 
-    final path = pickedFile!.path;
-    var fileName = (pickedFile!.path.split('/').last);
+    final path = pickedFile?.path ?? '';
+    var fileName = (pickedFile?.path.split('/').last) ?? '';
 
-    final bytes = await File(path).readAsBytesSync();
-    final compressed_bytes = await FlutterImageCompress.compressWithList(
-        bytes.buffer.asUint8List(),
-        quality: 85,
-        minWidth: 500,
-        minHeight: 500);
-
+    if (path.isNotEmpty) {
+      bytes = await File(path).readAsBytesSync();
+      compressed_bytes = await FlutterImageCompress.compressWithList(
+          bytes.buffer.asUint8List(),
+          quality: 85,
+          minWidth: 500,
+          minHeight: 500);
+    } else
+      compressed_bytes = '';
     setState(() {
       access_token = this.preferences?.getString('access_token');
     });
@@ -235,8 +239,10 @@ class _TaskDetailsPageState extends State<TaskDetailsPage> {
         'percent_done': formatted_end_date,
         'status': category_id,
         'assign_to': assign_to_id,
-        'attachment':
-            await MultipartFile.fromBytes(compressed_bytes, filename: fileName),
+        'attachment': compressed_bytes != ''
+            ? await MultipartFile.fromBytes(compressed_bytes,
+                filename: fileName)
+            : null,
       });
       Response response = await _dio.post(API.base_url + 'todo-comment',
           data: formData,
