@@ -790,96 +790,105 @@ class _HomeTabPageState extends State<HomeTabPage> {
                     height: height * 0.6,
                     child: LazyLoadScrollView(
                       onEndOfPage: () => show_loading(),
-                      child: ListView.builder(
-                          controller: controller,
-                          itemCount: list.length < projects.length
-                              ? list.length + 2
-                              : projects.length,
-                          shrinkWrap: true,
-                          itemExtent: 120.0,
-                          itemBuilder: (BuildContext context, index) {
-                            return GestureDetector(
-                              onTap: () async {
-                                this.preferences =
-                                    await SharedPreferences.getInstance();
-                                this.preferences?.setInt(
-                                    'project_id', projects[index]['id']);
-                                this.preferences?.setString(
-                                    'logo_url', projects[index]['logo_url']);
+                      child: MediaQuery.removePadding(
+                        context: context,
+                        removeTop: true,
+                        child: ListView.builder(
+                            controller: controller,
+                            itemCount: list.length < projects.length
+                                ? list.length + 2
+                                : projects.length,
+                            shrinkWrap: true,
+                            itemExtent: 120.0,
+                            itemBuilder: (BuildContext context, index) {
+                              return GestureDetector(
+                                onTap: () async {
+                                  this.preferences =
+                                      await SharedPreferences.getInstance();
+                                  this.preferences?.setInt(
+                                      'project_id', projects[index]['id']);
+                                  this.preferences?.setString(
+                                      'logo_url', projects[index]['logo_url']);
 
-                                Navigator.of(context).push(MaterialPageRoute(
-                                    builder: (context) => ProjectDetails()));
-                              },
-                              child: ListTile(
-                                title: Container(
-                                  height: 99.0,
-                                  width: width * 0.85,
-                                  decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.circular(14.0),
-                                      border: Border.all(
-                                          color: Color(0xffEBEBEB),
-                                          width: 2.0)),
-                                  child: Row(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.center,
-                                    mainAxisAlignment: MainAxisAlignment.start,
-                                    children: [
-                                      Container(
-                                        padding: EdgeInsets.all(10.0),
-                                        width: 60,
-                                        height: 60,
-                                        child: projects[index]['logo_url'] == ''
-                                            ? Image.asset(
-                                                'assets/sample_logo.png')
-                                            : Image.network(
-                                                projects[index]['logo_url'],
-                                                fit: BoxFit.fill,
-                                              ),
-                                      ),
-                                      Container(
-                                        padding: EdgeInsets.all(10.0),
-                                        margin: EdgeInsets.only(top: 15.0),
-                                        width: width * 0.4,
-                                        child: Column(
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.start,
-                                            children: [
-                                              AutoSizeText(
-                                                projects[index]['title'],
-                                                maxLines: 1,
-                                                style: TextStyle(
-                                                    color: Colors.black,
-                                                    fontSize: 18.0),
-                                              ),
-                                              AutoSizeText(
-                                                projects[index]['description'],
-                                                maxLines: 1,
-                                                overflow: TextOverflow.ellipsis,
-                                                style: TextStyle(
-                                                    color: Colors.black,
-                                                    fontSize: 12.0),
-                                              ),
-                                            ]),
-                                      ),
-                                      SizedBox(
-                                        width:
-                                            orientation == Orientation.portrait
-                                                ? width * 0.18
-                                                : width * 0.3,
-                                      ),
-                                      GestureDetector(
-                                        onTap: () {},
-                                        child: Image(
-                                          image: AssetImage(
-                                              'assets/arrow_details.png'),
+                                  Navigator.of(context).push(MaterialPageRoute(
+                                      builder: (context) => ProjectDetails()));
+                                },
+                                child: ListTile(
+                                  title: Container(
+                                    height: 99.0,
+                                    width: width * 0.85,
+                                    decoration: BoxDecoration(
+                                        borderRadius:
+                                            BorderRadius.circular(14.0),
+                                        border: Border.all(
+                                            color: Color(0xffEBEBEB),
+                                            width: 2.0)),
+                                    child: Row(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.center,
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.start,
+                                      children: [
+                                        Container(
+                                          padding: EdgeInsets.all(10.0),
+                                          width: 60,
+                                          height: 60,
+                                          child: projects[index]['logo_url'] ==
+                                                  ''
+                                              ? Image.asset(
+                                                  'assets/sample_logo.png')
+                                              : Image.network(
+                                                  projects[index]['logo_url'],
+                                                  fit: BoxFit.fill,
+                                                ),
                                         ),
-                                      )
-                                    ],
+                                        Container(
+                                          padding: EdgeInsets.all(10.0),
+                                          margin: EdgeInsets.only(top: 15.0),
+                                          width: width * 0.4,
+                                          child: Column(
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
+                                              children: [
+                                                AutoSizeText(
+                                                  projects[index]['title'],
+                                                  maxLines: 1,
+                                                  style: TextStyle(
+                                                      color: Colors.black,
+                                                      fontSize: 18.0),
+                                                ),
+                                                AutoSizeText(
+                                                  projects[index]
+                                                      ['description'],
+                                                  maxLines: 1,
+                                                  overflow:
+                                                      TextOverflow.ellipsis,
+                                                  style: TextStyle(
+                                                      color: Colors.black,
+                                                      fontSize: 12.0),
+                                                ),
+                                              ]),
+                                        ),
+                                        SizedBox(
+                                          width: orientation ==
+                                                  Orientation.portrait
+                                              ? width * 0.18
+                                              : width * 0.3,
+                                        ),
+                                        GestureDetector(
+                                          onTap: () {},
+                                          child: Image(
+                                            image: AssetImage(
+                                                'assets/arrow_details.png'),
+                                          ),
+                                        )
+                                      ],
+                                    ),
                                   ),
                                 ),
-                              ),
-                            );
-                          }),
+                              );
+                            }),
+                      ),
                     ),
                   ),
                 if (_is_loading == true && projects.isEmpty)
