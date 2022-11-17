@@ -2150,6 +2150,7 @@ class _TaskTabPageState extends State<TaskTabPage> {
                   cellBorderColor: Colors.transparent,
                   todayHighlightColor: ColorsTheme.btnColor,
                   showNavigationArrow: true,
+                  showDatePickerButton: true,
                   onTap: calendarTapped,
                   dataSource: MeetingDataSource(getAppointments()),
                   timeSlotViewSettings: TimeSlotViewSettings(
