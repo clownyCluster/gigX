@@ -3,6 +3,8 @@ import 'package:dio/dio.dart';
 import 'package:efleet_project_tree/api.dart';
 import 'package:efleet_project_tree/colors.dart';
 import 'package:efleet_project_tree/login.dart';
+import 'package:efleet_project_tree/pages/webviewprivacypolicy.dart';
+import 'package:efleet_project_tree/pages/webviewtermsandconditions.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/src/widgets/container.dart';
 import 'package:flutter/src/widgets/framework.dart';
@@ -127,27 +129,39 @@ class _AccountTabPageState extends State<AccountTabPage> {
             ])),
             trailing: Image.asset('assets/arrow_right.png'),
           ),
-          ListTile(
-            leading: Image.asset('assets/privacy_policy_icon.png'),
-            title: Text(
-              'Privacy Policy',
-              style: TextStyle(
-                  color: Colors.black,
-                  fontWeight: FontWeight.w600,
-                  fontSize: 16.0),
+          InkWell(
+            onTap: () {
+              Navigator.of(context).push(
+                  MaterialPageRoute(builder: (context) => PrivacyPolicy()));
+            },
+            child: ListTile(
+              leading: Image.asset('assets/privacy_policy_icon.png'),
+              title: Text(
+                'Privacy Policy',
+                style: TextStyle(
+                    color: Colors.black,
+                    fontWeight: FontWeight.w600,
+                    fontSize: 16.0),
+              ),
+              trailing: Image.asset('assets/arrow_right.png'),
             ),
-            trailing: Image.asset('assets/arrow_right.png'),
           ),
-          ListTile(
-            leading: Image.asset('assets/terms_conditions_icon.png'),
-            title: Text(
-              'Terms & Conditions',
-              style: TextStyle(
-                  color: Colors.black,
-                  fontWeight: FontWeight.w600,
-                  fontSize: 16.0),
+          InkWell(
+            onTap: () {
+              Navigator.of(context).push(
+                  MaterialPageRoute(builder: (context) => TermsConditions()));
+            },
+            child: ListTile(
+              leading: Image.asset('assets/terms_conditions_icon.png'),
+              title: Text(
+                'Terms & Conditions',
+                style: TextStyle(
+                    color: Colors.black,
+                    fontWeight: FontWeight.w600,
+                    fontSize: 16.0),
+              ),
+              trailing: Image.asset('assets/arrow_right.png'),
             ),
-            trailing: Image.asset('assets/arrow_right.png'),
           ),
           ListTile(
             leading: Image(

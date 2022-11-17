@@ -25,7 +25,9 @@ class Home extends StatelessWidget {
           primarySwatch: Colors.blue,
           fontFamily: 'Poppins',
           scaffoldBackgroundColor: ColorsTheme.bgColor),
-      home: const HomePage(),
+      home: const HomePage(
+        initialPage: 0,
+      ),
     );
   }
 }
@@ -33,11 +35,11 @@ class Home extends StatelessWidget {
 var height, width;
 int _current_index = 0;
 bool? viewed_project_details = false;
-  var bottomWidgetKey = new GlobalKey<State<BottomNavigationBar>>();
-
+var bottomWidgetKey = new GlobalKey<State<BottomNavigationBar>>();
 
 class HomePage extends StatefulWidget {
-  const HomePage({super.key});
+  final int initialPage;
+  const HomePage({Key? key, required this.initialPage}) : super(key: key);
 
   @override
   State<HomePage> createState() => _HomePageState();
@@ -67,6 +69,11 @@ class _HomePageState extends State<HomePage> {
     super.initState();
     BackButtonInterceptor.add(myInterceptor);
     initializePrefs();
+    if (widget.initialPage != 0) {
+      setState(() {
+        _selectedIndex = widget.initialPage;
+      });
+    }
   }
 
   @override
