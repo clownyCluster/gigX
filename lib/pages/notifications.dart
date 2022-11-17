@@ -42,6 +42,8 @@ class _NotificationTabPageState extends State<NotificationTabPage> {
   String? access_token = "";
   bool is_loading = false;
   var notifications = [];
+  var updated_notifications = [];
+  late Map notificationsMap;
   DateTime? formatted_updated_at;
   @override
   void initState() {
@@ -79,11 +81,22 @@ class _NotificationTabPageState extends State<NotificationTabPage> {
         setState(() {
           notifications = response.data['data'];
           is_loading = false;
-          notifications.forEach((element) {
+          notifications
+              .where((element) => element['is_read'] == 0)
+              .forEach((element) {
+            print(element);
+
             formatted_updated_at = format.parse(element['updated_at']);
 
             element['updated_at'] =
                 DateFormat('MMMM dd, yyyy hh:mm').format(formatted_updated_at!);
+
+            notificationsMap = {
+              'notification': element['notification'],
+              'updated_at': element['updated_at']
+            };
+
+            updated_notifications.add(notificationsMap);
 
             // if (notifications.isNotEmpty == true)
             //   NotificationService().showNotification(element['todo_id'],
@@ -161,7 +174,7 @@ class _NotificationTabPageState extends State<NotificationTabPage> {
                     ? EdgeInsets.all(10.0)
                     : EdgeInsets.all(20.0),
                 child: ListView.builder(
-                    itemCount: notifications.length,
+                    itemCount: updated_notifications.length,
                     shrinkWrap: true,
                     itemExtent: 100.0,
                     itemBuilder: (BuildContext context, index) {
@@ -178,14 +191,16 @@ class _NotificationTabPageState extends State<NotificationTabPage> {
                           title: new RichText(
                             text: TextSpan(children: [
                               new TextSpan(
-                                  text: notifications[index]['notification'] +
+                                  text: updated_notifications[index]
+                                          ['notification'] +
                                       '\n',
                                   style: TextStyle(
                                       fontWeight: FontWeight.w600,
                                       fontSize: 13.0,
                                       color: Colors.black)),
                               new TextSpan(
-                                  text: notifications[index]['updated_at'],
+                                  text: updated_notifications[index]
+                                      ['updated_at'],
                                   style: TextStyle(
                                       fontWeight: FontWeight.w400,
                                       fontSize: 12,

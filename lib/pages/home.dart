@@ -115,9 +115,7 @@ class _HomeTabPageState extends State<HomeTabPage> {
       if (notification != null && android != null) {
         flutterLocalNotificationsPlugin.initialize(initializationSettings,
             onDidReceiveNotificationResponse: (details) {
-          BottomNavigationBar navigationBar =
-              bottomWidgetKey.currentWidget as BottomNavigationBar;
-          navigationBar.onTap!(2);
+          setNotificationAsRead(message.data['id']);
         });
         flutterLocalNotificationsPlugin.show(
             notification.hashCode,
@@ -174,9 +172,8 @@ class _HomeTabPageState extends State<HomeTabPage> {
     FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage remoteMessage) {
       String? title = remoteMessage.notification!.title;
       String? description = remoteMessage.notification!.body;
-      BottomNavigationBar navigationBar =
-          bottomWidgetKey.currentWidget as BottomNavigationBar;
-      navigationBar.onTap!(2);
+      String id = remoteMessage.data['id'];
+      setNotificationAsRead(id);
     });
   }
 
@@ -201,7 +198,9 @@ class _HomeTabPageState extends State<HomeTabPage> {
         setState(() {
           notifications = response.data['data'];
 
-          notifications.forEach((element) {
+          notifications
+              .where((element) => element['is_read'] == 0)
+              .forEach((element) {
             formatted_updated_at = format.parse(element['updated_at']);
             final difference = formatted_updated_at
                 ?.difference(DateTime.now())
@@ -209,7 +208,7 @@ class _HomeTabPageState extends State<HomeTabPage> {
                 .abs();
             print('The difference is ' + difference.toString());
             if (difference! < 700) {
-              sendNotification(element['todo_id'], element['notification']);
+              sendNotification(element['id'], element['notification']);
             }
           });
         });
@@ -323,6 +322,32 @@ class _HomeTabPageState extends State<HomeTabPage> {
           (_) => false,
         );
       }
+      return null;
+    }
+  }
+
+  Future<void> setNotificationAsRead(String notification_id) async {
+    final _dio = new Dio();
+
+    try {
+      final formData = FormData.fromMap({
+        'is_read': 1,
+      });
+      Response response =
+          await _dio.post(API.base_url + 'todo-notification/$notification_id',
+              data: formData,
+              options: Options(headers: {
+                "Content-type": "multipart/form-data",
+                "authorization": "Bearer " + access_token.toString()
+              }));
+      print(response.data);
+      if (response.statusCode == 200) {
+        BottomNavigationBar navigationBar =
+            bottomWidgetKey.currentWidget as BottomNavigationBar;
+        navigationBar.onTap!(2);
+      }
+    } on DioError catch (e) {
+      print(e);
       return null;
     }
   }
