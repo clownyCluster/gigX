@@ -72,10 +72,15 @@ List<Appointment> getAppointments() {
 
     subject = element['title'];
 
-    DateTime tempEndDateTime =
-        new DateFormat("dd/MM/yyyy HH:mm").parse(element['end_date']);
-    formatted_start_time = DateFormat.Hm().format(tempStartDateTime);
-    formatted_end_time = DateFormat.Hm().format(tempEndDateTime);
+    var inputFormat = DateFormat('dd/MM/yyyy HH:mm');
+    var startDateFormat =
+        inputFormat.parse(element['start_date']); // <-- dd/MM 24H format
+
+    var outputFormat = DateFormat('MM/dd/yyyy hh:mm a');
+    var startDate = outputFormat.format(startDateFormat);
+
+    print(startDate);
+
     print(formatted_start_time);
     meetings.add(Appointment(
         startTime: DateFormat("dd/MM/yyyy HH:mm").parse(element['start_date']),
@@ -298,7 +303,9 @@ class _TaskTabPageState extends State<TaskTabPage> {
   }
 
   int? selectedIndex3;
-  Widget setupUpdateSelectProjectDialog() {
+  bool selectedAddProject = false;
+
+  Widget setupUpdateSelectProjectDialog(StateSetter updateState) {
     return Container(
       height: 300.0, // Change as per your requirement
       width: 300.0, // Change as per your requirement
@@ -311,12 +318,13 @@ class _TaskTabPageState extends State<TaskTabPage> {
             return InkWell(
               onTap: () {
                 print(projects[index]['id']);
-                setState(() {
+                updateState(() {
+                  selectedAddProject = true;
                   selectedIndex3 = index;
                   project_id = projects[index]['id'];
                 });
                 Navigator.of(context).pop();
-                refreshUpdateTaskModal();
+                // refreshUpdateTaskModal();
               },
               child: Container(
                 color: selectedIndex3 == index ? ColorsTheme.btnColor : null,
@@ -338,7 +346,7 @@ class _TaskTabPageState extends State<TaskTabPage> {
   }
 
   int? selectedIndex4;
-  Widget setupUpdateSelectUserDialog() {
+  Widget setupUpdateSelectUserDialog(StateSetter updateState) {
     return Container(
       height: 300.0, // Change as per your requirement
       width: 300.0, // Change as per your requirement
@@ -351,12 +359,12 @@ class _TaskTabPageState extends State<TaskTabPage> {
             return InkWell(
               onTap: () {
                 print(users[index]['id']);
-                setState(() {
+                updateState(() {
                   selectedIndex4 = index;
                   user_id = users[index]['id'];
                 });
                 Navigator.of(context).pop();
-                refreshUpdateTaskModal();
+                // refreshUpdateTaskModal();
               },
               child: Container(
                 color: selectedIndex4 == index ? ColorsTheme.btnColor : null,
@@ -1357,766 +1365,759 @@ class _TaskTabPageState extends State<TaskTabPage> {
   }
 
   void _updateTaskModalBottomSheet(BuildContext context, int task_id) async {
-    Future.delayed(Duration.zero, () {
-      showModalBottomSheet(
-          context: context,
-          isScrollControlled: true,
-          isDismissible: true,
-          // useRootNavigator: false,
-          shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.only(
-                  topLeft: Radius.circular(14.0),
-                  topRight: Radius.circular(14.0))),
-          builder: (context) {
-            return StatefulBuilder(builder: (BuildContext context,
-                StateSetter setState /*You can rename this!*/) {
-              return Container(
-                height: 620.0,
-                padding: EdgeInsets.all(20.0),
-                child: ListView(
-                  children: [
-                    Container(
-                      child: Text(
-                        'Task Name',
-                        style: TextStyle(
-                            color: Colors.black,
-                            fontWeight: FontWeight.w600,
-                            fontSize: 14.0),
+    showModalBottomSheet(
+        context: context,
+        isScrollControlled: true,
+        isDismissible: true,
+        // useRootNavigator: false,
+        shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.only(
+                topLeft: Radius.circular(14.0),
+                topRight: Radius.circular(14.0))),
+        builder: (context) {
+          return StatefulBuilder(builder: (BuildContext context,
+              StateSetter state /*You can rename this!*/) {
+            return Container(
+              height: 620.0,
+              padding: EdgeInsets.all(20.0),
+              child: ListView(
+                children: [
+                  Container(
+                    child: Text(
+                      'Task Name',
+                      style: TextStyle(
+                          color: Colors.black,
+                          fontWeight: FontWeight.w600,
+                          fontSize: 14.0),
+                    ),
+                  ),
+                  Container(
+                    child: TextField(
+                      controller: txt_updateTaskNameController,
+                      onChanged: (value) {
+                        state(() {
+                          task_name = value.toString();
+                        });
+                      },
+                      decoration: InputDecoration(
+                        hintText: 'Name',
                       ),
                     ),
-                    Container(
-                      child: TextField(
-                        controller: txt_updateTaskNameController,
-                        onChanged: (value) {
-                          setState(() {
-                            task_name = value.toString();
-                          });
-                        },
-                        decoration: InputDecoration(
-                          hintText: 'Name',
-                        ),
-                      ),
-                    ),
-                    Container(
-                      margin: EdgeInsets.only(
-                          top: 20.0, left: 5.0, bottom: 20.0, right: 5.0),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        children: [
-                          InkWell(
-                            onTap: () {
-                              showDialog(
-                                context: context,
-                                builder: (BuildContext context) {
-                                  return StatefulBuilder(
-                                    builder: (BuildContext context,
-                                        StateSetter setState) {
-                                      return AlertDialog(
-                                        content: Column(
-                                          mainAxisSize: MainAxisSize.min,
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
-                                          children: [
-                                            Text(
-                                              'Please select a project.',
-                                              style: TextStyle(
-                                                  color: Colors.black,
-                                                  fontWeight: FontWeight.w700),
-                                            ),
-                                            setupUpdateSelectProjectDialog(),
-                                          ],
-                                        ),
-                                        actions: <Widget>[
-                                          // usually buttons at the bottom of the dialog
-                                          new TextButton(
-                                            child: new Text("Close"),
-                                            onPressed: () {
-                                              Navigator.of(context).pop();
-                                            },
+                  ),
+                  Container(
+                    margin: EdgeInsets.only(
+                        top: 20.0, left: 5.0, bottom: 20.0, right: 5.0),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: [
+                        InkWell(
+                          onTap: () {
+                            showDialog(
+                              context: context,
+                              builder: (BuildContext context) {
+                                return StatefulBuilder(
+                                  builder: (BuildContext context,
+                                      StateSetter setState) {
+                                    return AlertDialog(
+                                      content: Column(
+                                        mainAxisSize: MainAxisSize.min,
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          Text(
+                                            'Please select a project.',
+                                            style: TextStyle(
+                                                color: Colors.black,
+                                                fontWeight: FontWeight.w700),
                                           ),
+                                          setupUpdateSelectProjectDialog(state),
                                         ],
-                                      );
-                                    },
-                                  );
-                                },
-                              );
-                            },
-                            child: Container(
-                              padding: EdgeInsets.only(right: 20.0),
-                              child: Image(
-                                image:
-                                    AssetImage('assets/plus_add_project.png'),
-                              ),
+                                      ),
+                                      actions: <Widget>[
+                                        // usually buttons at the bottom of the dialog
+                                        new TextButton(
+                                          child: new Text("Close"),
+                                          onPressed: () {
+                                            Navigator.of(context).pop();
+                                          },
+                                        ),
+                                      ],
+                                    );
+                                  },
+                                );
+                              },
+                            );
+                          },
+                          child: Container(
+                            padding: EdgeInsets.only(right: 20.0),
+                            child: Image(
+                              image: AssetImage('assets/plus_add_project.png'),
                             ),
                           ),
-                          selectedIndex3 != null
-                              ? AutoSizeText('Project Selected')
-                              : AutoSizeText('Add Project')
-                        ],
-                      ),
+                        ),
+                        selectedAddProject != false
+                            ? AutoSizeText('Project Selected')
+                            : AutoSizeText('Add Project')
+                      ],
                     ),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Container(
+                  ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Container(
+                        margin: EdgeInsets.only(
+                            top: 20.0, left: 5.0, bottom: 20.0, right: 5.0),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          children: [
+                            InkWell(
+                              onTap: () {
+                                showDialog(
+                                  context: context,
+                                  builder: (BuildContext context) {
+                                    return StatefulBuilder(
+                                      builder: (BuildContext context,
+                                          StateSetter setState) {
+                                        return AlertDialog(
+                                          content: Column(
+                                            mainAxisSize: MainAxisSize.min,
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: [
+                                              Text(
+                                                'Please select a user.',
+                                                style: TextStyle(
+                                                    color: Colors.black,
+                                                    fontWeight:
+                                                        FontWeight.w700),
+                                              ),
+                                              setupUpdateSelectUserDialog(
+                                                  state),
+                                            ],
+                                          ),
+                                          actions: <Widget>[
+                                            // usually buttons at the bottom of the dialog
+                                            new TextButton(
+                                              child: new Text("Close"),
+                                              onPressed: () {
+                                                Navigator.of(context).pop();
+                                              },
+                                            ),
+                                          ],
+                                        );
+                                      },
+                                    );
+                                  },
+                                );
+                              },
+                              child: Container(
+                                padding: EdgeInsets.only(right: 20.0),
+                                child: Image(
+                                  image:
+                                      AssetImage('assets/unassigned_icon.png'),
+                                ),
+                              ),
+                            ),
+                            selectedIndex4 != null
+                                ? AutoSizeText('Assigned')
+                                : AutoSizeText('Unassigned'),
+                          ],
+                        ),
+                      ),
+                      GestureDetector(
+                        onTap: () async {
+                          DateTimeRangePicker(
+                              startText: "From",
+                              endText: "To",
+                              doneText: "Yes",
+                              cancelText: "Cancel",
+                              interval: 5,
+                              initialStartTime: DateTime.now(),
+                              initialEndTime:
+                                  DateTime.now().add(Duration(days: 20)),
+                              mode: DateTimeRangePickerMode.dateAndTime,
+                              minimumTime:
+                                  DateTime.now().subtract(Duration(days: 120)),
+                              maximumTime:
+                                  DateTime.now().add(Duration(days: 365)),
+                              use24hFormat: false,
+                              onConfirm: (start, end) {
+                                formatted_start_date =
+                                    DateFormat('dd/MM/yyyy HH:mm')
+                                        .format(start);
+                                formatted_end_date =
+                                    DateFormat('dd/MM/yyyy HH:mm').format(end);
+                                print(formatted_start_date);
+                                print(formatted_end_date);
+                              }).showPicker(context);
+                        },
+                        child: Container(
                           margin: EdgeInsets.only(
                               top: 20.0, left: 5.0, bottom: 20.0, right: 5.0),
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.start,
                             children: [
-                              InkWell(
-                                onTap: () {
-                                  showDialog(
-                                    context: context,
-                                    builder: (BuildContext context) {
-                                      return StatefulBuilder(
-                                        builder: (BuildContext context,
-                                            StateSetter setState) {
-                                          return AlertDialog(
-                                            content: Column(
-                                              mainAxisSize: MainAxisSize.min,
-                                              crossAxisAlignment:
-                                                  CrossAxisAlignment.start,
-                                              children: [
-                                                Text(
-                                                  'Please select a user.',
-                                                  style: TextStyle(
-                                                      color: Colors.black,
-                                                      fontWeight:
-                                                          FontWeight.w700),
-                                                ),
-                                                setupUpdateSelectUserDialog(),
-                                              ],
-                                            ),
-                                            actions: <Widget>[
-                                              // usually buttons at the bottom of the dialog
-                                              new TextButton(
-                                                child: new Text("Close"),
-                                                onPressed: () {
-                                                  Navigator.of(context).pop();
-                                                },
-                                              ),
-                                            ],
-                                          );
-                                        },
-                                      );
-                                    },
-                                  );
-                                },
-                                child: Container(
-                                  padding: EdgeInsets.only(right: 20.0),
-                                  child: Image(
-                                    image: AssetImage(
-                                        'assets/unassigned_icon.png'),
-                                  ),
+                              Container(
+                                padding: EdgeInsets.only(right: 20.0),
+                                child: Image(
+                                  image: AssetImage('assets/due_date_icon.png'),
                                 ),
                               ),
-                              selectedIndex4 != null
-                                  ? AutoSizeText('Assigned')
-                                  : AutoSizeText('Unassigned'),
+                              AutoSizeText('Due Date'),
                             ],
                           ),
                         ),
-                        GestureDetector(
-                          onTap: () async {
-                            DateTimeRangePicker(
-                                startText: "From",
-                                endText: "To",
-                                doneText: "Yes",
-                                cancelText: "Cancel",
-                                interval: 5,
-                                initialStartTime: DateTime.now(),
-                                initialEndTime:
-                                    DateTime.now().add(Duration(days: 20)),
-                                mode: DateTimeRangePickerMode.dateAndTime,
-                                minimumTime: DateTime.now()
-                                    .subtract(Duration(days: 120)),
-                                maximumTime:
-                                    DateTime.now().add(Duration(days: 365)),
-                                use24hFormat: false,
-                                onConfirm: (start, end) {
-                                  formatted_start_date =
-                                      DateFormat('dd/MM/yyyy HH:mm')
-                                          .format(start);
-                                  formatted_end_date =
-                                      DateFormat('dd/MM/yyyy HH:mm')
-                                          .format(end);
-                                  print(formatted_start_date);
-                                  print(formatted_end_date);
-                                }).showPicker(context);
-                          },
-                          child: Container(
-                            margin: EdgeInsets.only(
-                                top: 20.0, left: 5.0, bottom: 20.0, right: 5.0),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.start,
-                              children: [
-                                Container(
-                                  padding: EdgeInsets.only(right: 20.0),
-                                  child: Image(
-                                    image:
-                                        AssetImage('assets/due_date_icon.png'),
-                                  ),
-                                ),
-                                AutoSizeText('Due Date'),
-                              ],
+                      ),
+                    ],
+                  ),
+                  Container(
+                    child: Text(
+                      'Description',
+                      style: TextStyle(
+                          color: Colors.black,
+                          fontWeight: FontWeight.w600,
+                          fontSize: 14.0),
+                    ),
+                  ),
+                  Container(
+                    child: TextField(
+                      controller: txt_updateTaskDescController,
+                      onChanged: (value) {
+                        setState(() {
+                          task_desc = value.toString();
+                        });
+                      },
+                      decoration: InputDecoration(
+                        hintText: 'Type here',
+                      ),
+                    ),
+                  ),
+                  Container(
+                    child: Text(
+                      'Percent Done',
+                      style: TextStyle(
+                          color: Colors.black,
+                          fontWeight: FontWeight.w600,
+                          fontSize: 14.0),
+                    ),
+                  ),
+                  Container(
+                    child: SfSlider(
+                      min: 0.0,
+                      max: 100.0,
+                      value: _percent,
+                      activeColor: ColorsTheme.btnColor,
+                      interval: 20,
+                      showTicks: true,
+                      showLabels: true,
+                      enableTooltip: true,
+                      minorTicksPerInterval: 1,
+                      onChanged: (dynamic value) {
+                        setState(() {
+                          // print(value);
+                          _percent = value;
+                        });
+                      },
+                    ),
+                  ),
+                  Container(
+                    margin: EdgeInsets.only(top: 10.0),
+                    child: Text(
+                      'Priority',
+                      style: TextStyle(
+                          color: Colors.black,
+                          fontWeight: FontWeight.w600,
+                          fontSize: 14.0),
+                    ),
+                  ),
+                  Container(
+                    margin: EdgeInsets.only(top: 10.0),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Container(
+                          width: width * 0.23,
+                          height: 38.0,
+                          child: TextButton(
+                            style: ButtonStyle(
+                              shape: MaterialStateProperty.all(
+                                  RoundedRectangleBorder(
+                                side: BorderSide(
+                                    color: priority_id == 0
+                                        ? Colors.white
+                                        : ColorsTheme.txtDescColor),
+                                borderRadius: BorderRadius.circular(14.0),
+                              )),
+                              foregroundColor:
+                                  MaterialStateProperty.resolveWith<Color>(
+                                      (Set<MaterialState> states) {
+                                if (states.contains(MaterialState.hovered) ||
+                                    states.contains(MaterialState.focused))
+                                  return priority_id == 0
+                                      ? Colors.white
+                                      : ColorsTheme.txtDescColor;
+                                return priority_id == 0
+                                    ? Colors.white
+                                    : ColorsTheme.txtDescColor;
+                              }),
+                              backgroundColor:
+                                  MaterialStateProperty.resolveWith<Color>(
+                                      (Set<MaterialState> states) {
+                                if (states.contains(MaterialState.hovered) ||
+                                    states.contains(MaterialState.focused))
+                                  return priority_id == 0
+                                      ? ColorsTheme.compbtnColor
+                                      : ColorsTheme.bgColor;
+
+                                return priority_id == 0
+                                    ? ColorsTheme.compbtnColor
+                                    : ColorsTheme.bgColor;
+                              }),
                             ),
+                            child: Text('Low'),
+                            onPressed: () {
+                              state(() {
+                                priority_id = 0;
+                              });
+                            },
+                          ),
+                        ),
+                        Container(
+                          width: width * 0.23,
+                          height: 38.0,
+                          child: TextButton(
+                            style: ButtonStyle(
+                              shape: MaterialStateProperty.all(
+                                  RoundedRectangleBorder(
+                                side: BorderSide(
+                                    color: priority_id == 1
+                                        ? Colors.white
+                                        : ColorsTheme.txtDescColor),
+                                borderRadius: BorderRadius.circular(14.0),
+                              )),
+                              foregroundColor:
+                                  MaterialStateProperty.resolveWith<Color>(
+                                      (Set<MaterialState> states) {
+                                if (states.contains(MaterialState.hovered) ||
+                                    states.contains(MaterialState.focused))
+                                  return priority_id == 1
+                                      ? Colors.white
+                                      : ColorsTheme.txtDescColor;
+                                return priority_id == 1
+                                    ? Colors.white
+                                    : ColorsTheme.txtDescColor;
+                              }),
+                              backgroundColor:
+                                  MaterialStateProperty.resolveWith<Color>(
+                                      (Set<MaterialState> states) {
+                                if (states.contains(MaterialState.hovered) ||
+                                    states.contains(MaterialState.focused))
+                                  return priority_id == 1
+                                      ? ColorsTheme.inCompbtnColor
+                                      : ColorsTheme.bgColor;
+
+                                return priority_id == 1
+                                    ? ColorsTheme.inCompbtnColor
+                                    : ColorsTheme.bgColor;
+                              }),
+                            ),
+                            child: Text('High'),
+                            onPressed: () {
+                              state(() {
+                                priority_id = 1;
+                              });
+                            },
+                          ),
+                        ),
+                        Container(
+                          width: width * 0.23,
+                          height: 38.0,
+                          child: TextButton(
+                            style: ButtonStyle(
+                              shape: MaterialStateProperty.all(
+                                  RoundedRectangleBorder(
+                                side: BorderSide(
+                                    color: priority_id == 2
+                                        ? Colors.white
+                                        : ColorsTheme.txtDescColor),
+                                borderRadius: BorderRadius.circular(14.0),
+                              )),
+                              foregroundColor:
+                                  MaterialStateProperty.resolveWith<Color>(
+                                      (Set<MaterialState> states) {
+                                if (states.contains(MaterialState.hovered) ||
+                                    states.contains(MaterialState.focused))
+                                  return priority_id == 2
+                                      ? Colors.white
+                                      : ColorsTheme.txtDescColor;
+                                return priority_id == 2
+                                    ? Colors.white
+                                    : ColorsTheme.txtDescColor;
+                              }),
+                              backgroundColor:
+                                  MaterialStateProperty.resolveWith<Color>(
+                                      (Set<MaterialState> states) {
+                                if (states.contains(MaterialState.hovered) ||
+                                    states.contains(MaterialState.focused))
+                                  return priority_id == 2
+                                      ? ColorsTheme.inProgbtnColor
+                                      : ColorsTheme.bgColor;
+
+                                return priority_id == 2
+                                    ? ColorsTheme.inProgbtnColor
+                                    : ColorsTheme.bgColor;
+                              }),
+                            ),
+                            child: Text('Urgent'),
+                            onPressed: () {
+                              state(() {
+                                priority_id = 2;
+                              });
+                            },
                           ),
                         ),
                       ],
                     ),
-                    Container(
-                      child: Text(
-                        'Description',
-                        style: TextStyle(
-                            color: Colors.black,
-                            fontWeight: FontWeight.w600,
-                            fontSize: 14.0),
-                      ),
+                  ),
+                  Container(
+                    margin: EdgeInsets.only(top: 10.0),
+                    child: Text(
+                      'Status',
+                      style: TextStyle(
+                          color: Colors.black,
+                          fontWeight: FontWeight.w600,
+                          fontSize: 14.0),
                     ),
-                    Container(
-                      child: TextField(
-                        controller: txt_updateTaskDescController,
-                        onChanged: (value) {
-                          setState(() {
-                            task_desc = value.toString();
-                          });
-                        },
-                        decoration: InputDecoration(
-                          hintText: 'Type here',
-                        ),
-                      ),
-                    ),
-                    Container(
-                      child: Text(
-                        'Percent Done',
-                        style: TextStyle(
-                            color: Colors.black,
-                            fontWeight: FontWeight.w600,
-                            fontSize: 14.0),
-                      ),
-                    ),
-                    Container(
-                      child: SfSlider(
-                        min: 0.0,
-                        max: 100.0,
-                        value: _percent,
-                        activeColor: ColorsTheme.btnColor,
-                        interval: 20,
-                        showTicks: true,
-                        showLabels: true,
-                        enableTooltip: true,
-                        minorTicksPerInterval: 1,
-                        onChanged: (dynamic value) {
-                          setState(() {
-                            // print(value);
-                            _percent = value;
-                          });
-                        },
-                      ),
-                    ),
-                    Container(
-                      margin: EdgeInsets.only(top: 10.0),
-                      child: Text(
-                        'Priority',
-                        style: TextStyle(
-                            color: Colors.black,
-                            fontWeight: FontWeight.w600,
-                            fontSize: 14.0),
-                      ),
-                    ),
-                    Container(
-                      margin: EdgeInsets.only(top: 10.0),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Container(
-                            width: width * 0.23,
-                            height: 38.0,
-                            child: TextButton(
-                              style: ButtonStyle(
-                                shape: MaterialStateProperty.all(
-                                    RoundedRectangleBorder(
-                                  side: BorderSide(
-                                      color: priority_id == 0
-                                          ? Colors.white
-                                          : ColorsTheme.txtDescColor),
-                                  borderRadius: BorderRadius.circular(14.0),
-                                )),
-                                foregroundColor:
-                                    MaterialStateProperty.resolveWith<Color>(
-                                        (Set<MaterialState> states) {
-                                  if (states.contains(MaterialState.hovered) ||
-                                      states.contains(MaterialState.focused))
-                                    return priority_id == 0
+                  ),
+                  Container(
+                    margin: EdgeInsets.only(top: 10.0),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Container(
+                          width: width * 0.32,
+                          height: 38.0,
+                          child: TextButton(
+                            style: ButtonStyle(
+                              shape: MaterialStateProperty.all(
+                                  RoundedRectangleBorder(
+                                side: BorderSide(
+                                    color: status_id == 0
                                         ? Colors.white
-                                        : ColorsTheme.txtDescColor;
-                                  return priority_id == 0
-                                      ? Colors.white
-                                      : ColorsTheme.txtDescColor;
-                                }),
-                                backgroundColor:
-                                    MaterialStateProperty.resolveWith<Color>(
-                                        (Set<MaterialState> states) {
-                                  if (states.contains(MaterialState.hovered) ||
-                                      states.contains(MaterialState.focused))
-                                    return priority_id == 0
-                                        ? ColorsTheme.compbtnColor
-                                        : ColorsTheme.bgColor;
-
-                                  return priority_id == 0
-                                      ? ColorsTheme.compbtnColor
-                                      : ColorsTheme.bgColor;
-                                }),
-                              ),
-                              child: Text('Low'),
-                              onPressed: () {
-                                setState(() {
-                                  priority_id = 0;
-                                });
-                              },
-                            ),
-                          ),
-                          Container(
-                            width: width * 0.23,
-                            height: 38.0,
-                            child: TextButton(
-                              style: ButtonStyle(
-                                shape: MaterialStateProperty.all(
-                                    RoundedRectangleBorder(
-                                  side: BorderSide(
-                                      color: priority_id == 1
-                                          ? Colors.white
-                                          : ColorsTheme.txtDescColor),
-                                  borderRadius: BorderRadius.circular(14.0),
-                                )),
-                                foregroundColor:
-                                    MaterialStateProperty.resolveWith<Color>(
-                                        (Set<MaterialState> states) {
-                                  if (states.contains(MaterialState.hovered) ||
-                                      states.contains(MaterialState.focused))
-                                    return priority_id == 1
-                                        ? Colors.white
-                                        : ColorsTheme.txtDescColor;
-                                  return priority_id == 1
-                                      ? Colors.white
-                                      : ColorsTheme.txtDescColor;
-                                }),
-                                backgroundColor:
-                                    MaterialStateProperty.resolveWith<Color>(
-                                        (Set<MaterialState> states) {
-                                  if (states.contains(MaterialState.hovered) ||
-                                      states.contains(MaterialState.focused))
-                                    return priority_id == 1
-                                        ? ColorsTheme.inCompbtnColor
-                                        : ColorsTheme.bgColor;
-
-                                  return priority_id == 1
-                                      ? ColorsTheme.inCompbtnColor
-                                      : ColorsTheme.bgColor;
-                                }),
-                              ),
-                              child: Text('High'),
-                              onPressed: () {
-                                setState(() {
-                                  priority_id = 1;
-                                });
-                              },
-                            ),
-                          ),
-                          Container(
-                            width: width * 0.23,
-                            height: 38.0,
-                            child: TextButton(
-                              style: ButtonStyle(
-                                shape: MaterialStateProperty.all(
-                                    RoundedRectangleBorder(
-                                  side: BorderSide(
-                                      color: priority_id == 2
-                                          ? Colors.white
-                                          : ColorsTheme.txtDescColor),
-                                  borderRadius: BorderRadius.circular(14.0),
-                                )),
-                                foregroundColor:
-                                    MaterialStateProperty.resolveWith<Color>(
-                                        (Set<MaterialState> states) {
-                                  if (states.contains(MaterialState.hovered) ||
-                                      states.contains(MaterialState.focused))
-                                    return priority_id == 2
-                                        ? Colors.white
-                                        : ColorsTheme.txtDescColor;
-                                  return priority_id == 2
-                                      ? Colors.white
-                                      : ColorsTheme.txtDescColor;
-                                }),
-                                backgroundColor:
-                                    MaterialStateProperty.resolveWith<Color>(
-                                        (Set<MaterialState> states) {
-                                  if (states.contains(MaterialState.hovered) ||
-                                      states.contains(MaterialState.focused))
-                                    return priority_id == 2
-                                        ? ColorsTheme.inProgbtnColor
-                                        : ColorsTheme.bgColor;
-
-                                  return priority_id == 2
-                                      ? ColorsTheme.inProgbtnColor
-                                      : ColorsTheme.bgColor;
-                                }),
-                              ),
-                              child: Text('Urgent'),
-                              onPressed: () {
-                                setState(() {
-                                  priority_id = 2;
-                                });
-                              },
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    Container(
-                      margin: EdgeInsets.only(top: 10.0),
-                      child: Text(
-                        'Status',
-                        style: TextStyle(
-                            color: Colors.black,
-                            fontWeight: FontWeight.w600,
-                            fontSize: 14.0),
-                      ),
-                    ),
-                    Container(
-                      margin: EdgeInsets.only(top: 10.0),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Container(
-                            width: width * 0.32,
-                            height: 38.0,
-                            child: TextButton(
-                              style: ButtonStyle(
-                                shape: MaterialStateProperty.all(
-                                    RoundedRectangleBorder(
-                                  side: BorderSide(
-                                      color: status_id == 0
-                                          ? Colors.white
-                                          : ColorsTheme.txtDescColor),
-                                  borderRadius: BorderRadius.circular(14.0),
-                                )),
-                                foregroundColor:
-                                    MaterialStateProperty.resolveWith<Color>(
-                                        (Set<MaterialState> states) {
-                                  if (states.contains(MaterialState.hovered) ||
-                                      states.contains(MaterialState.focused))
-                                    return status_id == 0
-                                        ? Colors.white
-                                        : ColorsTheme.txtDescColor;
+                                        : ColorsTheme.txtDescColor),
+                                borderRadius: BorderRadius.circular(14.0),
+                              )),
+                              foregroundColor:
+                                  MaterialStateProperty.resolveWith<Color>(
+                                      (Set<MaterialState> states) {
+                                if (states.contains(MaterialState.hovered) ||
+                                    states.contains(MaterialState.focused))
                                   return status_id == 0
                                       ? Colors.white
                                       : ColorsTheme.txtDescColor;
-                                }),
-                                backgroundColor:
-                                    MaterialStateProperty.resolveWith<Color>(
-                                        (Set<MaterialState> states) {
-                                  if (states.contains(MaterialState.hovered) ||
-                                      states.contains(MaterialState.focused))
-                                    return status_id == 0
-                                        ? ColorsTheme.uIUxColor
-                                        : ColorsTheme.bgColor;
-
+                                return status_id == 0
+                                    ? Colors.white
+                                    : ColorsTheme.txtDescColor;
+                              }),
+                              backgroundColor:
+                                  MaterialStateProperty.resolveWith<Color>(
+                                      (Set<MaterialState> states) {
+                                if (states.contains(MaterialState.hovered) ||
+                                    states.contains(MaterialState.focused))
                                   return status_id == 0
                                       ? ColorsTheme.uIUxColor
                                       : ColorsTheme.bgColor;
-                                }),
-                              ),
-                              child: Text('Todo'),
-                              onPressed: () {
-                                setState(() {
-                                  status_id = 0;
-                                });
-                              },
+
+                                return status_id == 0
+                                    ? ColorsTheme.uIUxColor
+                                    : ColorsTheme.bgColor;
+                              }),
                             ),
+                            child: Text('Todo'),
+                            onPressed: () {
+                              state(() {
+                                status_id = 0;
+                              });
+                            },
                           ),
-                          Container(
-                            width: width * 0.5,
-                            height: 38.0,
-                            child: TextButton(
-                              style: ButtonStyle(
-                                shape: MaterialStateProperty.all(
-                                    RoundedRectangleBorder(
-                                  side: BorderSide(
-                                      color: status_id == 1
-                                          ? Colors.white
-                                          : ColorsTheme.txtDescColor),
-                                  borderRadius: BorderRadius.circular(14.0),
-                                )),
-                                foregroundColor:
-                                    MaterialStateProperty.resolveWith<Color>(
-                                        (Set<MaterialState> states) {
-                                  if (states.contains(MaterialState.hovered) ||
-                                      states.contains(MaterialState.focused))
-                                    return status_id == 1
+                        ),
+                        Container(
+                          width: width * 0.5,
+                          height: 38.0,
+                          child: TextButton(
+                            style: ButtonStyle(
+                              shape: MaterialStateProperty.all(
+                                  RoundedRectangleBorder(
+                                side: BorderSide(
+                                    color: status_id == 1
                                         ? Colors.white
-                                        : ColorsTheme.txtDescColor;
+                                        : ColorsTheme.txtDescColor),
+                                borderRadius: BorderRadius.circular(14.0),
+                              )),
+                              foregroundColor:
+                                  MaterialStateProperty.resolveWith<Color>(
+                                      (Set<MaterialState> states) {
+                                if (states.contains(MaterialState.hovered) ||
+                                    states.contains(MaterialState.focused))
                                   return status_id == 1
                                       ? Colors.white
                                       : ColorsTheme.txtDescColor;
-                                }),
-                                backgroundColor:
-                                    MaterialStateProperty.resolveWith<Color>(
-                                        (Set<MaterialState> states) {
-                                  if (states.contains(MaterialState.hovered) ||
-                                      states.contains(MaterialState.focused))
-                                    return status_id == 1
-                                        ? ColorsTheme.inProgbtnColor
-                                        : ColorsTheme.bgColor;
-
+                                return status_id == 1
+                                    ? Colors.white
+                                    : ColorsTheme.txtDescColor;
+                              }),
+                              backgroundColor:
+                                  MaterialStateProperty.resolveWith<Color>(
+                                      (Set<MaterialState> states) {
+                                if (states.contains(MaterialState.hovered) ||
+                                    states.contains(MaterialState.focused))
                                   return status_id == 1
                                       ? ColorsTheme.inProgbtnColor
                                       : ColorsTheme.bgColor;
-                                }),
-                              ),
-                              child: Text('Progress'),
-                              onPressed: () {
-                                setState(() {
-                                  status_id = 1;
-                                });
-                              },
+
+                                return status_id == 1
+                                    ? ColorsTheme.inProgbtnColor
+                                    : ColorsTheme.bgColor;
+                              }),
                             ),
+                            child: Text('Progress'),
+                            onPressed: () {
+                              state(() {
+                                status_id = 1;
+                              });
+                            },
                           ),
-                        ],
-                      ),
+                        ),
+                      ],
                     ),
-                    Container(
-                      margin: EdgeInsets.only(top: 10.0),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Container(
-                            width: width * 0.32,
-                            height: 38.0,
-                            child: TextButton(
-                              style: ButtonStyle(
-                                shape: MaterialStateProperty.all(
-                                    RoundedRectangleBorder(
-                                  side: BorderSide(
-                                      color: status_id == 2
-                                          ? Colors.white
-                                          : ColorsTheme.txtDescColor),
-                                  borderRadius: BorderRadius.circular(14.0),
-                                )),
-                                foregroundColor:
-                                    MaterialStateProperty.resolveWith<Color>(
-                                        (Set<MaterialState> states) {
-                                  if (states.contains(MaterialState.hovered) ||
-                                      states.contains(MaterialState.focused))
-                                    return status_id == 2
+                  ),
+                  Container(
+                    margin: EdgeInsets.only(top: 10.0),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Container(
+                          width: width * 0.32,
+                          height: 38.0,
+                          child: TextButton(
+                            style: ButtonStyle(
+                              shape: MaterialStateProperty.all(
+                                  RoundedRectangleBorder(
+                                side: BorderSide(
+                                    color: status_id == 2
                                         ? Colors.white
-                                        : ColorsTheme.txtDescColor;
+                                        : ColorsTheme.txtDescColor),
+                                borderRadius: BorderRadius.circular(14.0),
+                              )),
+                              foregroundColor:
+                                  MaterialStateProperty.resolveWith<Color>(
+                                      (Set<MaterialState> states) {
+                                if (states.contains(MaterialState.hovered) ||
+                                    states.contains(MaterialState.focused))
                                   return status_id == 2
                                       ? Colors.white
                                       : ColorsTheme.txtDescColor;
-                                }),
-                                backgroundColor:
-                                    MaterialStateProperty.resolveWith<Color>(
-                                        (Set<MaterialState> states) {
-                                  if (states.contains(MaterialState.hovered) ||
-                                      states.contains(MaterialState.focused))
-                                    return status_id == 2
-                                        ? ColorsTheme.inCompbtnColor
-                                        : ColorsTheme.bgColor;
-
+                                return status_id == 2
+                                    ? Colors.white
+                                    : ColorsTheme.txtDescColor;
+                              }),
+                              backgroundColor:
+                                  MaterialStateProperty.resolveWith<Color>(
+                                      (Set<MaterialState> states) {
+                                if (states.contains(MaterialState.hovered) ||
+                                    states.contains(MaterialState.focused))
                                   return status_id == 2
                                       ? ColorsTheme.inCompbtnColor
                                       : ColorsTheme.bgColor;
-                                }),
-                              ),
-                              child: Text('Pending'),
-                              onPressed: () {
-                                setState(() {
-                                  status_id = 2;
-                                });
-                              },
+
+                                return status_id == 2
+                                    ? ColorsTheme.inCompbtnColor
+                                    : ColorsTheme.bgColor;
+                              }),
                             ),
+                            child: Text('Pending'),
+                            onPressed: () {
+                              state(() {
+                                status_id = 2;
+                              });
+                            },
                           ),
-                          Container(
-                            width: width * 0.5,
-                            height: 38.0,
-                            child: TextButton(
-                              style: ButtonStyle(
-                                shape: MaterialStateProperty.all(
-                                    RoundedRectangleBorder(
-                                  side: BorderSide(
-                                      color: status_id == 3
-                                          ? Colors.white
-                                          : ColorsTheme.txtDescColor),
-                                  borderRadius: BorderRadius.circular(14.0),
-                                )),
-                                foregroundColor:
-                                    MaterialStateProperty.resolveWith<Color>(
-                                        (Set<MaterialState> states) {
-                                  if (states.contains(MaterialState.hovered) ||
-                                      states.contains(MaterialState.focused))
-                                    return status_id == 3
+                        ),
+                        Container(
+                          width: width * 0.5,
+                          height: 38.0,
+                          child: TextButton(
+                            style: ButtonStyle(
+                              shape: MaterialStateProperty.all(
+                                  RoundedRectangleBorder(
+                                side: BorderSide(
+                                    color: status_id == 3
                                         ? Colors.white
-                                        : ColorsTheme.txtDescColor;
+                                        : ColorsTheme.txtDescColor),
+                                borderRadius: BorderRadius.circular(14.0),
+                              )),
+                              foregroundColor:
+                                  MaterialStateProperty.resolveWith<Color>(
+                                      (Set<MaterialState> states) {
+                                if (states.contains(MaterialState.hovered) ||
+                                    states.contains(MaterialState.focused))
                                   return status_id == 3
                                       ? Colors.white
                                       : ColorsTheme.txtDescColor;
-                                }),
-                                backgroundColor:
-                                    MaterialStateProperty.resolveWith<Color>(
-                                        (Set<MaterialState> states) {
-                                  if (states.contains(MaterialState.hovered) ||
-                                      states.contains(MaterialState.focused))
-                                    return status_id == 3
-                                        ? ColorsTheme.compbtnColor
-                                        : ColorsTheme.bgColor;
-
+                                return status_id == 3
+                                    ? Colors.white
+                                    : ColorsTheme.txtDescColor;
+                              }),
+                              backgroundColor:
+                                  MaterialStateProperty.resolveWith<Color>(
+                                      (Set<MaterialState> states) {
+                                if (states.contains(MaterialState.hovered) ||
+                                    states.contains(MaterialState.focused))
                                   return status_id == 3
                                       ? ColorsTheme.compbtnColor
                                       : ColorsTheme.bgColor;
-                                }),
-                              ),
-                              child: Text('Complete'),
-                              onPressed: () {
-                                setState(() {
-                                  status_id = 3;
-                                });
-                              },
+
+                                return status_id == 3
+                                    ? ColorsTheme.compbtnColor
+                                    : ColorsTheme.bgColor;
+                              }),
                             ),
+                            child: Text('Complete'),
+                            onPressed: () {
+                              state(() {
+                                status_id = 3;
+                              });
+                            },
                           ),
-                        ],
-                      ),
+                        ),
+                      ],
                     ),
-                    Container(
-                      margin: EdgeInsets.only(top: 40.0),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.start,
-                            children: [
-                              IconButton(
-                                  onPressed: () {},
-                                  icon: Icon(Icons.camera_alt)),
-                              IconButton(
-                                  onPressed: () {}, icon: Icon(Icons.image)),
-                              IconButton(
-                                  onPressed: () {},
-                                  icon: Icon(Icons.attach_file)),
-                              GestureDetector(
-                                  onTap: () {},
-                                  child: Image.asset(
-                                      'assets/add_assignee_icon.png'))
-                            ],
-                          ),
-                          Container(
-                            width: width * 0.3,
-                            height: 38.0,
-                            child: TextButton(
-                              style: ButtonStyle(
-                                shape: MaterialStateProperty.all(
-                                    RoundedRectangleBorder(
-                                  side: BorderSide(
-                                      color: ColorsTheme.txtDescColor),
-                                  borderRadius: BorderRadius.circular(14.0),
-                                )),
-                                foregroundColor:
-                                    MaterialStateProperty.resolveWith<Color>(
-                                        (Set<MaterialState> states) {
-                                  if (states.contains(MaterialState.hovered) ||
-                                      states.contains(MaterialState.focused))
-                                    return Colors.white;
+                  ),
+                  Container(
+                    margin: EdgeInsets.only(top: 40.0),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          children: [
+                            IconButton(
+                                onPressed: () {}, icon: Icon(Icons.camera_alt)),
+                            IconButton(
+                                onPressed: () {}, icon: Icon(Icons.image)),
+                            IconButton(
+                                onPressed: () {},
+                                icon: Icon(Icons.attach_file)),
+                            GestureDetector(
+                                onTap: () {},
+                                child:
+                                    Image.asset('assets/add_assignee_icon.png'))
+                          ],
+                        ),
+                        Container(
+                          width: width * 0.3,
+                          height: 38.0,
+                          child: TextButton(
+                            style: ButtonStyle(
+                              shape: MaterialStateProperty.all(
+                                  RoundedRectangleBorder(
+                                side:
+                                    BorderSide(color: ColorsTheme.txtDescColor),
+                                borderRadius: BorderRadius.circular(14.0),
+                              )),
+                              foregroundColor:
+                                  MaterialStateProperty.resolveWith<Color>(
+                                      (Set<MaterialState> states) {
+                                if (states.contains(MaterialState.hovered) ||
+                                    states.contains(MaterialState.focused))
                                   return Colors.white;
-                                }),
-                                backgroundColor:
-                                    MaterialStateProperty.resolveWith<Color>(
-                                        (Set<MaterialState> states) {
-                                  if (states.contains(MaterialState.hovered) ||
-                                      states.contains(MaterialState.focused))
-                                    return ColorsTheme.btnColor;
-
+                                return Colors.white;
+                              }),
+                              backgroundColor:
+                                  MaterialStateProperty.resolveWith<Color>(
+                                      (Set<MaterialState> states) {
+                                if (states.contains(MaterialState.hovered) ||
+                                    states.contains(MaterialState.focused))
                                   return ColorsTheme.btnColor;
-                                }),
-                              ),
-                              child: Text('Update'),
-                              onPressed: () async {
-                                bool result = false;
 
-                                if (task_name.isNotEmpty &&
-                                    task_desc.isNotEmpty &&
-                                    formatted_start_date.isNotEmpty &&
-                                    formatted_end_date.isNotEmpty &&
-                                    project_id != 0) {
-                                  result = await updateTask(task_id);
-                                  if (result == true) {
-                                    setState(() {
-                                      task_name = '';
-                                      task_desc = '';
-                                      formatted_end_date = '';
-                                      formatted_end_date = '';
-                                    });
-                                    Navigator.of(context).pop();
-                                    getUserTasks();
-                                    txt_updateTaskNameController.clear();
-                                    txt_updateTaskDescController.clear();
+                                return ColorsTheme.btnColor;
+                              }),
+                            ),
+                            child: Text('Update'),
+                            onPressed: () async {
+                              bool result = false;
 
-                                    Fluttertoast.showToast(
-                                        msg: "Task Updated!",
-                                        toastLength: Toast.LENGTH_SHORT,
-                                        gravity: ToastGravity.CENTER,
-                                        timeInSecForIosWeb: 1,
-                                        backgroundColor: ColorsTheme.btnColor,
-                                        textColor: Colors.white,
-                                        fontSize: 16.0);
+                              if (task_name.isNotEmpty &&
+                                  task_desc.isNotEmpty &&
+                                  formatted_start_date.isNotEmpty &&
+                                  formatted_end_date.isNotEmpty &&
+                                  project_id != 0) {
+                                result = await updateTask(task_id);
+                                if (result == true) {
+                                  setState(() {
+                                    task_name = '';
+                                    task_desc = '';
+                                    formatted_end_date = '';
+                                    formatted_end_date = '';
+                                  });
+                                  Navigator.of(context).pop();
+                                  getUserTasks();
+                                  txt_updateTaskNameController.clear();
+                                  txt_updateTaskDescController.clear();
 
-                                    getAppointments();
+                                  Fluttertoast.showToast(
+                                      msg: "Task Updated!",
+                                      toastLength: Toast.LENGTH_SHORT,
+                                      gravity: ToastGravity.CENTER,
+                                      timeInSecForIosWeb: 1,
+                                      backgroundColor: ColorsTheme.btnColor,
+                                      textColor: Colors.white,
+                                      fontSize: 16.0);
 
-                                    Navigator.of(context, rootNavigator: false)
-                                        .push(MaterialPageRoute(
-                                            builder: (context) =>
-                                                const TaskTab(),
-                                            fullscreenDialog: true));
+                                  getAppointments();
 
-                                    // NotificationService().showNotification(
-                                    //     created_task_id,
-                                    //     'Task Updated Successfully!',
-                                    //     'Tap to view details',
-                                    //     10);
-                                  } else
-                                    Fluttertoast.showToast(
-                                        msg: "Something went wrong!",
-                                        toastLength: Toast.LENGTH_SHORT,
-                                        gravity: ToastGravity.CENTER,
-                                        timeInSecForIosWeb: 1,
-                                        backgroundColor:
-                                            ColorsTheme.dangerColor,
-                                        textColor: Colors.white,
-                                        fontSize: 16.0);
+                                  Navigator.of(context, rootNavigator: false)
+                                      .push(MaterialPageRoute(
+                                          builder: (context) => const TaskTab(),
+                                          fullscreenDialog: true));
+
+                                  // NotificationService().showNotification(
+                                  //     created_task_id,
+                                  //     'Task Updated Successfully!',
+                                  //     'Tap to view details',
+                                  //     10);
                                 } else
                                   Fluttertoast.showToast(
-                                      msg: "Any field is missing!",
+                                      msg: "Something went wrong!",
                                       toastLength: Toast.LENGTH_SHORT,
                                       gravity: ToastGravity.CENTER,
                                       timeInSecForIosWeb: 1,
                                       backgroundColor: ColorsTheme.dangerColor,
                                       textColor: Colors.white,
                                       fontSize: 16.0);
-                              },
-                            ),
+                              } else
+                                Fluttertoast.showToast(
+                                    msg: "Any field is missing!",
+                                    toastLength: Toast.LENGTH_SHORT,
+                                    gravity: ToastGravity.CENTER,
+                                    timeInSecForIosWeb: 1,
+                                    backgroundColor: ColorsTheme.dangerColor,
+                                    textColor: Colors.white,
+                                    fontSize: 16.0);
+                            },
                           ),
-                        ],
-                      ),
-                    )
-                  ],
-                ),
-              );
-            });
+                        ),
+                      ],
+                    ),
+                  )
+                ],
+              ),
+            );
           });
-    });
+        });
   }
 
   @override
@@ -2156,6 +2157,9 @@ class _TaskTabPageState extends State<TaskTabPage> {
                   timeSlotViewSettings: TimeSlotViewSettings(
                       timeIntervalHeight: 600,
                       timeIntervalWidth: 80,
+                      dayFormat: 'EEEE',
+                      dateFormat: 'dd',
+                      timeFormat: 'hh:mm: a',
                       timelineAppointmentHeight: 800),
                   appointmentBuilder: (BuildContext context,
                       CalendarAppointmentDetails calendarAppointmentDetails) {
@@ -2221,15 +2225,11 @@ class _TaskTabPageState extends State<TaskTabPage> {
                                           color: Colors.white,
                                         )),
                                     Text(
-                                      meeting.startTime
-                                              .toString()
-                                              .substring(0, 16)
-                                              .replaceAll('-', '/') +
+                                      DateFormat('MMMM dd, yyyy hh:mm a')
+                                              .format(meeting.startTime) +
                                           ' - ' +
-                                          meeting.endTime
-                                              .toString()
-                                              .substring(0, 16)
-                                              .replaceAll('-', '/'),
+                                          DateFormat('MMMM dd, yyyy hh:mm a')
+                                              .format(meeting.endTime),
                                       style: TextStyle(color: Colors.white),
                                     )
                                   ],
