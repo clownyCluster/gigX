@@ -1,37 +1,37 @@
 {
   "project_info": {
-    "project_number": "881002725127",
-    "project_id": "projectxtest-ae518",
-    "storage_bucket": "projectxtest-ae518.appspot.com"
+    "project_number": "312713444384",
+    "project_id": "projectx-a1036",
+    "storage_bucket": "projectx-a1036.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:881002725127:android:0c605f89c5e97919570fa2",
+        "mobilesdk_app_id": "1:312713444384:android:123494400be4d0cccd5045",
         "android_client_info": {
           "package_name": "com.efleetpassprojectx.com.au"
         }
       },
       "oauth_client": [
         {
-          "client_id": "881002725127-5of7a6kpk8k62aep413jel34hhm7g6h8.apps.googleusercontent.com",
+          "client_id": "312713444384-ovj2jh7f0tvf7ghl6eci946n3ssm56ng.apps.googleusercontent.com",
           "client_type": 3
         }
       ],
       "api_key": [
         {
-          "current_key": "AIzaSyAdubWO4TU0mbrKCC1uI3toWkIqGx6xalU"
+          "current_key": "AIzaSyBva_OsRbRAjckJ-jHeC9t9e3foYI3BlUQ"
         }
       ],
       "services": {
         "appinvite_service": {
           "other_platform_oauth_client": [
             {
-              "client_id": "881002725127-5of7a6kpk8k62aep413jel34hhm7g6h8.apps.googleusercontent.com",
+              "client_id": "312713444384-ovj2jh7f0tvf7ghl6eci946n3ssm56ng.apps.googleusercontent.com",
               "client_type": 3
             },
             {
-              "client_id": "881002725127-utumkp5e6gdqkqiplvc14gj7lugg9bb5.apps.googleusercontent.com",
+              "client_id": "312713444384-4aq9phvh2n95opmvj83k7fiudb6b9i7t.apps.googleusercontent.com",
               "client_type": 2,
               "ios_info": {
                 "bundle_id": "com.efleetpassprojectx.com.au"
