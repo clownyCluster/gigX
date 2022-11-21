@@ -398,9 +398,10 @@ class _HomeTabPageState extends State<HomeTabPage> {
       is_loading = true;
     });
     Future.delayed(const Duration(seconds: 4), () {
-      setState(() {
-        is_loading = false;
-      });
+      if (this.mounted)
+        setState(() {
+          is_loading = false;
+        });
     });
   }
 
@@ -776,7 +777,7 @@ class _HomeTabPageState extends State<HomeTabPage> {
                                         fontSize: 20.0,
                                         fontWeight: FontWeight.w600)),
                                 new TextSpan(
-                                    text: '6 Projects',
+                                    text: '${projects.length} Projects',
                                     style: TextStyle(
                                         color: ColorsTheme.txtDescColor))
                               ])),
