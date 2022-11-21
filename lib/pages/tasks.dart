@@ -79,9 +79,6 @@ List<Appointment> getAppointments() {
     var outputFormat = DateFormat('MM/dd/yyyy hh:mm a');
     var startDate = outputFormat.format(startDateFormat);
 
-    print(startDate);
-
-    print(formatted_start_time);
     meetings.add(Appointment(
         startTime: DateFormat("dd/MM/yyyy HH:mm").parse(element['start_date']),
         endTime: DateFormat("dd/MM/yyyy HH:mm").parse(element['end_date']),
@@ -136,7 +133,6 @@ class _TaskTabPageState extends State<TaskTabPage> {
     super.initState();
 
     WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
-      print('testing here so');
       pref();
       getProjects();
       getUsers();
@@ -173,11 +169,7 @@ class _TaskTabPageState extends State<TaskTabPage> {
         setState(() {
           tasks = response.data['data'];
           is_loading = false;
-          tasks.forEach((element) {
-            var len = [];
-            len = element['end_date'];
-            print(len.length);
-          });
+
           result = response.data;
         });
       } else if (response.statusCode == 401) {
@@ -557,9 +549,7 @@ class _TaskTabPageState extends State<TaskTabPage> {
     DateTime stDate = DateFormat('d/MM/yyyy HH:mm').parse(formatted_start_date);
     DateTime edDate = DateFormat('d/MM/yyyy HH:mm').parse(formatted_end_date);
     Map<String, dynamic> result = Map<String, dynamic>();
-    // print(stDate);
-    // print(edDate);
-    // return false;
+
     try {
       final formData = FormData.fromMap({
         'title': task_name,
@@ -791,8 +781,6 @@ class _TaskTabPageState extends State<TaskTabPage> {
                                         .format(start);
                                 formatted_end_date =
                                     DateFormat('dd/MM/yyyy HH:mm').format(end);
-                                print(formatted_start_date);
-                                print(formatted_end_date);
                               }).showPicker(context);
                         },
                         child: Container(
@@ -1547,8 +1535,6 @@ class _TaskTabPageState extends State<TaskTabPage> {
                                         .format(start);
                                 formatted_end_date =
                                     DateFormat('dd/MM/yyyy HH:mm').format(end);
-                                print(formatted_start_date);
-                                print(formatted_end_date);
                               }).showPicker(context);
                         },
                         child: Container(

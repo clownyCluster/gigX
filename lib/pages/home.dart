@@ -282,7 +282,6 @@ class _HomeTabPageState extends State<HomeTabPage> {
       access_token = this.preferences?.getString('access_token');
     });
 
-    print('Access Token' + access_token.toString());
     try {
       Response response = await _dio.get(API.base_url + 'todo-projects',
           options: Options(headers: {"authorization": "Bearer $access_token"}));
@@ -295,7 +294,6 @@ class _HomeTabPageState extends State<HomeTabPage> {
           projects = response.data['data'];
           _is_loading = false;
         });
-        print(projects);
       } else if (response.statusCode == 401) {
         await this.preferences?.remove('access_token');
         Navigator.of(context, rootNavigator: true).pushAndRemoveUntil(
@@ -322,6 +320,39 @@ class _HomeTabPageState extends State<HomeTabPage> {
           (_) => false,
         );
       }
+      return null;
+    }
+  }
+
+  Future<void> getProjectsFromSearch(String search) async {
+    final _dio = Dio();
+    _is_loading = true;
+
+    // Map<St  Future<void> getVehicles(String type) asyn2 {ring, dynamic> arrayTest;
+
+    this.preferences = await SharedPreferences.getInstance();
+    setState(() {
+      access_token = this.preferences?.getString('access_token');
+    });
+
+    print('Access Token' + access_token.toString());
+    try {
+      Response response = await _dio.get(API.base_url + 'todo-projects',
+          options: Options(headers: {"authorization": "Bearer $access_token"}));
+      Map result = response.data;
+      print('Status Code ' + response.statusCode.toString());
+
+      if (response.statusCode == 200) {
+        this.preferences?.setBool('someoneLoggedIn', false);
+        setState(() {
+          projects = response.data['data'];
+          setSearchResults(search);
+        });
+        print(projects);
+      }
+
+      return null;
+    } on DioError catch (e) {
       return null;
     }
   }
@@ -613,8 +644,7 @@ class _HomeTabPageState extends State<HomeTabPage> {
                                   formatted_end_date =
                                       DateFormat('dd/MM/yyyy HH:mm')
                                           .format(end);
-                                  print(formatted_start_date);
-                                  print(formatted_end_date);
+
                                   setState(() {
                                     duration_selected = true;
                                   });
@@ -787,6 +817,7 @@ class _HomeTabPageState extends State<HomeTabPage> {
                                   if (this.mounted)
                                     setState(() {
                                       search_query = value.toString();
+                                      getProjectsFromSearch(search_query);
                                     });
                                 },
                               ),
@@ -798,7 +829,6 @@ class _HomeTabPageState extends State<HomeTabPage> {
                                     is_search_visible = true;
                                   });
                                 print(search_query);
-                                setSearchResults(search_query);
                               },
                               child: Container(
                                 child: Image(
