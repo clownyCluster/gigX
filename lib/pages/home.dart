@@ -207,9 +207,9 @@ class _HomeTabPageState extends State<HomeTabPage> {
                 .inMinutes
                 .abs();
             print('The difference is ' + difference.toString());
-            if (difference! < 700) {
-              sendNotification(element['id'], element['notification']);
-            }
+            // if (difference! < 700) {
+            sendNotification(element['id'], element['notification']);
+            // }
           });
         });
       }
