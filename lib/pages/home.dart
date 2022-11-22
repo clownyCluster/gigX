@@ -215,7 +215,6 @@ class _HomeTabPageState extends State<HomeTabPage> {
             print('The difference is ' + difference.toString());
             print(this.preferences?.getInt('count').toString());
             // if (difference! < 700) {
-            print(element['id']);
             sendNotification(element['id'], element['notification']);
             // }
           });
