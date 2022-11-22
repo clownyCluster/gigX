@@ -1599,7 +1599,7 @@ class _TaskTabPageState extends State<TaskTabPage> {
                       enableTooltip: true,
                       minorTicksPerInterval: 1,
                       onChanged: (dynamic value) {
-                        setState(() {
+                        state(() {
                           // print(value);
                           _percent = value;
                         });

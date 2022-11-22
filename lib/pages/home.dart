@@ -208,12 +208,11 @@ class _HomeTabPageState extends State<HomeTabPage> {
               .where((element) => element['is_read'] == 0)
               .forEach((element) {
             formatted_updated_at = format.parse(element['updated_at']);
-            final difference = formatted_updated_at
-                ?.difference(DateTime.now())
-                .inMinutes
-                .abs();
-            print('The difference is ' + difference.toString());
-            print(this.preferences?.getInt('count').toString());
+            // final difference = formatted_updated_at
+            //     ?.difference(DateTime.now())
+            //     .inMinutes
+            //     .abs();
+            // print('The difference is ' + difference.toString());
             // if (difference! < 700) {
             sendNotification(element['id'], element['notification']);
             // }
