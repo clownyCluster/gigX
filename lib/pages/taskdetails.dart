@@ -329,10 +329,10 @@ class _TaskDetailsPageState extends State<TaskDetailsPage> {
                                   color: Colors.black,
                                 )),
                           ),
-                          Container(
-                            child: Image(
-                                image: AssetImage('assets/dots_icon.png')),
-                          )
+                          // Container(
+                          //   child: Image(
+                          //       image: AssetImage('assets/dots_icon.png')),
+                          // )
                         ],
                       ),
                     ),

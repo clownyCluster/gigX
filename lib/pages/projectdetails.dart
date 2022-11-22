@@ -1160,22 +1160,22 @@ class _ProjectDetailsPageState extends State<ProjectDetailsPage> {
                                       fontSize: 20.0,
                                       fontWeight: FontWeight.w600)),
                               new TextSpan(
-                                  text: '5 Tasks',
+                                  text: '${tasks.length} Tasks',
                                   style: TextStyle(
                                       color: ColorsTheme.txtDescColor))
                             ])),
                           ),
                         ],
                       ),
-                      GestureDetector(
-                        onTap: () {
-                          showMemberDialog(context);
-                        },
-                        child: Container(
-                          child: Image(
-                              image: AssetImage('assets/add_member_icon.png')),
-                        ),
-                      )
+                      // GestureDetector(
+                      //   onTap: () {
+                      //     showMemberDialog(context);
+                      //   },
+                      //   child: Container(
+                      //     child: Image(
+                      //         image: AssetImage('assets/add_member_icon.png')),
+                      //   ),
+                      // )
                     ],
                   ),
                 ),
