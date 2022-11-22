@@ -54,6 +54,7 @@ class _HomeTabPageState extends State<HomeTabPage> {
   bool _is_loading = false;
   bool is_search_visible = true;
   bool keyboardVisible = false;
+  bool notification_shown = false;
   var projects = [];
   var notifications = [];
   List list = [];
@@ -158,6 +159,7 @@ class _HomeTabPageState extends State<HomeTabPage> {
     });
 
     init();
+
     getNotifications();
     // sendNotification();
   }
@@ -181,13 +183,17 @@ class _HomeTabPageState extends State<HomeTabPage> {
     final _dio = Dio();
     String? access_token;
     DateTime? formatted_updated_at;
+    int count = 0;
 
     DateFormat format = DateFormat("yyyy-MM-dd hh:mm:ss");
 
     this.preferences = await SharedPreferences.getInstance();
     setState(() {
       access_token = this.preferences?.getString('access_token');
+      count++;
     });
+
+    this.preferences?.setInt('count', 0);
 
     try {
       Response response = await _dio.get(API.base_url + 'my/todo-notifications',
@@ -207,7 +213,9 @@ class _HomeTabPageState extends State<HomeTabPage> {
                 .inMinutes
                 .abs();
             print('The difference is ' + difference.toString());
+            print(this.preferences?.getInt('count').toString());
             // if (difference! < 700) {
+            print(element['id']);
             sendNotification(element['id'], element['notification']);
             // }
           });
