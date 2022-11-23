@@ -104,7 +104,7 @@ Color inCompColor = Colors.black;
 Color compColor = Colors.black;
 Color inprogColor = Colors.black;
 double _percent = 40.0;
-var projects = [];
+
 var project = [];
 var users = [];
 var tasks = [];
@@ -126,6 +126,8 @@ bool is_loading = false;
 Map result = new Map();
 
 class _TaskTabPageState extends State<TaskTabPage> {
+  var projects = [];
+  var dupList = [];
   SharedPreferences? preferences;
   @override
   void initState() {
@@ -286,8 +288,8 @@ class _TaskTabPageState extends State<TaskTabPage> {
     );
   }
 
-  int? selectedIndex3;
-  bool selectedAddProject = false;
+  int? selectedIndex3 = 0;
+  bool selectedAddProject = true;
 
   Widget setupUpdateSelectProjectDialog(StateSetter updateState) {
     return Container(
@@ -305,7 +307,8 @@ class _TaskTabPageState extends State<TaskTabPage> {
                 updateState(() {
                   selectedAddProject = true;
                   selectedIndex3 = index;
-                  print(selectedIndex3);
+                  print('This is index' + index.toString());
+
                   project_id = projects[index]['id'];
                 });
                 Navigator.of(context).pop();
@@ -372,6 +375,7 @@ class _TaskTabPageState extends State<TaskTabPage> {
 
   Future<void> getProjects() async {
     final _dio = Dio();
+    int i = -1;
 
     String? access_token;
     this.preferences = await SharedPreferences.getInstance();
@@ -388,7 +392,19 @@ class _TaskTabPageState extends State<TaskTabPage> {
       if (response.statusCode == 200) {
         this.preferences?.setBool('someoneLoggedIn', false);
         setState(() {
-          projects = response.data['data'];
+          dupList = response.data['data'];
+
+          dupList.forEach((element) {
+            i++;
+            projects.add({
+              'id': element['id'],
+              'title': element['title'],
+              'project_index': i
+            });
+          });
+          projects.forEach((element) {
+            print(element);
+          });
         });
       } else if (response.statusCode == 401) {
         await this.preferences?.remove('access_token');
@@ -1350,6 +1366,8 @@ class _TaskTabPageState extends State<TaskTabPage> {
       print(element);
       txt_updateTaskNameController.text = element['title'];
       txt_updateTaskDescController.text = element['description'];
+      task_name = element['title'];
+      task_desc = element['description'];
       priority_id = element['priority'];
       status_id = element['category'];
       project_id = element['project_id'];
@@ -2036,7 +2054,11 @@ class _TaskTabPageState extends State<TaskTabPage> {
                             child: Text('Update'),
                             onPressed: () async {
                               bool result = false;
-
+                              print(task_name.isNotEmpty);
+                              print(task_desc.isNotEmpty);
+                              print(formatted_start_date.isNotEmpty);
+                              print(formatted_end_date.isNotEmpty);
+                              print(project_id != 0);
                               if (task_name.isNotEmpty &&
                                   task_desc.isNotEmpty &&
                                   formatted_start_date.isNotEmpty &&

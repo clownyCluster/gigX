@@ -305,7 +305,7 @@ class _TaskDetailsPageState extends State<TaskDetailsPage> {
             child: Container(
               width: width,
               height: orientation == Orientation.portrait
-                  ? height * 1.58
+                  ? height * 1.30
                   : height * 3.2,
               child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -742,39 +742,39 @@ class _TaskDetailsPageState extends State<TaskDetailsPage> {
                     //         fontWeight: FontWeight.w600),
                     //   ),
                     // ),
-                    Container(
-                      margin: EdgeInsets.only(left: 20.0),
-                      child: Container(
-                        height: 90.0,
-                        child: SingleChildScrollView(
-                          scrollDirection: Axis.horizontal,
-                          child: Row(
-                              mainAxisAlignment: MainAxisAlignment.start,
-                              children: [
-                                GestureDetector(
-                                  onTap: () {},
-                                  child: DottedBorder(
-                                    borderType: BorderType.RRect,
-                                    radius: Radius.circular(8),
-                                    dashPattern: [6, 6],
-                                    color: Colors.grey,
-                                    strokeWidth: 2,
-                                    child: Container(
-                                      height: 90.0,
-                                      width: width * 0.2,
-                                      decoration: BoxDecoration(
-                                          borderRadius:
-                                              BorderRadius.circular(8.0),
-                                          image: DecorationImage(
-                                              image: AssetImage(
-                                                  'assets/upload_image_button_icon.png'))),
-                                    ),
-                                  ),
-                                ),
-                              ]),
-                        ),
-                      ),
-                    ),
+                    // Container(
+                    //   margin: EdgeInsets.only(left: 20.0),
+                    //   child: Container(
+                    //     height: 90.0,
+                    //     child: SingleChildScrollView(
+                    //       scrollDirection: Axis.horizontal,
+                    //       child: Row(
+                    //           mainAxisAlignment: MainAxisAlignment.start,
+                    //           children: [
+                    //             GestureDetector(
+                    //               onTap: () {},
+                    //               child: DottedBorder(
+                    //                 borderType: BorderType.RRect,
+                    //                 radius: Radius.circular(8),
+                    //                 dashPattern: [6, 6],
+                    //                 color: Colors.grey,
+                    //                 strokeWidth: 2,
+                    //                 child: Container(
+                    //                   height: 90.0,
+                    //                   width: width * 0.2,
+                    //                   decoration: BoxDecoration(
+                    //                       borderRadius:
+                    //                           BorderRadius.circular(8.0),
+                    //                       image: DecorationImage(
+                    //                           image: AssetImage(
+                    //                               'assets/upload_image_button_icon.png'))),
+                    //                 ),
+                    //               ),
+                    //             ),
+                    //           ]),
+                    //     ),
+                    //   ),
+                    // ),
                     Container(
                       padding: EdgeInsets.all(20.0),
                       child: AutoSizeText(
