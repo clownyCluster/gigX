@@ -281,8 +281,6 @@ class _HomeTabPageState extends State<HomeTabPage> {
     final _dio = Dio();
     _is_loading = true;
 
-    // Map<St  Future<void> getVehicles(String type) asyn2 {ring, dynamic> arrayTest;
-
     this.preferences = await SharedPreferences.getInstance();
     setState(() {
       access_token = this.preferences?.getString('access_token');
