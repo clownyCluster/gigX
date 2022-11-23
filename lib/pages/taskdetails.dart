@@ -350,6 +350,7 @@ class _TaskDetailsPageState extends State<TaskDetailsPage> {
                                 maxLines: 1,
                                 style: TextStyle(
                                     color: Colors.black,
+                                    overflow: TextOverflow.ellipsis,
                                     fontSize: 18.0,
                                     fontWeight: FontWeight.w600),
                               )),
@@ -731,16 +732,16 @@ class _TaskDetailsPageState extends State<TaskDetailsPage> {
                             fontWeight: FontWeight.w400),
                       ),
                     ),
-                    Container(
-                      padding: EdgeInsets.all(20.0),
-                      child: AutoSizeText(
-                        'ATTACHMENTS',
-                        style: TextStyle(
-                            color: Colors.black,
-                            fontSize: 14.0,
-                            fontWeight: FontWeight.w600),
-                      ),
-                    ),
+                    // Container(
+                    //   padding: EdgeInsets.all(20.0),
+                    //   child: AutoSizeText(
+                    //     'ATTACHMENTS',
+                    //     style: TextStyle(
+                    //         color: Colors.black,
+                    //         fontSize: 14.0,
+                    //         fontWeight: FontWeight.w600),
+                    //   ),
+                    // ),
                     Container(
                       margin: EdgeInsets.only(left: 20.0),
                       child: Container(
@@ -750,45 +751,6 @@ class _TaskDetailsPageState extends State<TaskDetailsPage> {
                           child: Row(
                               mainAxisAlignment: MainAxisAlignment.start,
                               children: [
-                                Container(
-                                  height: 90.0,
-                                  width: width * 0.2,
-                                  decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.circular(8.0),
-                                      image: DecorationImage(
-                                          fit: BoxFit.cover,
-                                          image: AssetImage(
-                                              'assets/attachment_1.png'))),
-                                ),
-                                SizedBox(
-                                  width: 10.0,
-                                ),
-                                Container(
-                                  height: 90.0,
-                                  width: width * 0.2,
-                                  decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.circular(8.0),
-                                      image: DecorationImage(
-                                          fit: BoxFit.cover,
-                                          image: AssetImage(
-                                              'assets/attachment_1.png'))),
-                                ),
-                                SizedBox(
-                                  width: 10.0,
-                                ),
-                                Container(
-                                  height: 90.0,
-                                  width: width * 0.2,
-                                  decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.circular(8.0),
-                                      image: DecorationImage(
-                                          fit: BoxFit.cover,
-                                          image: AssetImage(
-                                              'assets/attachment_1.png'))),
-                                ),
-                                SizedBox(
-                                  width: 10.0,
-                                ),
                                 GestureDetector(
                                   onTap: () {},
                                   child: DottedBorder(
@@ -987,28 +949,28 @@ class _TaskDetailsPageState extends State<TaskDetailsPage> {
                                 )
                               ],
                             ),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.start,
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              children: [
-                                IconButton(
-                                    onPressed: () {},
-                                    icon: Icon(Icons.alternate_email)),
-                                IconButton(
-                                    onPressed: () {
-                                      _getFromCamera();
-                                    },
-                                    icon: Icon(Icons.camera_alt)),
-                                IconButton(
-                                    onPressed: () {
-                                      _getFromGallery();
-                                    },
-                                    icon: Icon(Icons.photo)),
-                                IconButton(
-                                    onPressed: () {},
-                                    icon: Icon(Icons.attach_file)),
-                              ],
-                            ),
+                            // Row(
+                            //   mainAxisAlignment: MainAxisAlignment.start,
+                            //   crossAxisAlignment: CrossAxisAlignment.center,
+                            //   children: [
+                            //     IconButton(
+                            //         onPressed: () {},
+                            //         icon: Icon(Icons.alternate_email)),
+                            //     IconButton(
+                            //         onPressed: () {
+                            //           _getFromCamera();
+                            //         },
+                            //         icon: Icon(Icons.camera_alt)),
+                            //     IconButton(
+                            //         onPressed: () {
+                            //           _getFromGallery();
+                            //         },
+                            //         icon: Icon(Icons.photo)),
+                            //     IconButton(
+                            //         onPressed: () {},
+                            //         icon: Icon(Icons.attach_file)),
+                            //   ],
+                            // ),
                           ]),
                     ),
                   ]),

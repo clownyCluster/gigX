@@ -79,10 +79,10 @@ class _LoginPageState extends State<LoginPage> {
     try {
       var map = new Map<String, dynamic>();
       map['grant_type'] = 'password';
-      // map['client_id'] = '14';
-      // map['client_secret'] = 'PYZTnOaDfJWM0X9eyIUlXZMJU1z6ZKkAEtLHlbiI';
-      map['client_id'] = '20';
-      map['client_secret'] = 'VDt8JhTzNdBrCWoKTwWNGOw0SQ5bPg99J2HI2BLL';
+      map['client_id'] = '14';
+      map['client_secret'] = 'PYZTnOaDfJWM0X9eyIUlXZMJU1z6ZKkAEtLHlbiI';
+      // map['client_id'] = '20';
+      // map['client_secret'] = 'VDt8JhTzNdBrCWoKTwWNGOw0SQ5bPg99J2HI2BLL';
       // email = 'leonardo@myfleetmanager.com.au';
       // password = 'Efleet@02dev';
       map['username'] = email;
@@ -273,28 +273,22 @@ class _LoginPageState extends State<LoginPage> {
             width: width,
             child: Column(children: <Widget>[
               Container(
+                margin: EdgeInsets.only(top: 80.0),
+                width: width * 0.8,
+                height: 120,
+                alignment: Alignment.bottomCenter,
+                child: Image(
+                  image: AssetImage('assets/logo_title.jpg'),
+                  fit: BoxFit.contain,
+                ),
+              ),
+              Container(
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.start,
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: <Widget>[
-                    // Container(
-                    //   margin: EdgeInsets.only(top: 40.0),
-                    //   padding: EdgeInsets.all(20.0),
-                    //   child: IconButton(
-                    //     onPressed: () {},
-                    //     icon: Icon(
-                    //       Icons.arrow_back,
-                    //       color: Colors.black,
-                    //     ),
-                    //   ),
-                    // ),
-                    Container(
-                      margin: EdgeInsets.only(top: 60.0),
-                      alignment: Alignment.center,
-                      child: Image(image: AssetImage('assets/logo_title.png')),
-                    ),
                     SizedBox(
-                      height: 90.0,
+                      height: 60.0,
                     ),
                     Container(
                       padding: EdgeInsets.only(left: 40.0, right: 40.0),

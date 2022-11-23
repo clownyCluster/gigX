@@ -206,14 +206,6 @@ class _TaskTabPageState extends State<TaskTabPage> {
     _addTaskModalBottomSheet(context);
   }
 
-  Future<void> refreshUpdateTaskModal() async {
-    CalendarTapDetails? calendarTapDetails;
-    Appointment appointment = calendarTapDetails!.appointments![0];
-    int task_id = appointment.id as int;
-    print('this is task_id ' + task_id.toString());
-    _updateTaskModalBottomSheet(context, task_id);
-  }
-
   int? selectedIndex;
   Widget setupAddSelectProjectDialog() {
     return Container(
@@ -313,6 +305,7 @@ class _TaskTabPageState extends State<TaskTabPage> {
                 updateState(() {
                   selectedAddProject = true;
                   selectedIndex3 = index;
+                  print(selectedIndex3);
                   project_id = projects[index]['id'];
                 });
                 Navigator.of(context).pop();
@@ -488,7 +481,7 @@ class _TaskTabPageState extends State<TaskTabPage> {
     if (calendarTapDetails.targetElement == CalendarElement.appointment) {
       Appointment appointment = calendarTapDetails.appointments![0];
       int task_id = appointment.id as int;
-      print(task_id);
+
       _updateTaskModalBottomSheet(context, task_id);
     }
   }
@@ -1353,6 +1346,14 @@ class _TaskTabPageState extends State<TaskTabPage> {
   }
 
   void _updateTaskModalBottomSheet(BuildContext context, int task_id) async {
+    tasks.forEach((element) {
+      print(element);
+      txt_updateTaskNameController.text = element['title'];
+      txt_updateTaskDescController.text = element['description'];
+      priority_id = element['priority'];
+      status_id = element['category'];
+      project_id = element['project_id'];
+    });
     showModalBottomSheet(
         context: context,
         isScrollControlled: true,

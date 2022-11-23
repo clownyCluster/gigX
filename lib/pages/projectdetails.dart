@@ -1413,7 +1413,7 @@ class _ProjectDetailsPageState extends State<ProjectDetailsPage> {
                               ? list.length + 2
                               : tasks.length,
                           shrinkWrap: true,
-                          itemExtent: 300.0,
+                          itemExtent: 250.0,
                           itemBuilder: (BuildContext context, index) {
                             return Container(
                               margin: EdgeInsets.all(10),
@@ -1444,7 +1444,12 @@ class _ProjectDetailsPageState extends State<ProjectDetailsPage> {
                                             MainAxisAlignment.start,
                                         children: [
                                           SizedBox(
-                                            width: width * 0.4,
+                                            width: tasks[index]['title']
+                                                        .toString()
+                                                        .length >
+                                                    20
+                                                ? width * 0.5
+                                                : width * 0.4,
                                             height: 40.0,
                                             child: TextButton(
                                               style: ButtonStyle(
@@ -1487,12 +1492,15 @@ class _ProjectDetailsPageState extends State<ProjectDetailsPage> {
                                                   return Colors.purple.shade100;
                                                 }),
                                               ),
-                                              child: Text(
+                                              child: AutoSizeText(
                                                 tasks[index]['title'],
+                                                maxLines: 1,
                                                 style: TextStyle(
                                                     color:
                                                         ColorsTheme.uIUxColor,
                                                     fontSize: 12.0,
+                                                    overflow:
+                                                        TextOverflow.ellipsis,
                                                     fontWeight:
                                                         FontWeight.w400),
                                               ),
@@ -1609,12 +1617,13 @@ class _ProjectDetailsPageState extends State<ProjectDetailsPage> {
                                     ),
                                     Container(
                                       alignment: Alignment.centerLeft,
-                                      margin: EdgeInsets.all(20.0),
-                                      height: 60,
+                                      padding: EdgeInsets.only(top: 20.0, bottom: 20.0),
+                                      margin: EdgeInsets.only(left: 20, right: 20),
                                       decoration: BoxDecoration(
                                           border: Border(
                                               bottom: BorderSide(
-                                                  color: Colors.black))),
+                                        color: Colors.black,
+                                      ))),
                                       child: AutoSizeText(
                                         tasks[index]['description'],
                                         overflow: TextOverflow.ellipsis,
