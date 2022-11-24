@@ -55,6 +55,7 @@ String task_name = "";
 String task_desc = "";
 String start_date = "";
 String end_date = "";
+String? project_title = "";
 String formatted_start_date = "";
 String formatted_end_date = "";
 String? access_token;
@@ -116,6 +117,7 @@ class _ProjectDetailsPageState extends State<ProjectDetailsPage> {
     this.preferences = await SharedPreferences.getInstance();
     access_token = this.preferences?.getString('access_token');
     selected_project_id = this.preferences?.getInt('project_id');
+    project_title = this.preferences?.getString('project_title');
     print(selected_project_id);
   }
 
@@ -1154,7 +1156,7 @@ class _ProjectDetailsPageState extends State<ProjectDetailsPage> {
                             child: new RichText(
                                 text: new TextSpan(children: [
                               new TextSpan(
-                                  text: 'eFleet Pass \n',
+                                  text: '$project_title \n',
                                   style: TextStyle(
                                       color: Colors.black,
                                       fontSize: 20.0,
@@ -1617,8 +1619,10 @@ class _ProjectDetailsPageState extends State<ProjectDetailsPage> {
                                     ),
                                     Container(
                                       alignment: Alignment.centerLeft,
-                                      padding: EdgeInsets.only(top: 20.0, bottom: 20.0),
-                                      margin: EdgeInsets.only(left: 20, right: 20),
+                                      padding: EdgeInsets.only(
+                                          top: 20.0, bottom: 20.0),
+                                      margin:
+                                          EdgeInsets.only(left: 20, right: 20),
                                       decoration: BoxDecoration(
                                           border: Border(
                                               bottom: BorderSide(

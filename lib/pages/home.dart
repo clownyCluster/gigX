@@ -949,6 +949,8 @@ class _HomeTabPageState extends State<HomeTabPage> {
                                       'project_id', projects[index]['id']);
                                   this.preferences?.setString(
                                       'logo_url', projects[index]['logo_url']);
+                                  this.preferences?.setString('project_title',
+                                      projects[index]['title']);
 
                                   Navigator.of(context).push(MaterialPageRoute(
                                       builder: (context) => ProjectDetails()));
