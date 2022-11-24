@@ -434,30 +434,30 @@ class _LoginPageState extends State<LoginPage> {
                   ),
                 ),
               ),
-              Container(
-                  alignment: Alignment.center,
-                  padding: EdgeInsets.all(10.0),
-                  child: new RichText(
-                      maxLines: 1,
-                      text: new TextSpan(children: [
-                        new TextSpan(
-                          text: 'Don’t have an account yet? Register ',
-                          style: TextStyle(
-                              color: Colors.black,
-                              letterSpacing: -0.8,
-                              fontSize: 12.0,
-                              fontWeight: FontWeight.w400),
-                        ),
-                        new TextSpan(
-                          text: 'here',
-                          recognizer: new TapGestureRecognizer()
-                            ..onTap = () => print('Go to register'),
-                          style: TextStyle(
-                              color: ColorsTheme.btnColor,
-                              fontSize: 14.0,
-                              fontWeight: FontWeight.w400),
-                        )
-                      ]))),
+              // Container(
+              //     alignment: Alignment.center,
+              //     padding: EdgeInsets.all(10.0),
+              //     child: new RichText(
+              //         maxLines: 1,
+              //         text: new TextSpan(children: [
+              //           new TextSpan(
+              //             text: 'Don’t have an account yet? Register ',
+              //             style: TextStyle(
+              //                 color: Colors.black,
+              //                 letterSpacing: -0.8,
+              //                 fontSize: 12.0,
+              //                 fontWeight: FontWeight.w400),
+              //           ),
+              //           new TextSpan(
+              //             text: 'here',
+              //             recognizer: new TapGestureRecognizer()
+              //               ..onTap = () => print('Go to register'),
+              //             style: TextStyle(
+              //                 color: ColorsTheme.btnColor,
+              //                 fontSize: 14.0,
+              //                 fontWeight: FontWeight.w400),
+              //           )
+              //         ]))),
               Container(
                 alignment: Alignment.center,
                 margin: EdgeInsets.only(top: 20.0),

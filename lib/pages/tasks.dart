@@ -215,7 +215,7 @@ class _TaskTabPageState extends State<TaskTabPage> {
           endTime: DateFormat("dd/MM/yyyy HH:mm").parse(element['end_date']),
           subject: element['title'],
           color: ColorsTheme.aptBox,
-          notes: selected_project_id.toString(),
+          notes: element['selected_project_id'].toString(),
           id: element['id'],
 
           // recurrenceRule: 'FREQ=DAILY;COUNT=10',
@@ -635,7 +635,7 @@ class _TaskTabPageState extends State<TaskTabPage> {
 
   void setSelectedProjectIndex(int task_id) {
     tasks.where((element) => element['id'] == task_id).forEach((element) {
-      
+      element['selected_project_id'] = selected_project_index;
     });
   }
 
@@ -1528,7 +1528,6 @@ class _TaskTabPageState extends State<TaskTabPage> {
       status_id = element['category'];
       project_id = element['project_id'];
     });
-    print(picked_project_index);
     showModalBottomSheet(
         context: context,
         isScrollControlled: true,
