@@ -63,38 +63,6 @@ class TaskTabPage extends StatefulWidget {
   State<TaskTabPage> createState() => _TaskTabPageState();
 }
 
-List<Appointment> getAppointments() {
-  List<Appointment> meetings = <Appointment>[];
-
-  tasks.forEach((element) {
-    // DateTime startDate = DateTime.parse(element['start_date']);
-    DateTime tempStartDateTime =
-        new DateFormat("dd/MM/yyyy HH:mm").parse(element['start_date']);
-
-    subject = element['title'];
-
-    var inputFormat = DateFormat('dd/MM/yyyy HH:mm');
-    var startDateFormat =
-        inputFormat.parse(element['start_date']); // <-- dd/MM 24H format
-
-    var outputFormat = DateFormat('MM/dd/yyyy hh:mm a');
-    var startDate = outputFormat.format(startDateFormat);
-
-    meetings.add(Appointment(
-        startTime: DateFormat("dd/MM/yyyy HH:mm").parse(element['start_date']),
-        endTime: DateFormat("dd/MM/yyyy HH:mm").parse(element['end_date']),
-        subject: element['title'],
-        color: ColorsTheme.aptBox,
-        notes: selected_project_id.toString(),
-        id: element['id'],
-
-        // recurrenceRule: 'FREQ=DAILY;COUNT=10',
-        isAllDay: false));
-  });
-
-  return meetings;
-}
-
 class MeetingDataSource extends CalendarDataSource {
   MeetingDataSource(List<Appointment> source) {
     appointments = source;
@@ -109,7 +77,8 @@ double _percent = 40.0;
 
 var project = [];
 var users = [];
-var tasks = [];
+var tempList = [];
+
 String _currentItemSelected = "Select Project";
 int project_id = 0;
 int priority_id = 0;
@@ -130,8 +99,10 @@ Map result = new Map();
 class _TaskTabPageState extends State<TaskTabPage> {
   var projects = [];
   var dupList = [];
-  var dupList2 = [];
+  var tasks = [];
+
   var notifications = [];
+  late Map taskMap;
   String? selected_project_index = "";
 
   SharedPreferences? preferences;
@@ -163,7 +134,6 @@ class _TaskTabPageState extends State<TaskTabPage> {
     final _dio = Dio();
     is_loading = true;
     String? access_token;
-    var test = [];
 
     this.preferences = await SharedPreferences.getInstance();
     setState(() {
@@ -177,8 +147,31 @@ class _TaskTabPageState extends State<TaskTabPage> {
       if (response.statusCode == 200) {
         this.preferences?.setBool('someoneLoggedIn', false);
         setState(() {
-          tasks = response.data['data'];
+          tempList = response.data['data'];
+          // tasks = response.data['data'];
           is_loading = false;
+          tempList.forEach((element) {
+            taskMap = {
+              'id': element['id'],
+              'start_date': element['start_date'].toString(),
+              'end_date': element['end_date'].toString(),
+              'project_id': element['project_id'],
+              'category': element['category'],
+              'priority': element['priority'],
+              'title': element['title'].toString(),
+              'description': element['description'].toString(),
+              'selected_project_id': 2
+            };
+            tasks.add(taskMap);
+
+            // tasks.add(element);
+            // tasks.add({'newKey': 2});
+            // tasks.add({'newKey': 2});
+          });
+
+          tasks.forEach((element) {
+            print(element);
+          });
         });
       } else if (response.statusCode == 401) {
         await this.preferences?.remove('access_token');
@@ -208,6 +201,28 @@ class _TaskTabPageState extends State<TaskTabPage> {
       }
       return null;
     }
+  }
+
+  List<Appointment> getAppointments() {
+    List<Appointment> meetings = <Appointment>[];
+
+    tasks.forEach((element) {
+      // DateTime startDate = DateTime.parse(element['start_date']);
+
+      meetings.add(Appointment(
+          startTime:
+              DateFormat("dd/MM/yyyy HH:mm").parse(element['start_date']),
+          endTime: DateFormat("dd/MM/yyyy HH:mm").parse(element['end_date']),
+          subject: element['title'],
+          color: ColorsTheme.aptBox,
+          notes: selected_project_id.toString(),
+          id: element['id'],
+
+          // recurrenceRule: 'FREQ=DAILY;COUNT=10',
+          isAllDay: false));
+    });
+
+    return meetings;
   }
 
   Future<void> refreshAddTaskModal() async {
@@ -616,6 +631,12 @@ class _TaskTabPageState extends State<TaskTabPage> {
       print(e.message);
       return false;
     }
+  }
+
+  void setSelectedProjectIndex(int task_id) {
+    tasks.where((element) => element['id'] == task_id).forEach((element) {
+      
+    });
   }
 
   Future<void> getNotifications() async {
