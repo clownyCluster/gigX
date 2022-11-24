@@ -58,6 +58,8 @@ class _HomeTabPageState extends State<HomeTabPage> {
   var projects = [];
   var notifications = [];
   List list = [];
+  Map<String, dynamic> user = new Map<String, dynamic>();
+  String? user_id = "";
   int current_max = 4;
   late ScrollController controller;
   XFile? image; //this is the state variable
@@ -82,6 +84,8 @@ class _HomeTabPageState extends State<HomeTabPage> {
   void initState() {
     // TODO: implement initState
     super.initState();
+    getUserProfile();
+    // saveDeviceID();
     getProjects();
     KeyboardVisibilityController().onChange.listen((isVisible) {
       setState(() {
@@ -214,7 +218,7 @@ class _HomeTabPageState extends State<HomeTabPage> {
             //     .abs();
             // print('The difference is ' + difference.toString());
             // if (difference! < 700) {
-            sendNotification(element['id'], element['notification']);
+            // sendNotification(element['id'], element['notification']);
             // }
           });
         });
@@ -226,47 +230,123 @@ class _HomeTabPageState extends State<HomeTabPage> {
     }
   }
 
-  Future<void> sendNotification(int id, String notification) async {
-    var postUrl = "https://fcm.googleapis.com/fcm/send";
-
-    var token = await getDeviceToken();
-
-    final data = {
-      "notification": {"body": "Tap to view details", "title": notification},
-      "priority": "high",
-      "data": {
-        "click_action": "FLUTTER_NOTIFICATION_CLICK",
-        "id": id,
-        "status": "done"
-      },
-      "to": "$token"
-    };
-
-    final headers = {
-      'content-type': 'application/json',
-      'Authorization':
-          'key=AAAASM8sfCA:APA91bFHBZYV2O1Xix8vA4XYVtUCeJbqNRoNypN2IWeXNcrulxJngCUDNWwGeVniEjy9ET9DQDJDdFuIh6VOTJpnDRXdvbM9lo59dYTiloqOwdOfhvZBy99VNiIz0ntQ7Mwc95-6VuXH'
-    };
-
-    BaseOptions options = new BaseOptions(
-      connectTimeout: 5000,
-      receiveTimeout: 3000,
-      headers: headers,
-    );
-
+  Future<void> getUserProfile() async {
+    final _dio = new Dio();
+    this.preferences = await SharedPreferences.getInstance();
+    setState(() {
+      access_token = this.preferences?.getString('access_token');
+    });
     try {
-      final response = await Dio(options).post(postUrl, data: data);
+      Response response = await _dio.get(API.base_url + 'me',
+          options: Options(headers: {"authorization": "Bearer $access_token"}));
 
       if (response.statusCode == 200) {
-        // Fluttertoast.showToast(msg: 'Request Sent To Driver');
-      } else {
-        print('notification sending failed');
-        // on failure do sth
+        this.preferences?.setBool('someoneLoggedIn', false);
+        setState(() {
+          user = response.data;
+          user_id = user['id'].toString();
+          saveDeviceID(user_id);
+        });
+      } else if (response.statusCode == 401) {
+        await this.preferences?.remove('access_token');
+        Navigator.of(context, rootNavigator: true).pushAndRemoveUntil(
+          MaterialPageRoute(
+            builder: (BuildContext context) {
+              return const Login();
+            },
+          ),
+          (_) => false,
+        );
       }
-    } catch (e) {
-      print('exception $e');
+    } on DioError catch (e) {
+      print(e);
+      if (e.response?.statusCode == 401) {
+        this.preferences?.setBool('someoneLoggedIn', true);
+        await this.preferences?.remove('access_token');
+        Navigator.of(context, rootNavigator: true).pushAndRemoveUntil(
+          MaterialPageRoute(
+            builder: (BuildContext context) {
+              return const Login();
+            },
+          ),
+          (_) => false,
+        );
+      }
     }
   }
+
+  Future<bool> saveDeviceID(String? userID) async {
+    final _dio = new Dio();
+    Map<String, dynamic> result = Map<String, dynamic>();
+
+    setState(() {
+      access_token = this.preferences?.getString('access_token');
+    });
+
+    try {
+      final formData = FormData.fromMap({
+        'user_id': userID,
+        'device_token': await getDeviceToken(),
+        'device_type': Platform.isIOS == true ? 'apple' : 'android'
+      });
+      Response response = await _dio.post(API.base_url + 'todo-user-token',
+          data: formData,
+          options: Options(headers: {
+            "Content-type": "multipart/form-data",
+            "authorization": "Bearer " + access_token.toString()
+          }));
+      print(response.data);
+      if (response.statusCode == 200) {
+        return true;
+      } else
+        return false;
+    } on DioError catch (e) {
+      print(e);
+      return false;
+    }
+  }
+
+  // Future<void> sendNotification(int id, String notification) async {
+  //   var postUrl = "https://fcm.googleapis.com/fcm/send";
+
+  //   var token = await getDeviceToken();
+
+  //   final data = {
+  //     "notification": {"body": "Tap to view details", "title": notification},
+  //     "priority": "high",
+  //     "data": {
+  //       "click_action": "FLUTTER_NOTIFICATION_CLICK",
+  //       "id": id,
+  //       "status": "done"
+  //     },
+  //     "to": "$token"
+  //   };
+
+  //   final headers = {
+  //     'content-type': 'application/json',
+  //     'Authorization':
+  //         'key=AAAASM8sfCA:APA91bFHBZYV2O1Xix8vA4XYVtUCeJbqNRoNypN2IWeXNcrulxJngCUDNWwGeVniEjy9ET9DQDJDdFuIh6VOTJpnDRXdvbM9lo59dYTiloqOwdOfhvZBy99VNiIz0ntQ7Mwc95-6VuXH'
+  //   };
+
+  //   BaseOptions options = new BaseOptions(
+  //     connectTimeout: 5000,
+  //     receiveTimeout: 3000,
+  //     headers: headers,
+  //   );
+
+  //   try {
+  //     final response = await Dio(options).post(postUrl, data: data);
+
+  //     if (response.statusCode == 200) {
+  //       // Fluttertoast.showToast(msg: 'Request Sent To Driver');
+  //     } else {
+  //       print('notification sending failed');
+  //       // on failure do sth
+  //     }
+  //   } catch (e) {
+  //     print('exception $e');
+  //   }
+  // }
 
   //get device token to use for push notification
   Future getDeviceToken() async {

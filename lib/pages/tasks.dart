@@ -10,6 +10,7 @@ import 'package:efleet_project_tree/pages/home.dart';
 import 'package:efleet_project_tree/pages/projectdetails.dart';
 import 'package:efleet_project_tree/utils/notification_service.dart';
 import 'package:f_datetimerangepicker/f_datetimerangepicker.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/src/widgets/container.dart';
 import 'package:flutter/src/widgets/framework.dart';
@@ -84,6 +85,7 @@ List<Appointment> getAppointments() {
         endTime: DateFormat("dd/MM/yyyy HH:mm").parse(element['end_date']),
         subject: element['title'],
         color: ColorsTheme.aptBox,
+        notes: selected_project_id.toString(),
         id: element['id'],
 
         // recurrenceRule: 'FREQ=DAILY;COUNT=10',
@@ -128,6 +130,10 @@ Map result = new Map();
 class _TaskTabPageState extends State<TaskTabPage> {
   var projects = [];
   var dupList = [];
+  var dupList2 = [];
+  var notifications = [];
+  String? selected_project_index = "";
+
   SharedPreferences? preferences;
   @override
   void initState() {
@@ -139,6 +145,7 @@ class _TaskTabPageState extends State<TaskTabPage> {
       getProjects();
       getUsers();
       getUserTasks();
+      getDeviceToken();
       setState(() {
         inCompColor = Colors.black;
         compColor = Colors.black;
@@ -156,6 +163,7 @@ class _TaskTabPageState extends State<TaskTabPage> {
     final _dio = Dio();
     is_loading = true;
     String? access_token;
+    var test = [];
 
     this.preferences = await SharedPreferences.getInstance();
     setState(() {
@@ -171,8 +179,6 @@ class _TaskTabPageState extends State<TaskTabPage> {
         setState(() {
           tasks = response.data['data'];
           is_loading = false;
-
-          result = response.data;
         });
       } else if (response.statusCode == 401) {
         await this.preferences?.remove('access_token');
@@ -220,11 +226,13 @@ class _TaskTabPageState extends State<TaskTabPage> {
           itemCount: projects.length,
           itemBuilder: (BuildContext context, int index) {
             return InkWell(
-              onTap: () {
-                print(projects[index]['id']);
+              onTap: () async {
                 setState(() {
                   selectedIndex = index;
                   project_id = projects[index]['id'];
+                  selected_project_index =
+                      projects[index]['selected_project_id'].toString();
+                  print(selected_project_index);
                 });
                 Navigator.of(context).pop();
                 refreshAddTaskModal();
@@ -288,7 +296,7 @@ class _TaskTabPageState extends State<TaskTabPage> {
     );
   }
 
-  int? selectedIndex3 = 0;
+  int? selectedIndex3;
   bool selectedAddProject = true;
 
   Widget setupUpdateSelectProjectDialog(StateSetter updateState) {
@@ -376,6 +384,7 @@ class _TaskTabPageState extends State<TaskTabPage> {
   Future<void> getProjects() async {
     final _dio = Dio();
     int i = -1;
+    late Map projectMap;
 
     String? access_token;
     this.preferences = await SharedPreferences.getInstance();
@@ -396,12 +405,14 @@ class _TaskTabPageState extends State<TaskTabPage> {
 
           dupList.forEach((element) {
             i++;
-            projects.add({
+            projectMap = {
               'id': element['id'],
               'title': element['title'],
-              'project_index': i
-            });
+              'selected_project_id': i
+            };
+            projects.add(projectMap);
           });
+
           projects.forEach((element) {
             print(element);
           });
@@ -497,8 +508,10 @@ class _TaskTabPageState extends State<TaskTabPage> {
     if (calendarTapDetails.targetElement == CalendarElement.appointment) {
       Appointment appointment = calendarTapDetails.appointments![0];
       int task_id = appointment.id as int;
+      print(appointment.notes);
+      String? picked_project_index = appointment.notes;
 
-      _updateTaskModalBottomSheet(context, task_id);
+      _updateTaskModalBottomSheet(context, task_id, picked_project_index);
     }
   }
 
@@ -538,6 +551,7 @@ class _TaskTabPageState extends State<TaskTabPage> {
             endTime: edDate,
             subject: task_name,
             color: ColorsTheme.aptBox,
+            notes: selected_project_index.toString(),
             id: result['id'],
 
             // recurrenceRule: 'FREQ=DAILY;COUNT=10',
@@ -601,6 +615,131 @@ class _TaskTabPageState extends State<TaskTabPage> {
     } on DioError catch (e) {
       print(e.message);
       return false;
+    }
+  }
+
+  Future<void> getNotifications() async {
+    final _dio = Dio();
+    String? access_token;
+    DateTime? formatted_updated_at;
+    int count = 0;
+
+    DateFormat format = DateFormat("yyyy-MM-dd hh:mm:ss");
+
+    this.preferences = await SharedPreferences.getInstance();
+    setState(() {
+      access_token = this.preferences?.getString('access_token');
+      count++;
+    });
+
+    this.preferences?.setInt('count', 0);
+
+    try {
+      Response response = await _dio.get(API.base_url + 'my/todo-notifications',
+          options: Options(headers: {"authorization": "Bearer $access_token"}));
+      Map result = response.data;
+
+      if (response.statusCode == 200) {
+        setState(() {
+          notifications = response.data['data'];
+
+          notifications
+              .where((element) => element['is_read'] == 0)
+              .forEach((element) {
+            formatted_updated_at = format.parse(element['updated_at']);
+            // final difference = formatted_updated_at
+            //     ?.difference(DateTime.now())
+            //     .inMinutes
+            //     .abs();
+            // print('The difference is ' + difference.toString());
+            // if (difference! < 700) {
+            sendNotification(element['id'], element['notification']);
+            // }
+          });
+        });
+      }
+
+      return null;
+    } on DioError catch (e) {
+      return null;
+    }
+  }
+
+  Future getDeviceToken() async {
+    FirebaseMessaging.instance.requestPermission();
+    FirebaseMessaging _firebaseMessage = FirebaseMessaging.instance;
+    String? deviceToken = await _firebaseMessage.getToken();
+    return (deviceToken == null) ? "" : deviceToken;
+    //    final _dio = new Dio();
+    // this.preferences = await SharedPreferences.getInstance();
+    // setState(() {
+    //   access_token = this.preferences?.getString('access_token');
+    // });
+    // try {
+    //   Response response = await _dio.get(API.base_url + 'me',
+    //       options: Options(headers: {"authorization": "Bearer $access_token"}));
+
+    //   if (response.statusCode == 200) {
+    //     this.preferences?.setBool('someoneLoggedIn', false);
+    //     setState(() {
+
+    //     });
+    //   } else if (response.statusCode == 401) {
+    //     await this.preferences?.remove('access_token');
+    //     Navigator.of(context, rootNavigator: true).pushAndRemoveUntil(
+    //       MaterialPageRoute(
+    //         builder: (BuildContext context) {
+    //           return const Login();
+    //         },
+    //       ),
+    //       (_) => false,
+    //     );
+    //   }
+    // } on DioError catch (e) {
+    //   print(e);
+
+    // }
+  }
+
+  Future<void> sendNotification(int id, String notification) async {
+    var postUrl = "https://fcm.googleapis.com/fcm/send";
+
+    var token = await getDeviceToken();
+
+    final data = {
+      "notification": {"body": "Tap to view details", "title": notification},
+      "priority": "high",
+      "data": {
+        "click_action": "FLUTTER_NOTIFICATION_CLICK",
+        "id": id,
+        "status": "done"
+      },
+      "to": "$token"
+    };
+
+    final headers = {
+      'content-type': 'application/json',
+      'Authorization':
+          'key=AAAASM8sfCA:APA91bFHBZYV2O1Xix8vA4XYVtUCeJbqNRoNypN2IWeXNcrulxJngCUDNWwGeVniEjy9ET9DQDJDdFuIh6VOTJpnDRXdvbM9lo59dYTiloqOwdOfhvZBy99VNiIz0ntQ7Mwc95-6VuXH'
+    };
+
+    BaseOptions options = new BaseOptions(
+      connectTimeout: 5000,
+      receiveTimeout: 3000,
+      headers: headers,
+    );
+
+    try {
+      final response = await Dio(options).post(postUrl, data: data);
+
+      if (response.statusCode == 200) {
+        // Fluttertoast.showToast(msg: 'Request Sent To Driver');
+      } else {
+        print('notification sending failed');
+        // on failure do sth
+      }
+    } catch (e) {
+      print('exception $e');
     }
   }
 
@@ -1324,12 +1463,7 @@ class _TaskTabPageState extends State<TaskTabPage> {
                                           builder: (context) => const TaskTab(),
                                           fullscreenDialog: true));
 
-                                  // NotificationService().showNotification(
-                                  //     created_task_id,
-                                  //     'Task Added Successfully!',
-                                  //     'Tap to view details',
-                                  //     10,
-                                  //     logged_in_user_id);
+                                  // sendNotification(project_id, 'Task assigned');
                                 } else
                                   Fluttertoast.showToast(
                                       msg: "Something went wrong!",
@@ -1361,9 +1495,10 @@ class _TaskTabPageState extends State<TaskTabPage> {
         });
   }
 
-  void _updateTaskModalBottomSheet(BuildContext context, int task_id) async {
+  void _updateTaskModalBottomSheet(
+      BuildContext context, int task_id, String? picked_project_index) async {
     tasks.forEach((element) {
-      print(element);
+      // print(element);
       txt_updateTaskNameController.text = element['title'];
       txt_updateTaskDescController.text = element['description'];
       task_name = element['title'];
@@ -1372,6 +1507,7 @@ class _TaskTabPageState extends State<TaskTabPage> {
       status_id = element['category'];
       project_id = element['project_id'];
     });
+    print(picked_project_index);
     showModalBottomSheet(
         context: context,
         isScrollControlled: true,
