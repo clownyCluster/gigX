@@ -110,35 +110,36 @@ class _HomePageState extends State<HomePage> {
         child: _widgetOptions.elementAt(_selectedIndex),
       ),
       bottomNavigationBar: BottomNavigationBar(
-          key: bottomWidgetKey,
-          items: const <BottomNavigationBarItem>[
-            BottomNavigationBarItem(
-                icon: Image(image: AssetImage('assets/navbaricon_home.png')),
-                label: 'Home',
-                backgroundColor: Colors.white),
-            BottomNavigationBarItem(
-                icon: Image(image: AssetImage('assets/navbaricon_tasks.png')),
-                label: 'Tasks',
-                backgroundColor: Colors.white),
-            BottomNavigationBarItem(
-              icon: Image(
-                  image: AssetImage('assets/navbaricon_notifications.png')),
-              label: 'Notifications',
-              backgroundColor: Colors.white,
-            ),
-            BottomNavigationBarItem(
-              icon: Image(image: AssetImage('assets/navbaricon_account.png')),
-              label: 'Account',
-              backgroundColor: Colors.white,
-            ),
-          ],
-          type: BottomNavigationBarType.fixed,
-          currentIndex: _selectedIndex,
-          selectedItemColor: ColorsTheme.btnColor,
-
-          // iconSize: 40,
-          onTap: _onItemTapped,
-          elevation: 5),
+        key: bottomWidgetKey,
+        items: const <BottomNavigationBarItem>[
+          BottomNavigationBarItem(
+              icon: Image(image: AssetImage('assets/navbaricon_home.png')),
+              label: 'Home',
+              backgroundColor: Colors.white),
+          BottomNavigationBarItem(
+              icon: Image(image: AssetImage('assets/navbaricon_tasks.png')),
+              label: 'Tasks',
+              backgroundColor: Colors.white),
+          BottomNavigationBarItem(
+            icon:
+                Image(image: AssetImage('assets/navbaricon_notifications.png')),
+            label: 'Notifications',
+            backgroundColor: Colors.white,
+          ),
+          BottomNavigationBarItem(
+            icon: Image(image: AssetImage('assets/navbaricon_account.png')),
+            label: 'Account',
+            backgroundColor: Colors.white,
+          ),
+        ],
+        type: BottomNavigationBarType.fixed,
+        currentIndex: _selectedIndex,
+        selectedItemColor: ColorsTheme.btnColor,
+        selectedFontSize: 12,
+        unselectedFontSize: 12,
+        // iconSize: 40,
+        onTap: _onItemTapped,
+      ),
     );
     // return CupertinoTabScaffold(
     //     resizeToAvoidBottomInset: false,

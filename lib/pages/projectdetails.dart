@@ -1188,9 +1188,10 @@ class _ProjectDetailsPageState extends State<ProjectDetailsPage> {
                   child: SingleChildScrollView(
                     scrollDirection: Axis.horizontal,
                     child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
                         SizedBox(
-                          width: width * 0.2,
+                          width: width * 0.3,
                           height: 38.0,
                           child: TextButton(
                               onPressed: () {
@@ -1230,7 +1231,7 @@ class _ProjectDetailsPageState extends State<ProjectDetailsPage> {
                                   return ColorsTheme.bgColor;
                                 }),
                               ),
-                              child: Text(
+                              child: AutoSizeText(
                                 'Pending',
                                 style: TextStyle(
                                     color: inCompColor,
@@ -1242,7 +1243,7 @@ class _ProjectDetailsPageState extends State<ProjectDetailsPage> {
                           width: 10.0,
                         ),
                         SizedBox(
-                          width: width * 0.15,
+                          width: width * 0.2,
                           height: 38.0,
                           child: TextButton(
                               onPressed: () {
@@ -1295,7 +1296,7 @@ class _ProjectDetailsPageState extends State<ProjectDetailsPage> {
                           width: 10.0,
                         ),
                         SizedBox(
-                          width: width * 0.3,
+                          width: width * 0.35,
                           height: 38.0,
                           child: TextButton(
                               onPressed: () {
@@ -1347,7 +1348,7 @@ class _ProjectDetailsPageState extends State<ProjectDetailsPage> {
                           width: 10.0,
                         ),
                         SizedBox(
-                          width: width * 0.25,
+                          width: width * 0.4,
                           height: 38.0,
                           child: TextButton(
                               onPressed: () {
