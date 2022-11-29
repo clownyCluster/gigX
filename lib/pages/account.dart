@@ -164,6 +164,59 @@ class _AccountTabPageState extends State<AccountTabPage> {
     }
   }
 
+  Future _pickProfileImageFromCamera() async {
+    final profileimg;
+    final ImagePicker _picker;
+    _picker = ImagePicker();
+    profileimg = await _picker.pickImage(source: ImageSource.camera);
+
+    setState(() {
+      access_token = this.preferences?.getString('access_token');
+      is_loading = true;
+    });
+    try {
+      final _dio = Dio();
+      var base_url = API.base_url;
+      final path = profileimg.path;
+      var fileName = (profileimg.path.split('/').last);
+
+      final bytes = await File(path).readAsBytesSync();
+
+      print('before ' + bytes.length.toString());
+      final compressed_bytes = await FlutterImageCompress.compressWithList(
+          bytes.buffer.asUint8List(),
+          quality: 85,
+          minWidth: 500,
+          minHeight: 500);
+      final formData = FormData.fromMap({
+        'profile_image':
+            await MultipartFile.fromBytes(compressed_bytes, filename: fileName),
+      });
+      Response response = await _dio.post(base_url + 'profile/image',
+          data: formData,
+          options: Options(headers: {
+            "Content-type": "multipart/form-data",
+            "authorization": "Bearer $access_token"
+          }));
+
+      setState(() {
+        is_loading = false;
+      });
+
+      Fluttertoast.showToast(
+          msg: "Profile Image Uploaded Successfully!",
+          toastLength: Toast.LENGTH_SHORT,
+          gravity: ToastGravity.CENTER,
+          timeInSecForIosWeb: 1,
+          backgroundColor: ColorsTheme.btnColor,
+          textColor: Colors.white,
+          fontSize: 16.0);
+      getUserProfile();
+    } on DioError catch (error) {
+      print(error.response);
+    }
+  }
+
   Widget showAccountListItems(BuildContext context) {
     return MediaQuery.removePadding(
       context: context,
@@ -256,8 +309,9 @@ class _AccountTabPageState extends State<AccountTabPage> {
             children: [
               Container(
                 width: width,
-                height:
-                    orientation == Orientation.portrait ? height : height * 2.2,
+                height: orientation == Orientation.portrait
+                    ? height * 0.85
+                    : height * 2.2,
                 child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -288,12 +342,9 @@ class _AccountTabPageState extends State<AccountTabPage> {
                                         return AlertDialog(
                                           title: Text(
                                               'Pick Image From Gallery Or Camera'),
-                                          // content: Text(
-                                          //     'Pick Image From Gallery Or Camera'),
                                           actions: [
                                             TextButton(
                                               onPressed: () {
-                                                // _pickOrDeleteFrontImage(true);
                                                 _pickProfileImageFromGallery();
                                                 Navigator.pop(context);
                                               },
@@ -305,7 +356,7 @@ class _AccountTabPageState extends State<AccountTabPage> {
                                             ),
                                             TextButton(
                                               onPressed: () {
-                                                // _pickOrDeleteFrontImageCamera(true);
+                                                _pickProfileImageFromCamera();
                                                 Navigator.pop(context);
                                               },
                                               child: Text(
@@ -326,7 +377,7 @@ class _AccountTabPageState extends State<AccountTabPage> {
                                   ),
                                 ),
                                 Container(
-                                  width: width * 0.40,
+                                  width: width * 0.512,
                                   margin: EdgeInsets.only(left: 10.0),
                                   child: new Column(
                                       crossAxisAlignment:
@@ -370,7 +421,7 @@ class _AccountTabPageState extends State<AccountTabPage> {
                         Container(
                           padding: EdgeInsets.only(left: 40.0),
                           child: Container(
-                              height: 226,
+                              height: 280,
                               width: width * 0.82,
                               decoration: BoxDecoration(
                                   color: Color(0xffD3D3D3),

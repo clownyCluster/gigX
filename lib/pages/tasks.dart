@@ -2210,11 +2210,7 @@ class _TaskTabPageState extends State<TaskTabPage> {
                             child: Text('Update'),
                             onPressed: () async {
                               bool result = false;
-                              print(task_name.isNotEmpty);
-                              print(task_desc.isNotEmpty);
-                              print(formatted_start_date.isNotEmpty);
-                              print(formatted_end_date.isNotEmpty);
-                              print(project_id != 0);
+
                               if (task_name.isNotEmpty &&
                                   task_desc.isNotEmpty &&
                                   formatted_start_date.isNotEmpty &&
