@@ -1518,7 +1518,7 @@ class _TaskTabPageState extends State<TaskTabPage> {
 
   void _updateTaskModalBottomSheet(
       BuildContext context, int task_id, String? picked_project_index) async {
-    tasks.forEach((element) {
+    tasks.where((element) => element['id'] == task_id).forEach((element) {
       // print(element);
       txt_updateTaskNameController.text = element['title'];
       txt_updateTaskDescController.text = element['description'];

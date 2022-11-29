@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:dio/dio.dart';
 import 'package:efleet_project_tree/api.dart';
@@ -8,7 +10,10 @@ import 'package:efleet_project_tree/pages/webviewtermsandconditions.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/src/widgets/container.dart';
 import 'package:flutter/src/widgets/framework.dart';
+import 'package:flutter_image_compress/flutter_image_compress.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:fluttertoast/fluttertoast.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class AccountTab extends StatelessWidget {
@@ -31,7 +36,7 @@ class AccountTab extends StatelessWidget {
 var height, width;
 Map<String, dynamic> user = new Map<String, dynamic>();
 String? access_token = "";
-String userEmail = "", userName = "";
+String userEmail = "", userName = "", profileUrl = "";
 
 class AccountTabPage extends StatefulWidget {
   const AccountTabPage({super.key});
@@ -42,6 +47,7 @@ class AccountTabPage extends StatefulWidget {
 
 class _AccountTabPageState extends State<AccountTabPage> {
   SharedPreferences? preferences;
+  bool is_loading = false;
 
   @override
   void initState() {
@@ -57,6 +63,7 @@ class _AccountTabPageState extends State<AccountTabPage> {
     this.preferences = await SharedPreferences.getInstance();
     setState(() {
       access_token = this.preferences?.getString('access_token');
+      is_loading = true;
     });
     try {
       Response response = await _dio.get(API.base_url + 'me',
@@ -65,9 +72,11 @@ class _AccountTabPageState extends State<AccountTabPage> {
       if (response.statusCode == 200) {
         this.preferences?.setBool('someoneLoggedIn', false);
         setState(() {
+          is_loading = false;
           user = response.data;
           userName = user['username'];
           userEmail = user['email'];
+          profileUrl = user['ProfilePic'];
 
           // user.forEach((element) {
           //   userName = element['username'];
@@ -99,6 +108,59 @@ class _AccountTabPageState extends State<AccountTabPage> {
           (_) => false,
         );
       }
+    }
+  }
+
+  Future _pickProfileImageFromGallery() async {
+    final profileimg;
+    final ImagePicker _picker;
+    _picker = ImagePicker();
+    profileimg = await _picker.pickImage(source: ImageSource.gallery);
+
+    setState(() {
+      access_token = this.preferences?.getString('access_token');
+      is_loading = true;
+    });
+    try {
+      final _dio = Dio();
+      var base_url = API.base_url;
+      final path = profileimg.path;
+      var fileName = (profileimg.path.split('/').last);
+
+      final bytes = await File(path).readAsBytesSync();
+
+      print('before ' + bytes.length.toString());
+      final compressed_bytes = await FlutterImageCompress.compressWithList(
+          bytes.buffer.asUint8List(),
+          quality: 85,
+          minWidth: 500,
+          minHeight: 500);
+      final formData = FormData.fromMap({
+        'profile_image':
+            await MultipartFile.fromBytes(compressed_bytes, filename: fileName),
+      });
+      Response response = await _dio.post(base_url + 'profile/image',
+          data: formData,
+          options: Options(headers: {
+            "Content-type": "multipart/form-data",
+            "authorization": "Bearer $access_token"
+          }));
+
+      setState(() {
+        is_loading = false;
+      });
+
+      Fluttertoast.showToast(
+          msg: "Profile Image Uploaded Successfully!",
+          toastLength: Toast.LENGTH_SHORT,
+          gravity: ToastGravity.CENTER,
+          timeInSecForIosWeb: 1,
+          backgroundColor: ColorsTheme.btnColor,
+          textColor: Colors.white,
+          fontSize: 16.0);
+      getUserProfile();
+    } on DioError catch (error) {
+      print(error.response);
     }
   }
 
@@ -189,137 +251,199 @@ class _AccountTabPageState extends State<AccountTabPage> {
     return Scaffold(
       body: OrientationBuilder(builder: (context, orientation) {
         return SingleChildScrollView(
-          child: Container(
-            width: width,
-            height: orientation == Orientation.portrait ? height : height * 2.2,
-            child:
-                Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          child: Stack(
+            alignment: Alignment.center,
+            children: [
               Container(
-                padding: EdgeInsets.all(40.0),
-                margin: EdgeInsets.only(top: 20.0),
-                child: AutoSizeText(
-                  'Account',
-                  style: TextStyle(
-                      color: Colors.black,
-                      fontWeight: FontWeight.w600,
-                      fontSize: 20.0),
-                ),
-              ),
-              Container(
-                padding: EdgeInsets.all(40.0),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      children: [
-                        CircleAvatar(
-                          radius: 30.0,
-                          backgroundImage: AssetImage('assets/profile.png'),
+                width: width,
+                height:
+                    orientation == Orientation.portrait ? height : height * 2.2,
+                child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Container(
+                        padding: EdgeInsets.all(40.0),
+                        margin: EdgeInsets.only(top: 20.0),
+                        child: AutoSizeText(
+                          'Account',
+                          style: TextStyle(
+                              color: Colors.black,
+                              fontWeight: FontWeight.w600,
+                              fontSize: 20.0),
                         ),
-                        Container(
-                          width: width * 0.40,
-                          margin: EdgeInsets.only(left: 10.0),
-                          child: new Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
+                      ),
+                      Container(
+                        padding: EdgeInsets.all(40.0),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.start,
                               children: [
-                                new AutoSizeText('$userName',
-                                    maxLines: 2,
-                                    style: TextStyle(
-                                        color: Colors.black,
-                                        fontWeight: FontWeight.w600,
-                                        fontSize: 16.0)),
-                                new AutoSizeText(userEmail,
-                                    maxLines: 2,
-                                    style: TextStyle(
-                                        color: ColorsTheme.txtColor,
-                                        fontWeight: FontWeight.w400,
-                                        letterSpacing: -0.9,
-                                        fontSize: 6.0)),
-                              ]),
+                                InkWell(
+                                  onTap: () {
+                                    showDialog(
+                                      context: context,
+                                      builder: (BuildContext context) {
+                                        return AlertDialog(
+                                          title: Text(
+                                              'Pick Image From Gallery Or Camera'),
+                                          // content: Text(
+                                          //     'Pick Image From Gallery Or Camera'),
+                                          actions: [
+                                            TextButton(
+                                              onPressed: () {
+                                                // _pickOrDeleteFrontImage(true);
+                                                _pickProfileImageFromGallery();
+                                                Navigator.pop(context);
+                                              },
+                                              child: Text(
+                                                'Gallery',
+                                                style: TextStyle(
+                                                    color: Colors.black),
+                                              ),
+                                            ),
+                                            TextButton(
+                                              onPressed: () {
+                                                // _pickOrDeleteFrontImageCamera(true);
+                                                Navigator.pop(context);
+                                              },
+                                              child: Text(
+                                                'Camera',
+                                                style: TextStyle(
+                                                    color: Colors.black),
+                                              ),
+                                            ),
+                                          ],
+                                        );
+                                      },
+                                    );
+                                  },
+                                  child: CircleAvatar(
+                                    radius: 30.0,
+                                    backgroundImage:
+                                        NetworkImage(profileUrl.toString()),
+                                  ),
+                                ),
+                                Container(
+                                  width: width * 0.40,
+                                  margin: EdgeInsets.only(left: 10.0),
+                                  child: new Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        new AutoSizeText('$userName',
+                                            maxLines: 2,
+                                            style: TextStyle(
+                                                color: Colors.black,
+                                                fontWeight: FontWeight.w600,
+                                                fontSize: 16.0)),
+                                        new AutoSizeText(userEmail,
+                                            maxLines: 2,
+                                            style: TextStyle(
+                                                color: ColorsTheme.txtColor,
+                                                fontWeight: FontWeight.w400,
+                                                letterSpacing: -0.9,
+                                                fontSize: 6.0)),
+                                      ]),
+                                ),
+                              ],
+                            ),
+                            Container(
+                                child: Image.asset('assets/arrow_right.png'))
+                          ],
                         ),
-                      ],
-                    ),
-                    Container(child: Image.asset('assets/arrow_right.png'))
-                  ],
-                ),
-              ),
-              if (orientation == Orientation.landscape)
-                Container(
-                  alignment: Alignment.center,
-                  child: Container(
-                    height: 235,
-                    width: width * 0.90,
-                    decoration: BoxDecoration(
-                        color: Color(0xffD3D3D3),
-                        borderRadius: BorderRadius.circular(14.0)),
-                    child: showAccountListItems(context),
-                  ),
-                ),
-              if (orientation == Orientation.portrait)
-                Container(
-                  padding: EdgeInsets.only(left: 40.0),
-                  child: Container(
-                      height: 226,
-                      width: width * 0.82,
-                      decoration: BoxDecoration(
-                          color: Color(0xffD3D3D3),
-                          borderRadius: BorderRadius.circular(14.0)),
-                      child: showAccountListItems(context)),
-                ),
-              Container(
-                margin: EdgeInsets.only(top: 20.0),
-                padding: EdgeInsets.only(left: 40.0),
-                child: SizedBox(
-                  width: orientation == Orientation.portrait
-                      ? width * 0.82
-                      : width * 0.90,
-                  height: 58.0,
-                  child: TextButton(
-                    onPressed: () async {
-                      Navigator.of(context, rootNavigator: true)
-                          .pushAndRemoveUntil(
-                        MaterialPageRoute(
-                          builder: (BuildContext context) {
-                            return LoginPage(
-                              is_logged_out: true,
-                            );
-                          },
+                      ),
+                      if (orientation == Orientation.landscape)
+                        Container(
+                          alignment: Alignment.center,
+                          child: Container(
+                            height: 235,
+                            width: width * 0.90,
+                            decoration: BoxDecoration(
+                                color: Color(0xffD3D3D3),
+                                borderRadius: BorderRadius.circular(14.0)),
+                            child: showAccountListItems(context),
+                          ),
                         ),
-                        (_) => false,
-                      );
-                    },
-                    style: ButtonStyle(
-                      shape: MaterialStateProperty.all(RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(14.0),
-                      )),
-                      foregroundColor: MaterialStateProperty.resolveWith<Color>(
-                          (Set<MaterialState> states) {
-                        if (states.contains(MaterialState.hovered) ||
-                            states.contains(MaterialState.focused))
-                          return ColorsTheme.lightGrey;
-                        return ColorsTheme.lightGrey;
-                      }),
-                      backgroundColor: MaterialStateProperty.resolveWith<Color>(
-                          (Set<MaterialState> states) {
-                        if (states.contains(MaterialState.hovered) ||
-                            states.contains(MaterialState.focused))
-                          return ColorsTheme.lightGrey;
+                      if (orientation == Orientation.portrait)
+                        Container(
+                          padding: EdgeInsets.only(left: 40.0),
+                          child: Container(
+                              height: 226,
+                              width: width * 0.82,
+                              decoration: BoxDecoration(
+                                  color: Color(0xffD3D3D3),
+                                  borderRadius: BorderRadius.circular(14.0)),
+                              child: showAccountListItems(context)),
+                        ),
+                      Container(
+                        margin: EdgeInsets.only(top: 20.0),
+                        padding: EdgeInsets.only(left: 40.0),
+                        child: SizedBox(
+                          width: orientation == Orientation.portrait
+                              ? width * 0.82
+                              : width * 0.90,
+                          height: 58.0,
+                          child: TextButton(
+                            onPressed: () async {
+                              Navigator.of(context, rootNavigator: true)
+                                  .pushAndRemoveUntil(
+                                MaterialPageRoute(
+                                  builder: (BuildContext context) {
+                                    return LoginPage(
+                                      is_logged_out: true,
+                                    );
+                                  },
+                                ),
+                                (_) => false,
+                              );
+                            },
+                            style: ButtonStyle(
+                              shape: MaterialStateProperty.all(
+                                  RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(14.0),
+                              )),
+                              foregroundColor:
+                                  MaterialStateProperty.resolveWith<Color>(
+                                      (Set<MaterialState> states) {
+                                if (states.contains(MaterialState.hovered) ||
+                                    states.contains(MaterialState.focused))
+                                  return ColorsTheme.lightGrey;
+                                return ColorsTheme.lightGrey;
+                              }),
+                              backgroundColor:
+                                  MaterialStateProperty.resolveWith<Color>(
+                                      (Set<MaterialState> states) {
+                                if (states.contains(MaterialState.hovered) ||
+                                    states.contains(MaterialState.focused))
+                                  return ColorsTheme.lightGrey;
 
-                        return ColorsTheme.lightGrey;
-                      }),
-                    ),
-                    child: Text(
-                      'Logout',
-                      style: TextStyle(
-                          color: ColorsTheme.dangerColor,
-                          fontWeight: FontWeight.w600,
-                          fontSize: 16.0),
-                    ),
+                                return ColorsTheme.lightGrey;
+                              }),
+                            ),
+                            child: Text(
+                              'Logout',
+                              style: TextStyle(
+                                  color: ColorsTheme.dangerColor,
+                                  fontWeight: FontWeight.w600,
+                                  fontSize: 16.0),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ]),
+              ),
+              if (is_loading == true && user.isEmpty)
+                Container(
+                  alignment: Alignment.topCenter,
+                  // margin: EdgeInsets.only(to),
+                  child: CircularProgressIndicator(
+                    valueColor:
+                        AlwaysStoppedAnimation<Color>(ColorsTheme.btnColor),
                   ),
                 ),
-              )
-            ]),
+            ],
           ),
         );
       }),
