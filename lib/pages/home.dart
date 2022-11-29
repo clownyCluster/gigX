@@ -955,79 +955,76 @@ class _HomeTabPageState extends State<HomeTabPage> {
                                   Navigator.of(context).push(MaterialPageRoute(
                                       builder: (context) => ProjectDetails()));
                                 },
-                                child: Flexible(
-                                  child: ListTile(
-                                    title: Container(
-                                      height: 100.0,
-                                      width: width * 0.85,
-                                      decoration: BoxDecoration(
-                                          borderRadius:
-                                              BorderRadius.circular(14.0),
-                                          border: Border.all(
-                                              color: Color(0xffEBEBEB),
-                                              width: 2.0)),
-                                      child: Row(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.center,
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.start,
-                                        children: [
-                                          Container(
-                                            padding: EdgeInsets.all(10.0),
-                                            width: 60,
-                                            height: 60,
-                                            child: projects[index]
-                                                        ['logo_url'] ==
-                                                    ''
-                                                ? Image.asset(
-                                                    'assets/sample_logo.png')
-                                                : Image.network(
-                                                    projects[index]['logo_url'],
-                                                    fit: BoxFit.fill,
-                                                  ),
+                                child: ListTile(
+                                  title: Container(
+                                    height: 100.0,
+                                    width: width * 0.85,
+                                    decoration: BoxDecoration(
+                                        borderRadius:
+                                            BorderRadius.circular(14.0),
+                                        border: Border.all(
+                                            color: Color(0xffEBEBEB),
+                                            width: 2.0)),
+                                    child: Row(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.center,
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.start,
+                                      children: [
+                                        Container(
+                                          padding: EdgeInsets.all(10.0),
+                                          width: 60,
+                                          height: 60,
+                                          child: projects[index]['logo_url'] ==
+                                                  ''
+                                              ? Image.asset(
+                                                  'assets/sample_logo.png')
+                                              : Image.network(
+                                                  projects[index]['logo_url'],
+                                                  fit: BoxFit.fill,
+                                                ),
+                                        ),
+                                        Container(
+                                          padding: EdgeInsets.all(10.0),
+                                          margin: EdgeInsets.only(top: 15.0),
+                                          width: width * 0.4,
+                                          child: Column(
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
+                                              children: [
+                                                AutoSizeText(
+                                                  projects[index]['title'],
+                                                  maxLines: 1,
+                                                  style: TextStyle(
+                                                      color: Colors.black,
+                                                      fontSize: 18.0),
+                                                ),
+                                                AutoSizeText(
+                                                  projects[index]
+                                                      ['description'],
+                                                  maxLines: 1,
+                                                  overflow:
+                                                      TextOverflow.ellipsis,
+                                                  style: TextStyle(
+                                                      color: Colors.black,
+                                                      fontSize: 12.0),
+                                                ),
+                                              ]),
+                                        ),
+                                        SizedBox(
+                                          width: orientation ==
+                                                  Orientation.portrait
+                                              ? width * 0.18
+                                              : width * 0.3,
+                                        ),
+                                        GestureDetector(
+                                          onTap: () {},
+                                          child: Image(
+                                            image: AssetImage(
+                                                'assets/arrow_details.png'),
                                           ),
-                                          Container(
-                                            padding: EdgeInsets.all(10.0),
-                                            margin: EdgeInsets.only(top: 15.0),
-                                            width: width * 0.4,
-                                            child: Column(
-                                                crossAxisAlignment:
-                                                    CrossAxisAlignment.start,
-                                                children: [
-                                                  AutoSizeText(
-                                                    projects[index]['title'],
-                                                    maxLines: 1,
-                                                    style: TextStyle(
-                                                        color: Colors.black,
-                                                        fontSize: 18.0),
-                                                  ),
-                                                  AutoSizeText(
-                                                    projects[index]
-                                                        ['description'],
-                                                    maxLines: 1,
-                                                    overflow:
-                                                        TextOverflow.ellipsis,
-                                                    style: TextStyle(
-                                                        color: Colors.black,
-                                                        fontSize: 12.0),
-                                                  ),
-                                                ]),
-                                          ),
-                                          SizedBox(
-                                            width: orientation ==
-                                                    Orientation.portrait
-                                                ? width * 0.18
-                                                : width * 0.3,
-                                          ),
-                                          GestureDetector(
-                                            onTap: () {},
-                                            child: Image(
-                                              image: AssetImage(
-                                                  'assets/arrow_details.png'),
-                                            ),
-                                          )
-                                        ],
-                                      ),
+                                        )
+                                      ],
                                     ),
                                   ),
                                 ),
