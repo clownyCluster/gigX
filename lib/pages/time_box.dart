@@ -74,7 +74,7 @@ class _TimeBoxPageState extends State<TimeBoxPage> {
                 Container(
                   width: width,
                   height: orientation == Orientation.portrait
-                      ? height * 2.87
+                      ? height * 2.47
                       : height * 5.2,
                   child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
