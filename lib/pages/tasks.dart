@@ -1,14 +1,17 @@
+import 'dart:math';
+
 import 'package:auto_size_text/auto_size_text.dart';
+import 'package:calendar_builder/calendar_builder.dart';
 import 'package:calendar_date_picker2/calendar_date_picker2.dart';
 import 'package:dio/dio.dart';
 import 'package:dropdown_button2/dropdown_button2.dart';
-import 'package:efleet_project_tree/api.dart';
-import 'package:efleet_project_tree/colors.dart';
-import 'package:efleet_project_tree/home.dart';
-import 'package:efleet_project_tree/login.dart';
-import 'package:efleet_project_tree/pages/home.dart';
-import 'package:efleet_project_tree/pages/projectdetails.dart';
-import 'package:efleet_project_tree/utils/notification_service.dart';
+import 'package:gigX/api.dart';
+import 'package:gigX/colors.dart';
+import 'package:gigX/home.dart';
+import 'package:gigX/login.dart';
+import 'package:gigX/pages/home.dart';
+import 'package:gigX/pages/projectdetails.dart';
+import 'package:gigX/utils/notification_service.dart';
 import 'package:f_datetimerangepicker/f_datetimerangepicker.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
@@ -76,8 +79,8 @@ Color inprogColor = Colors.black;
 double _percent = 40.0;
 
 var project = [];
-var users = [];
 var tempList = [];
+var userList = [];
 
 String _currentItemSelected = "Select Project";
 int project_id = 0;
@@ -94,21 +97,30 @@ String? access_token;
 int? selected_project_id = 0;
 int logged_in_user_id = 0;
 bool is_loading = false;
+int assinged_to = 0;
+int project_to = 0;
 Map result = new Map();
 
 class _TaskTabPageState extends State<TaskTabPage> {
   var projects = [];
   var dupList = [];
   var tasks = [];
+  var users = [];
 
   var notifications = [];
   late Map taskMap;
+  late Map userMap;
   String? selected_project_index = "";
 
   SharedPreferences? preferences;
+  List<DateTime>? event_start_date = [];
+  List<DateTime>? event_end_date = [];
+
   @override
   void initState() {
     // TODO: implement initState
+    WidgetsFlutterBinding.ensureInitialized();
+
     super.initState();
 
     WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
@@ -116,6 +128,7 @@ class _TaskTabPageState extends State<TaskTabPage> {
       getProjects();
       getUsers();
       getUserTasks();
+
       getDeviceToken();
       setState(() {
         inCompColor = Colors.black;
@@ -134,7 +147,6 @@ class _TaskTabPageState extends State<TaskTabPage> {
     final _dio = Dio();
     is_loading = true;
     String? access_token;
-
     this.preferences = await SharedPreferences.getInstance();
     setState(() {
       access_token = this.preferences?.getString('access_token');
@@ -160,6 +172,7 @@ class _TaskTabPageState extends State<TaskTabPage> {
               'priority': element['priority'],
               'title': element['title'].toString(),
               'description': element['description'].toString(),
+              'assign_to': element['assign_to'],
               'selected_project_id': 2
             };
             tasks.add(taskMap);
@@ -170,7 +183,10 @@ class _TaskTabPageState extends State<TaskTabPage> {
           });
 
           tasks.forEach((element) {
-            print(element);
+            event_start_date?.add(
+                DateFormat("dd/MM/yyyy HH:mm").parse(element['start_date']));
+            event_end_date?.add(
+                DateFormat("dd/MM/yyyy HH:mm").parse(element['end_date']));
           });
         });
       } else if (response.statusCode == 401) {
@@ -464,7 +480,9 @@ class _TaskTabPageState extends State<TaskTabPage> {
 
   Future<void> getUsers() async {
     final _dio = Dio();
+    int i = -1;
     final storage = new FlutterSecureStorage();
+
     email = await storage.read(key: 'email') ?? '';
 
     String? access_token;
@@ -482,12 +500,22 @@ class _TaskTabPageState extends State<TaskTabPage> {
       if (response.statusCode == 200) {
         this.preferences?.setBool('someoneLoggedIn', false);
         setState(() {
-          users = response.data['data'];
-          users
-              .where((element) => element['email'] == email)
-              .forEach((element) {
-            logged_in_user_id = element['id'];
+          userList = response.data['data'];
+
+          userList.forEach((element) {
+            i++;
+            userMap = {
+              'id': element['id'],
+              'username': element['username'],
+              'selected_user_id': i
+            };
+            users.add(userMap);
           });
+          // users
+          //     .where((element) => element['email'] == email)
+          //     .forEach((element) {
+          //   logged_in_user_id = element['id'];
+          // });
         });
       } else if (response.statusCode == 401) {
         await this.preferences?.remove('access_token');
@@ -2281,6 +2309,136 @@ class _TaskTabPageState extends State<TaskTabPage> {
         });
   }
 
+  void getSelectedTasks(DateTime selectedDateTime) {
+    List<String> dates = [];
+    late Map selectTaskMap;
+    var dupList = [];
+    int count = 0;
+    // print(DateFormat("dd/MM/yyyy").format(selectedDateTime));
+    tasks.where((element) => element['project_id'] != 0).forEach((element) {
+      // print(element['start_date']);
+      if (element['start_date']
+          .toString()
+          .substring(0, 11)
+          .contains(DateFormat("dd/MM/yyyy").format(selectedDateTime))) {
+        count++;
+        selectTaskMap = {
+          'id': element['id'],
+          'title': element['title'],
+          'description': element['description'],
+          'project_id': element['project_id'],
+          'assign_to': element['assign_to'],
+          'selected_project_index': count - 1
+        };
+        dupList.add(selectTaskMap);
+        // print(element['id']);
+      }
+    });
+
+    showSelectedTaskDetails(context, dupList);
+    print(selectTaskMap['project_id']);
+
+    // dates.add(DateFormat("dd/MM/yyyy HH:mm").format(selectedDateTime));
+  }
+
+  void showSelectedTaskDetails(
+      BuildContext context, List<dynamic> selectedTasks) async {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      isDismissible: true,
+      // useRootNavigator: false,
+      shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.only(
+              topLeft: Radius.circular(14.0), topRight: Radius.circular(14.0))),
+      builder: (context) {
+        return StatefulBuilder(builder:
+            (BuildContext context, StateSetter state /*You can rename this!*/) {
+          return Container(
+            height: 560.0,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Center(
+                  child: Text('Tasks'),
+                ),
+                Container(
+                  height: 500.0,
+                  width: width,
+                  padding: EdgeInsets.all(20.0),
+                  child: MediaQuery.removePadding(
+                    context: context,
+                    removeTop: true,
+                    child: ListView.builder(
+                        itemCount: selectedTasks.length,
+                        itemBuilder: ((context, index) {
+                          return InkWell(
+                            onTap: () {
+                              // print(selectedTasks[index]['id']);
+
+                              setState(() {
+                                assinged_to = selectedTasks[index]['assign_to'];
+                                projects
+                                    .where((element) =>
+                                        element['id'] ==
+                                        selectedTasks[index]['project_id'])
+                                    .forEach((element) {
+                                  selectedIndex3 =
+                                      element['selected_project_id'];
+                                  // print(project_to);
+                                  print(assinged_to);
+                                });
+
+                                users
+                                    .where((element) =>
+                                        element['id'] ==
+                                        selectedTasks[index]['assign_to'])
+                                    .forEach((element) {
+                                  selectedIndex4 = element['selected_user_id'];
+                                });
+                              });
+                              Navigator.of(context).pop();
+                              _updateTaskModalBottomSheet(
+                                  context,
+                                  selectedTasks[index]['id'],
+                                  selectedTasks[index]['project_id']
+                                      .toString());
+                            },
+                            child: Container(
+                              width: width * 0.8,
+                              height: 200.0,
+                              color: ColorsTheme.uIUxColor,
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Container(
+                                      child: AutoSizeText(
+                                    selectedTasks[index]['title'],
+                                    style: TextStyle(
+                                        fontSize: 18,
+                                        fontWeight: FontWeight.w600,
+                                        color: Colors.white),
+                                  )),
+                                  Flexible(
+                                    child: Container(
+                                        child: AutoSizeText(selectedTasks[index]
+                                            ['description'])),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          );
+                        })),
+                  ),
+                ),
+              ],
+            ),
+          );
+        });
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     height = MediaQuery.of(context).size.height;
@@ -2295,6 +2453,7 @@ class _TaskTabPageState extends State<TaskTabPage> {
             children: [
               Container(
                   padding: EdgeInsets.all(40.0),
+                  margin: EdgeInsets.only(top: 40.0),
                   child: AutoSizeText(
                     'Tasks',
                     style:
@@ -2302,105 +2461,273 @@ class _TaskTabPageState extends State<TaskTabPage> {
                   )),
               Container(
                 width: width,
-                height: height * 1.9,
-                child: SfCalendar(
-                  controller: _controller,
-                  key: ValueKey(view),
-                  view: CalendarView.timelineDay,
-                  firstDayOfWeek: 6,
-                  initialSelectedDate: DateTime.now(),
-                  cellBorderColor: Colors.transparent,
-                  todayHighlightColor: ColorsTheme.btnColor,
-                  showNavigationArrow: true,
-                  showDatePickerButton: true,
-                  onTap: calendarTapped,
-                  dataSource: MeetingDataSource(getAppointments()),
-                  timeSlotViewSettings: TimeSlotViewSettings(
-                      timeIntervalHeight: 600,
-                      timeIntervalWidth: 80,
-                      dayFormat: 'EEEE',
-                      dateFormat: 'dd',
-                      timeFormat: 'hh:mm: a',
-                      timelineAppointmentHeight: 800),
-                  appointmentBuilder: (BuildContext context,
-                      CalendarAppointmentDetails calendarAppointmentDetails) {
-                    final Appointment meeting =
-                        calendarAppointmentDetails.appointments.first;
-                    // DateFormat format = DateFormat("dd/MM/yyyy");
+                // height: height * 1.9,
+                // height: height * 1.9,
 
-                    return SingleChildScrollView(
-                      scrollDirection: Axis.vertical,
-                      physics: NeverScrollableScrollPhysics(),
-                      child: Container(
-                        decoration: BoxDecoration(color: ColorsTheme.aptBox),
-                        padding: EdgeInsets.all(10.0),
-                        height: 300,
-                        child: Column(
-                            mainAxisAlignment: MainAxisAlignment.start,
-                            crossAxisAlignment: CrossAxisAlignment.start,
+                height: orientation == Orientation.portrait
+                    ? height * 4.62
+                    : height * 10.42,
+                child: MediaQuery.removePadding(
+                  context: context,
+                  removeTop: true,
+                  child: CbMonthBuilder(
+                    onDateClicked: (onDateSelected) {
+                      {
+                        if (onDateSelected.hasEvent)
+                          getSelectedTasks(onDateSelected.selectedDate);
+                      }
+                    },
+                    cbConfig: CbConfig(
+                        startDate: DateTime(2020),
+                        endDate: DateTime(2123),
+                        selectedDate: DateTime(2022),
+                        selectedYear: DateTime(2022),
+                        weekStartsFrom: WeekStartsFrom.sunday,
+
+                        // eventDates: [
+                        //   // DateTime(2022, 1, 2),
+                        //   // DateTime(2022, 1, 2),
+                        //   // DateTime(2022, 1, 3)
+                        // ],
+
+                        eventDates: event_start_date,
+                        highlightedDates: []),
+                    yearDropDownCustomizer: YearDropDownCustomizer(
+                      yearHeaderBuilder: (isYearPickerExpanded, selectedDate,
+                          selectedYear, year) {
+                        return Container(
+                          height: 40,
+                          color: ColorsTheme.uIUxColor,
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            crossAxisAlignment: CrossAxisAlignment.center,
                             children: [
-                              FittedBox(
-                                fit: BoxFit.contain,
-                                child: Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    AutoSizeText(
-                                      meeting.subject,
-                                      style: TextStyle(
-                                          color: Colors.white,
-                                          fontWeight: FontWeight.w600,
-                                          fontSize: 18.0),
-                                    ),
-                                    IconButton(
-                                        onPressed: () {},
-                                        icon: Icon(
-                                          Icons.notifications,
-                                          color: Colors.white,
-                                        ))
-                                  ],
+                              Text(
+                                year,
+                                style: const TextStyle(
+                                    fontWeight: FontWeight.bold),
+                              ),
+                              Icon(!isYearPickerExpanded
+                                  ? Icons.arrow_drop_down_outlined
+                                  : Icons.arrow_drop_up_outlined)
+                            ],
+                          ),
+                        );
+                      },
+                    ),
+                    monthCustomizer: MonthCustomizer(
+                      montMinhHeight: 200,
+                      monthMinWidth: 450,
+                      padding: const EdgeInsets.all(20),
+                      monthHeaderBuilder:
+                          (month, headerHeight, headerWidth, paddingLeft) {
+                        return Container(
+                          color: Colors.grey[200],
+                          height: headerHeight,
+                          width: headerWidth,
+                          child: Padding(
+                            padding: EdgeInsets.only(left: paddingLeft),
+                            child: Align(
+                              alignment: Alignment.center,
+                              child: Text(
+                                month,
+                                style: const TextStyle(
+                                  fontSize: 22,
+                                  fontWeight: FontWeight.w600,
                                 ),
                               ),
-                              Container(
+                            ),
+                          ),
+                        );
+                      },
+                      monthWeekBuilder: (index, weeks, weekHeight, weekWidth) {
+                        return SizedBox(
+                          height: weekHeight,
+                          width: weekWidth,
+                          child: Padding(
+                            padding: const EdgeInsets.all(4.0),
+                            child: Container(
+                              decoration: BoxDecoration(
+                                  color: Colors.red.withOpacity(0.1),
+                                  borderRadius: BorderRadius.circular(10),
+                                  border: Border.all(color: Colors.red)),
+                              child: Align(
                                 child: Text(
-                                  'eFleetPass',
-                                  style: TextStyle(
-                                      color: Colors.white,
-                                      fontSize: 12.0,
-                                      fontWeight: FontWeight.w400),
+                                  weeks,
+                                  style: const TextStyle(
+                                    fontSize: 14,
+                                    color: Colors.red,
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                  overflow: TextOverflow.ellipsis,
+                                  maxLines: 1,
                                 ),
                               ),
-                              Divider(
-                                thickness: 1.0,
-                                color: Colors.white,
-                              ),
-                              FittedBox(
-                                fit: BoxFit.contain,
-                                child: Row(
-                                  mainAxisAlignment: MainAxisAlignment.start,
-                                  children: [
-                                    IconButton(
-                                        onPressed: () {},
-                                        icon: Icon(
-                                          Icons.alarm,
-                                          color: Colors.white,
-                                        )),
-                                    Text(
-                                      DateFormat('MMMM dd, yyyy hh:mm a')
-                                              .format(meeting.startTime) +
-                                          ' - ' +
-                                          DateFormat('MMMM dd, yyyy hh:mm a')
-                                              .format(meeting.endTime),
-                                      style: TextStyle(color: Colors.white),
-                                    )
-                                  ],
-                                ),
-                              )
-                            ]),
-                      ),
-                    );
-                  },
+                            ),
+                          ),
+                        );
+                      },
+                      monthButtonBuilder: (dateTime,
+                          childHeight,
+                          childWidth,
+                          isSelected,
+                          isDisabled,
+                          hasEvent,
+                          isHighlighted,
+                          isCurrentDay) {
+                        //Text Theme
+                        final txtTheme = Theme.of(context).textTheme;
+                        //color theme
+                        final colorTheme = Theme.of(context);
+
+                        var daysText = Align(
+                          child: Text(
+                            '${dateTime.day}',
+                            style: isDisabled
+                                ? txtTheme.caption
+                                : isSelected
+                                    ? txtTheme.bodyText1!.copyWith(
+                                        fontWeight: FontWeight.bold,
+                                        color: colorTheme.brightness ==
+                                                Brightness.dark
+                                            ? Colors.black
+                                            : Colors.white)
+                                    : isHighlighted
+                                        ? txtTheme
+                                            .bodyText2 //Highlighted TextStyle
+                                        : isCurrentDay
+                                            ? txtTheme
+                                                .bodyText2 //CurrentDay TextStyle
+                                            : txtTheme.bodyText2,
+                          ),
+                        );
+                        if (isSelected) {
+                          return Container(
+                            decoration: const BoxDecoration(
+                              color: Colors.red,
+                              shape: BoxShape.rectangle,
+                            ),
+                            margin: const EdgeInsets.all(2),
+                            child: daysText,
+                          );
+                        }
+                        return Container(
+                          decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(14.0),
+                              border: hasEvent || isHighlighted
+                                  ? Border.all(
+                                      color: isHighlighted
+                                          ? Colors.red
+                                          : Colors.blue,
+                                      width: 2)
+                                  : null),
+                          margin: const EdgeInsets.all(2),
+                          child: daysText,
+                        );
+                      },
+                    ),
+                  ),
                 ),
+
+                // child: SfCalendar(
+                //   controller: _controller,
+                //   key: ValueKey(view),
+                //   view: CalendarView.timelineMonth,
+                //   firstDayOfWeek: 6,
+                //   initialSelectedDate: DateTime.now(),
+                //   cellBorderColor: Colors.transparent,
+                //   todayHighlightColor: ColorsTheme.btnColor,
+                //   showNavigationArrow: true,
+                //   showDatePickerButton: true,
+                //   onTap: calendarTapped,
+                //   dataSource: MeetingDataSource(getAppointments()),
+                //   timeSlotViewSettings: TimeSlotViewSettings(
+                //       timeIntervalHeight: 600,
+                //       timeIntervalWidth: 80,
+                //       dayFormat: 'EEEE',
+                //       dateFormat: 'dd',
+                //       timeFormat: 'hh:mm: a',
+                //       timelineAppointmentHeight: 800),
+                //   appointmentBuilder: (BuildContext context,
+                //       CalendarAppointmentDetails calendarAppointmentDetails) {
+                //     final Appointment meeting =
+                //         calendarAppointmentDetails.appointments.first;
+                //     // DateFormat format = DateFormat("dd/MM/yyyy");
+
+                //     return SingleChildScrollView(
+                //       scrollDirection: Axis.vertical,
+                //       physics: NeverScrollableScrollPhysics(),
+                //       child: Container(
+                //         decoration: BoxDecoration(color: ColorsTheme.aptBox),
+                //         padding: EdgeInsets.all(10.0),
+                //         height: 300,
+                //         child: Column(
+                //             mainAxisAlignment: MainAxisAlignment.start,
+                //             crossAxisAlignment: CrossAxisAlignment.start,
+                //             children: [
+                //               FittedBox(
+                //                 fit: BoxFit.contain,
+                //                 child: Row(
+                //                   mainAxisAlignment:
+                //                       MainAxisAlignment.spaceBetween,
+                //                   children: [
+                //                     AutoSizeText(
+                //                       meeting.subject,
+                //                       style: TextStyle(
+                //                           color: Colors.white,
+                //                           fontWeight: FontWeight.w600,
+                //                           fontSize: 18.0),
+                //                     ),
+                //                     IconButton(
+                //                         onPressed: () {},
+                //                         icon: Icon(
+                //                           Icons.notifications,
+                //                           color: Colors.white,
+                //                         ))
+                //                   ],
+                //                 ),
+                //               ),
+                //               Container(
+                //                 child: Text(
+                //                   'eFleetPass',
+                //                   style: TextStyle(
+                //                       color: Colors.white,
+                //                       fontSize: 12.0,
+                //                       fontWeight: FontWeight.w400),
+                //                 ),
+                //               ),
+                //               Divider(
+                //                 thickness: 1.0,
+                //                 color: Colors.white,
+                //               ),
+                //               FittedBox(
+                //                 fit: BoxFit.contain,
+                //                 child: Row(
+                //                   mainAxisAlignment: MainAxisAlignment.start,
+                //                   children: [
+                //                     IconButton(
+                //                         onPressed: () {},
+                //                         icon: Icon(
+                //                           Icons.alarm,
+                //                           color: Colors.white,
+                //                         )),
+                //                     Text(
+                //                       DateFormat('MMMM dd, yyyy hh:mm a')
+                //                               .format(meeting.startTime) +
+                //                           ' - ' +
+                //                           DateFormat('MMMM dd, yyyy hh:mm a')
+                //                               .format(meeting.endTime),
+                //                       style: TextStyle(color: Colors.white),
+                //                     )
+                //                   ],
+                //                 ),
+                //               )
+                //             ]),
+                //       ),
+                //     );
+                //   },
+                // ),
               )
             ],
           ),

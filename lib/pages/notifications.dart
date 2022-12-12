@@ -1,8 +1,8 @@
 import 'package:dio/dio.dart';
-import 'package:efleet_project_tree/api.dart';
-import 'package:efleet_project_tree/colors.dart';
-import 'package:efleet_project_tree/login.dart';
-import 'package:efleet_project_tree/utils/notification_service.dart';
+import 'package:gigX/api.dart';
+import 'package:gigX/colors.dart';
+import 'package:gigX/login.dart';
+import 'package:gigX/utils/notification_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/src/widgets/container.dart';
 import 'package:flutter/src/widgets/framework.dart';
@@ -46,6 +46,8 @@ class _NotificationTabPageState extends State<NotificationTabPage> {
   DateTime? formatted_updated_at;
   bool is_search_visible = true;
   String search_query = "";
+  Map<String, dynamic> user = new Map<String, dynamic>();
+  String profileUrl = "";
 
   @override
   void initState() {
@@ -54,6 +56,7 @@ class _NotificationTabPageState extends State<NotificationTabPage> {
     tz.initializeTimeZones();
     pref();
     getNotifications();
+    getUserProfile();
   }
 
   Future<void> pref() async {
@@ -121,6 +124,53 @@ class _NotificationTabPageState extends State<NotificationTabPage> {
         );
       }
       return null;
+    }
+  }
+
+  Future<void> getUserProfile() async {
+    final _dio = new Dio();
+    this.preferences = await SharedPreferences.getInstance();
+    setState(() {
+      access_token = this.preferences?.getString('access_token');
+      is_loading = true;
+    });
+    try {
+      Response response = await _dio.get(API.base_url + 'me',
+          options: Options(headers: {"authorization": "Bearer $access_token"}));
+
+      if (response.statusCode == 200) {
+        this.preferences?.setBool('someoneLoggedIn', false);
+        setState(() {
+          is_loading = false;
+          user = response.data;
+          profileUrl = user['ProfilePic'];
+          print(profileUrl);
+        });
+      } else if (response.statusCode == 401) {
+        await this.preferences?.remove('access_token');
+        Navigator.of(context, rootNavigator: true).pushAndRemoveUntil(
+          MaterialPageRoute(
+            builder: (BuildContext context) {
+              return const Login();
+            },
+          ),
+          (_) => false,
+        );
+      }
+    } on DioError catch (e) {
+      print(e);
+      if (e.response?.statusCode == 401) {
+        this.preferences?.setBool('someoneLoggedIn', true);
+        await this.preferences?.remove('access_token');
+        Navigator.of(context, rootNavigator: true).pushAndRemoveUntil(
+          MaterialPageRoute(
+            builder: (BuildContext context) {
+              return const Login();
+            },
+          ),
+          (_) => false,
+        );
+      }
     }
   }
 
@@ -271,41 +321,47 @@ class _NotificationTabPageState extends State<NotificationTabPage> {
                   padding: orientation == Orientation.portrait
                       ? EdgeInsets.all(10.0)
                       : EdgeInsets.all(20.0),
-                  child: ListView.builder(
-                      itemCount: notifications.length,
-                      shrinkWrap: true,
-                      itemExtent: 100.0,
-                      itemBuilder: (BuildContext context, index) {
-                        return Container(
-                          padding: EdgeInsets.only(left: 10.0, top: 10.0),
-                          decoration: BoxDecoration(
-                              border: Border(
-                                  bottom: BorderSide(color: Colors.black26))),
-                          child: ListTile(
-                            leading: CircleAvatar(
-                              radius: 30.0,
-                              backgroundImage: AssetImage('assets/profile.png'),
+                  child: MediaQuery.removePadding(
+                    context: context,
+                    removeTop: true,
+                    child: ListView.builder(
+                        itemCount: notifications.length,
+                        shrinkWrap: true,
+                        itemExtent: 100.0,
+                        itemBuilder: (BuildContext context, index) {
+                          return Container(
+                            padding: EdgeInsets.only(left: 10.0, top: 10.0),
+                            decoration: BoxDecoration(
+                                border: Border(
+                                    bottom: BorderSide(color: Colors.black26))),
+                            child: ListTile(
+                              leading: CircleAvatar(
+                                radius: 30.0,
+                                backgroundImage:
+                                    NetworkImage(profileUrl.toString()),
+                              ),
+                              title: new RichText(
+                                text: TextSpan(children: [
+                                  new TextSpan(
+                                      text: notifications[index]
+                                              ['notification'] +
+                                          '\n',
+                                      style: TextStyle(
+                                          fontWeight: FontWeight.w600,
+                                          fontSize: 13.0,
+                                          color: Colors.black)),
+                                  new TextSpan(
+                                      text: notifications[index]['updated_at'],
+                                      style: TextStyle(
+                                          fontWeight: FontWeight.w400,
+                                          fontSize: 12,
+                                          color: ColorsTheme.txtDescColor)),
+                                ]),
+                              ),
                             ),
-                            title: new RichText(
-                              text: TextSpan(children: [
-                                new TextSpan(
-                                    text: notifications[index]['notification'] +
-                                        '\n',
-                                    style: TextStyle(
-                                        fontWeight: FontWeight.w600,
-                                        fontSize: 13.0,
-                                        color: Colors.black)),
-                                new TextSpan(
-                                    text: notifications[index]['updated_at'],
-                                    style: TextStyle(
-                                        fontWeight: FontWeight.w400,
-                                        fontSize: 12,
-                                        color: ColorsTheme.txtDescColor)),
-                              ]),
-                            ),
-                          ),
-                        );
-                      }),
+                          );
+                        }),
+                  ),
                 ),
               if (is_loading == true && notifications.isEmpty)
                 Container(

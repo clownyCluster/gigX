@@ -1,6 +1,6 @@
 import 'dart:io';
-import 'package:efleet_project_tree/colors.dart';
-import 'package:efleet_project_tree/home.dart';
+import 'package:gigX/colors.dart';
+import 'package:gigX/home.dart';
 import 'package:flutter/material.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 

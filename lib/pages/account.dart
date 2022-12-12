@@ -2,11 +2,12 @@ import 'dart:io';
 
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:dio/dio.dart';
-import 'package:efleet_project_tree/api.dart';
-import 'package:efleet_project_tree/colors.dart';
-import 'package:efleet_project_tree/login.dart';
-import 'package:efleet_project_tree/pages/webviewprivacypolicy.dart';
-import 'package:efleet_project_tree/pages/webviewtermsandconditions.dart';
+import 'package:gigX/api.dart';
+import 'package:gigX/colors.dart';
+import 'package:gigX/login.dart';
+import 'package:gigX/pages/time_box.dart';
+import 'package:gigX/pages/webviewprivacypolicy.dart';
+import 'package:gigX/pages/webviewtermsandconditions.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/src/widgets/container.dart';
 import 'package:flutter/src/widgets/framework.dart';
@@ -247,6 +248,23 @@ class _AccountTabPageState extends State<AccountTabPage> {
           InkWell(
             onTap: () {
               Navigator.of(context).push(
+                  MaterialPageRoute(builder: (context) => const TimeBox()));
+            },
+            child: ListTile(
+              leading: Icon(Icons.timer, color: ColorsTheme.btnColor,),
+              title: Text(
+                'Time Box',
+                style: TextStyle(
+                    color: Colors.black,
+                    fontWeight: FontWeight.w600,
+                    fontSize: 16.0),
+              ),
+              trailing: Image.asset('assets/arrow_right.png'),
+            ),
+          ),
+          InkWell(
+            onTap: () {
+              Navigator.of(context).push(
                   MaterialPageRoute(builder: (context) => PrivacyPolicy()));
             },
             child: ListTile(
@@ -310,14 +328,14 @@ class _AccountTabPageState extends State<AccountTabPage> {
               Container(
                 width: width,
                 height: orientation == Orientation.portrait
-                    ? height * 0.85
+                    ? height * 0.87
                     : height * 2.2,
                 child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Container(
                         padding: EdgeInsets.all(40.0),
-                        margin: EdgeInsets.only(top: 20.0),
+                        margin: EdgeInsets.only(top: 40.0),
                         child: AutoSizeText(
                           'Account',
                           style: TextStyle(
@@ -421,7 +439,7 @@ class _AccountTabPageState extends State<AccountTabPage> {
                         Container(
                           padding: EdgeInsets.only(left: 40.0),
                           child: Container(
-                              height: 280,
+                              height: 310,
                               width: width * 0.82,
                               decoration: BoxDecoration(
                                   color: Color(0xffD3D3D3),

@@ -1,11 +1,11 @@
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:back_button_interceptor/back_button_interceptor.dart';
 import 'package:calendar_date_picker2/calendar_date_picker2.dart';
-import 'package:efleet_project_tree/colors.dart';
-import 'package:efleet_project_tree/pages/account.dart';
-import 'package:efleet_project_tree/pages/home.dart';
-import 'package:efleet_project_tree/pages/notifications.dart';
-import 'package:efleet_project_tree/pages/tasks.dart';
+import 'package:gigX/colors.dart';
+import 'package:gigX/pages/account.dart';
+import 'package:gigX/pages/home.dart';
+import 'package:gigX/pages/notifications.dart';
+import 'package:gigX/pages/tasks.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/src/widgets/container.dart';

@@ -3,9 +3,9 @@ import 'dart:io';
 
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:dio/dio.dart';
-import 'package:efleet_project_tree/api.dart';
-import 'package:efleet_project_tree/colors.dart';
-import 'package:efleet_project_tree/home.dart';
+import 'package:gigX/api.dart';
+import 'package:gigX/colors.dart';
+import 'package:gigX/home.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -79,10 +79,10 @@ class _LoginPageState extends State<LoginPage> {
     try {
       var map = new Map<String, dynamic>();
       map['grant_type'] = 'password';
-      // map['client_id'] = '14';
-      // map['client_secret'] = 'PYZTnOaDfJWM0X9eyIUlXZMJU1z6ZKkAEtLHlbiI';
-      map['client_id'] = '20';
-      map['client_secret'] = 'VDt8JhTzNdBrCWoKTwWNGOw0SQ5bPg99J2HI2BLL';
+      map['client_id'] = '14';
+      map['client_secret'] = 'PYZTnOaDfJWM0X9eyIUlXZMJU1z6ZKkAEtLHlbiI';
+      // map['client_id'] = '20';
+      // map['client_secret'] = 'VDt8JhTzNdBrCWoKTwWNGOw0SQ5bPg99J2HI2BLL';
       // email = 'leonardo@myfleetmanager.com.au';
       // password = 'Efleet@02dev';
       map['username'] = email;
@@ -278,7 +278,7 @@ class _LoginPageState extends State<LoginPage> {
                 height: 120,
                 alignment: Alignment.bottomCenter,
                 child: Image(
-                  image: AssetImage('assets/logo_title.jpg'),
+                  image: AssetImage('assets/logo_title.png'),
                   fit: BoxFit.contain,
                 ),
               ),

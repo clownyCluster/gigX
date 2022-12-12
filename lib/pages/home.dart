@@ -3,12 +3,12 @@ import 'dart:io';
 
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:dio/dio.dart';
-import 'package:efleet_project_tree/api.dart';
-import 'package:efleet_project_tree/colors.dart';
-import 'package:efleet_project_tree/home.dart';
-import 'package:efleet_project_tree/login.dart';
-import 'package:efleet_project_tree/pages/projectdetails.dart';
-import 'package:efleet_project_tree/utils/notification_service.dart';
+import 'package:gigX/api.dart';
+import 'package:gigX/colors.dart';
+import 'package:gigX/home.dart';
+import 'package:gigX/login.dart';
+import 'package:gigX/pages/projectdetails.dart';
+import 'package:gigX/utils/notification_service.dart';
 import 'package:f_datetimerangepicker/f_datetimerangepicker.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
@@ -83,10 +83,10 @@ class _HomeTabPageState extends State<HomeTabPage> {
   @override
   void initState() {
     // TODO: implement initState
+    WidgetsFlutterBinding.ensureInitialized();
+
     super.initState();
-    getUserProfile();
-    // saveDeviceID();
-    getProjects();
+
     KeyboardVisibilityController().onChange.listen((isVisible) {
       setState(() {
         keyboardVisible = isVisible;
@@ -96,12 +96,15 @@ class _HomeTabPageState extends State<HomeTabPage> {
 
     list = List.generate(4, (index) => null);
 
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      getUserProfile();
+      getProjects();
+    });
+
     controller.addListener(() {
       if (controller.position.pixels == controller.position.maxScrollExtent) {
-        // pageNumber++;
-
         setState(() {
-          getProjects();
+          getMoreProjects();
         }); // if add this, Reload your futurebuilder and load more data
 
       }
@@ -410,7 +413,6 @@ class _HomeTabPageState extends State<HomeTabPage> {
 
   Future<void> getProjectsFromSearch(String search) async {
     final _dio = Dio();
-    _is_loading = true;
 
     // Map<St  Future<void> getVehicles(String type) asyn2 {ring, dynamic> arrayTest;
 
@@ -742,7 +744,9 @@ class _HomeTabPageState extends State<HomeTabPage> {
                             ),
                           ),
                         ),
-                        AutoSizeText('Select Duration')
+                        duration_selected
+                            ? AutoSizeText('Duration Selected')
+                            : AutoSizeText('Select Duration')
                       ],
                     ),
                   ),
@@ -936,11 +940,16 @@ class _HomeTabPageState extends State<HomeTabPage> {
                         child: ListView.builder(
                             controller: controller,
                             itemCount: list.length < projects.length
-                                ? list.length + 2
+                                ? list.length + 1
                                 : projects.length,
                             shrinkWrap: true,
                             itemExtent: 120.0,
                             itemBuilder: (BuildContext context, index) {
+                              if (index == list.length)
+                                return Center(
+                                    child: CircularProgressIndicator(
+                                  color: ColorsTheme.btnColor,
+                                ));
                               return GestureDetector(
                                 onTap: () async {
                                   this.preferences =

@@ -1,8 +1,8 @@
 import 'package:dio/dio.dart';
-import 'package:efleet_project_tree/api.dart';
-import 'package:efleet_project_tree/home.dart';
-import 'package:efleet_project_tree/main.dart';
-import 'package:efleet_project_tree/pages/notifications.dart';
+import 'package:gigX/api.dart';
+import 'package:gigX/home.dart';
+import 'package:gigX/main.dart';
+import 'package:gigX/pages/notifications.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:shared_preferences/shared_preferences.dart';

@@ -1,12 +1,12 @@
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:calendar_date_picker2/calendar_date_picker2.dart';
 import 'package:dio/dio.dart';
-import 'package:efleet_project_tree/api.dart';
-import 'package:efleet_project_tree/colors.dart';
-import 'package:efleet_project_tree/home.dart';
-import 'package:efleet_project_tree/login.dart';
-import 'package:efleet_project_tree/pages/home.dart';
-import 'package:efleet_project_tree/pages/taskdetails.dart';
+import 'package:gigX/api.dart';
+import 'package:gigX/colors.dart';
+import 'package:gigX/home.dart';
+import 'package:gigX/login.dart';
+import 'package:gigX/pages/home.dart';
+import 'package:gigX/pages/taskdetails.dart';
 import 'package:f_datetimerangepicker/f_datetimerangepicker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
@@ -81,11 +81,10 @@ class _ProjectDetailsPageState extends State<ProjectDetailsPage> {
   @override
   void initState() {
     // TODO: implement initState
+    WidgetsFlutterBinding.ensureInitialized();
+
     super.initState();
-    pref();
-    getTasks();
-    getUsers();
-    getProjects();
+
     KeyboardVisibilityController().onChange.listen((isVisible) {
       setState(() {
         keyboardVisible = isVisible;
@@ -100,13 +99,19 @@ class _ProjectDetailsPageState extends State<ProjectDetailsPage> {
     controller = ScrollController();
 
     list = List.generate(4, (index) => null);
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      pref();
+      getTasks();
+      getUsers();
+      getProjects();
+    });
 
     controller.addListener(() {
       if (controller.position.pixels == controller.position.maxScrollExtent) {
         // pageNumber++;
 
         setState(() {
-          getProjects();
+          getMoreProjects();
         }); // if add this, Reload your futurebuilder and load more data
 
       }
@@ -180,6 +185,16 @@ class _ProjectDetailsPageState extends State<ProjectDetailsPage> {
       setState(() {
         is_loading = false;
       });
+    });
+  }
+
+  getMoreProjects() {
+    for (int i = current_max; i < current_max + 4; i++) {
+      list.add(i + 2);
+    }
+
+    setState(() {
+      current_max = current_max + 4;
     });
   }
 
@@ -298,6 +313,7 @@ class _ProjectDetailsPageState extends State<ProjectDetailsPage> {
 
             element['end_date'] = DateFormat('MMMM dd, yyyy')
                 .format(formatted_end_date_with_month!);
+            print(element);
           });
         });
       } else if (response.statusCode == 401) {
@@ -1405,19 +1421,25 @@ class _ProjectDetailsPageState extends State<ProjectDetailsPage> {
                   Container(
                     width: width,
                     height: orientation == Orientation.portrait
-                        ? height * 0.75
+                        ? height * 0.735
                         : height,
                     padding: EdgeInsets.only(left: 15.0),
                     child: LazyLoadScrollView(
                       onEndOfPage: () => show_loading(),
                       child: ListView.builder(
                           controller: controller,
+
                           itemCount: list.length < tasks.length
-                              ? list.length + 2
+                              ? list.length + 1
                               : tasks.length,
                           shrinkWrap: true,
                           itemExtent: 250.0,
                           itemBuilder: (BuildContext context, index) {
+                            if (index == list.length)
+                              return Center(
+                                  child: CircularProgressIndicator(
+                                color: ColorsTheme.btnColor,
+                              ));
                             return Container(
                               margin: EdgeInsets.all(10),
                               width: width,
