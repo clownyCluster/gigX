@@ -5,6 +5,7 @@ import 'package:dio/dio.dart';
 import 'package:gigX/api.dart';
 import 'package:gigX/colors.dart';
 import 'package:gigX/login.dart';
+import 'package:gigX/pages/account.dart';
 import 'package:gigX/pages/webviewprivacypolicy.dart';
 import 'package:gigX/pages/webviewtermsandconditions.dart';
 import 'package:flutter/material.dart';
@@ -79,16 +80,36 @@ class _TimeBoxPageState extends State<TimeBoxPage> {
                   child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Container(
-                          padding: EdgeInsets.all(40.0),
-                          margin: EdgeInsets.only(top: 40.0),
-                          child: AutoSizeText(
-                            'Time Box',
-                            style: TextStyle(
-                                color: Colors.black,
-                                fontWeight: FontWeight.w600,
-                                fontSize: 20.0),
-                          ),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          children: [
+                            Container(
+                              // padding: EdgeInsets.all(16.0),
+                              margin: EdgeInsets.only(top: 40.0, left: 16.0),
+                              child: IconButton(
+                                  onPressed: () async {
+                                    Navigator.of(context).push(
+                                        MaterialPageRoute(
+                                            builder: (context) =>
+                                                AccountTab()));
+                                  },
+                                  icon: Icon(
+                                    Icons.arrow_back,
+                                    color: Colors.black,
+                                  )),
+                            ),
+                            Container(
+                              padding: EdgeInsets.all(10.0),
+                              margin: EdgeInsets.only(top: 40.0),
+                              child: AutoSizeText(
+                                'Time Box',
+                                style: TextStyle(
+                                    color: Colors.black,
+                                    fontWeight: FontWeight.w600,
+                                    fontSize: 20.0),
+                              ),
+                            ),
+                          ],
                         ),
                         Container(
                             alignment: Alignment.center,
@@ -106,7 +127,8 @@ class _TimeBoxPageState extends State<TimeBoxPage> {
                               ],
                             )),
                         Container(
-                          padding: EdgeInsets.all(40.0),
+                          padding: EdgeInsets.all(16.0),
+                          margin: EdgeInsets.only(top: 29.0, left: 16),
                           child: AutoSizeText(
                             'Today’s Priorities',
                             style: TextStyle(
@@ -115,7 +137,8 @@ class _TimeBoxPageState extends State<TimeBoxPage> {
                         ),
                         Container(
                           height: 110,
-                          margin: EdgeInsets.only(left: 40.0, right: 16.0),
+                          padding: EdgeInsets.all(16.0),
+                          margin: EdgeInsets.only(left: 16.0),
                           child: MediaQuery.removePadding(
                               context: context,
                               removeTop: true,
@@ -147,7 +170,8 @@ class _TimeBoxPageState extends State<TimeBoxPage> {
                                   })),
                         ),
                         Container(
-                          margin: EdgeInsets.only(left: 40.0, right: 15.0),
+                          padding: EdgeInsets.all(16.0),
+                          margin: EdgeInsets.only(top: 29.0, left: 20),
                           child: AutoSizeText(
                             'Top Priorities',
                             style: TextStyle(
@@ -155,7 +179,9 @@ class _TimeBoxPageState extends State<TimeBoxPage> {
                           ),
                         ),
                         Container(
-                          padding: EdgeInsets.only(left: 35, top: 5, right: 10),
+                          // padding: EdgeInsets.only(left: 35, top: 5, right: 10),
+                          padding: EdgeInsets.all(16.0),
+                          margin: EdgeInsets.only(top: 5.0, left: 14),
                           child: Container(
                             color: Colors.white,
                             child: Padding(
@@ -180,7 +206,7 @@ class _TimeBoxPageState extends State<TimeBoxPage> {
                             width: orientation == Orientation.portrait
                                 ? width * 0.85
                                 : width * 0.94,
-                            margin: EdgeInsets.only(left: 28.0, top: 30.0),
+                            margin: EdgeInsets.only(left: 20.0, top: 30.0),
                             height: 48.0,
                             child: TextButton(
                               onPressed: () async {},

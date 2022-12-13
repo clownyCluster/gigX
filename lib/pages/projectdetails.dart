@@ -1027,24 +1027,24 @@ class _ProjectDetailsPageState extends State<ProjectDetailsPage> {
                   Container(
                     margin: EdgeInsets.only(top: 40.0),
                     child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      mainAxisAlignment: MainAxisAlignment.end,
                       children: [
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          children: [
-                            IconButton(
-                                onPressed: () {}, icon: Icon(Icons.camera_alt)),
-                            IconButton(
-                                onPressed: () {}, icon: Icon(Icons.image)),
-                            IconButton(
-                                onPressed: () {},
-                                icon: Icon(Icons.attach_file)),
-                            GestureDetector(
-                                onTap: () {},
-                                child:
-                                    Image.asset('assets/add_assignee_icon.png'))
-                          ],
-                        ),
+                        // Row(
+                        //   mainAxisAlignment: MainAxisAlignment.start,
+                        //   children: [
+                        //     IconButton(
+                        //         onPressed: () {}, icon: Icon(Icons.camera_alt)),
+                        //     IconButton(
+                        //         onPressed: () {}, icon: Icon(Icons.image)),
+                        //     IconButton(
+                        //         onPressed: () {},
+                        //         icon: Icon(Icons.attach_file)),
+                        //     GestureDetector(
+                        //         onTap: () {},
+                        //         child:
+                        //             Image.asset('assets/add_assignee_icon.png'))
+                        //   ],
+                        // ),
                         Container(
                           width: width * 0.3,
                           height: 38.0,
@@ -1428,7 +1428,6 @@ class _ProjectDetailsPageState extends State<ProjectDetailsPage> {
                       onEndOfPage: () => show_loading(),
                       child: ListView.builder(
                           controller: controller,
-
                           itemCount: list.length < tasks.length
                               ? list.length + 1
                               : tasks.length,

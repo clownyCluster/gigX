@@ -99,6 +99,10 @@ int logged_in_user_id = 0;
 bool is_loading = false;
 int assinged_to = 0;
 int project_to = 0;
+double percent_done = 0.0;
+DateTime selected_start_date = DateTime.now();
+DateTime selected_end_date = DateTime.now();
+bool is_selected_date_changed = false;
 Map result = new Map();
 
 class _TaskTabPageState extends State<TaskTabPage> {
@@ -173,6 +177,7 @@ class _TaskTabPageState extends State<TaskTabPage> {
               'title': element['title'].toString(),
               'description': element['description'].toString(),
               'assign_to': element['assign_to'],
+              'percent_done': element['percent_done'],
               'selected_project_id': 2
             };
             tasks.add(taskMap);
@@ -611,9 +616,16 @@ class _TaskTabPageState extends State<TaskTabPage> {
 
   Future<bool> updateTask(int task_id) async {
     final _dio = new Dio();
+    DateTime stDate;
+    DateTime edDate;
 
-    DateTime stDate = DateFormat('d/MM/yyyy HH:mm').parse(formatted_start_date);
-    DateTime edDate = DateFormat('d/MM/yyyy HH:mm').parse(formatted_end_date);
+    if (is_selected_date_changed == false) {
+      stDate = selected_start_date;
+      edDate = selected_end_date;
+    } else {
+      stDate = DateFormat('d/MM/yyyy HH:mm').parse(formatted_start_date);
+      edDate = DateFormat('d/MM/yyyy HH:mm').parse(formatted_end_date);
+    }
     Map<String, dynamic> result = Map<String, dynamic>();
 
     try {
@@ -1428,24 +1440,24 @@ class _TaskTabPageState extends State<TaskTabPage> {
                   Container(
                     margin: EdgeInsets.only(top: 40.0),
                     child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      mainAxisAlignment: MainAxisAlignment.end,
                       children: [
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          children: [
-                            IconButton(
-                                onPressed: () {}, icon: Icon(Icons.camera_alt)),
-                            IconButton(
-                                onPressed: () {}, icon: Icon(Icons.image)),
-                            IconButton(
-                                onPressed: () {},
-                                icon: Icon(Icons.attach_file)),
-                            GestureDetector(
-                                onTap: () {},
-                                child:
-                                    Image.asset('assets/add_assignee_icon.png'))
-                          ],
-                        ),
+                        // Row(
+                        //   mainAxisAlignment: MainAxisAlignment.start,
+                        //   children: [
+                        //     IconButton(
+                        //         onPressed: () {}, icon: Icon(Icons.camera_alt)),
+                        //     IconButton(
+                        //         onPressed: () {}, icon: Icon(Icons.image)),
+                        //     IconButton(
+                        //         onPressed: () {},
+                        //         icon: Icon(Icons.attach_file)),
+                        //     GestureDetector(
+                        //         onTap: () {},
+                        //         child:
+                        //             Image.asset('assets/add_assignee_icon.png'))
+                        //   ],
+                        // ),
                         Container(
                           width: width * 0.3,
                           height: 38.0,
@@ -1723,9 +1735,8 @@ class _TaskTabPageState extends State<TaskTabPage> {
                               doneText: "Yes",
                               cancelText: "Cancel",
                               interval: 5,
-                              initialStartTime: DateTime.now(),
-                              initialEndTime:
-                                  DateTime.now().add(Duration(days: 20)),
+                              initialStartTime: selected_start_date,
+                              initialEndTime: selected_end_date,
                               mode: DateTimeRangePickerMode.dateAndTime,
                               minimumTime:
                                   DateTime.now().subtract(Duration(days: 120)),
@@ -1739,6 +1750,9 @@ class _TaskTabPageState extends State<TaskTabPage> {
                                 formatted_end_date =
                                     DateFormat('dd/MM/yyyy HH:mm').format(end);
                               }).showPicker(context);
+                          state(() {
+                            is_selected_date_changed = true;
+                          });
                         },
                         child: Container(
                           margin: EdgeInsets.only(
@@ -1752,7 +1766,7 @@ class _TaskTabPageState extends State<TaskTabPage> {
                                   image: AssetImage('assets/due_date_icon.png'),
                                 ),
                               ),
-                              AutoSizeText('Due Date'),
+                              AutoSizeText('Date Selected'),
                             ],
                           ),
                         ),
@@ -1794,7 +1808,7 @@ class _TaskTabPageState extends State<TaskTabPage> {
                     child: SfSlider(
                       min: 0.0,
                       max: 100.0,
-                      value: _percent,
+                      value: percent_done,
                       activeColor: ColorsTheme.btnColor,
                       interval: 20,
                       showTicks: true,
@@ -1804,7 +1818,7 @@ class _TaskTabPageState extends State<TaskTabPage> {
                       onChanged: (dynamic value) {
                         state(() {
                           // print(value);
-                          _percent = value;
+                          percent_done = value;
                         });
                       },
                     ),
@@ -2188,24 +2202,24 @@ class _TaskTabPageState extends State<TaskTabPage> {
                   Container(
                     margin: EdgeInsets.only(top: 40.0),
                     child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      mainAxisAlignment: MainAxisAlignment.end,
                       children: [
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          children: [
-                            IconButton(
-                                onPressed: () {}, icon: Icon(Icons.camera_alt)),
-                            IconButton(
-                                onPressed: () {}, icon: Icon(Icons.image)),
-                            IconButton(
-                                onPressed: () {},
-                                icon: Icon(Icons.attach_file)),
-                            GestureDetector(
-                                onTap: () {},
-                                child:
-                                    Image.asset('assets/add_assignee_icon.png'))
-                          ],
-                        ),
+                        // Row(
+                        //   mainAxisAlignment: MainAxisAlignment.start,
+                        //   children: [
+                        //     IconButton(
+                        //         onPressed: () {}, icon: Icon(Icons.camera_alt)),
+                        //     IconButton(
+                        //         onPressed: () {}, icon: Icon(Icons.image)),
+                        //     IconButton(
+                        //         onPressed: () {},
+                        //         icon: Icon(Icons.attach_file)),
+                        //     GestureDetector(
+                        //         onTap: () {},
+                        //         child:
+                        //             Image.asset('assets/add_assignee_icon.png'))
+                        //   ],
+                        // ),
                         Container(
                           width: width * 0.3,
                           height: 38.0,
@@ -2241,9 +2255,8 @@ class _TaskTabPageState extends State<TaskTabPage> {
 
                               if (task_name.isNotEmpty &&
                                   task_desc.isNotEmpty &&
-                                  formatted_start_date.isNotEmpty &&
-                                  formatted_end_date.isNotEmpty &&
-                                  project_id != 0) {
+                                  selected_start_date != null &&
+                                  selected_end_date != null) {
                                 result = await updateTask(task_id);
                                 if (result == true) {
                                   setState(() {
@@ -2328,6 +2341,9 @@ class _TaskTabPageState extends State<TaskTabPage> {
           'description': element['description'],
           'project_id': element['project_id'],
           'assign_to': element['assign_to'],
+          'percent_done': double.parse(element['percent_done']),
+          'start_date': element['start_date'],
+          'end_date': element['end_date'],
           'selected_project_index': count - 1
         };
         dupList.add(selectTaskMap);
@@ -2378,6 +2394,14 @@ class _TaskTabPageState extends State<TaskTabPage> {
 
                               setState(() {
                                 assinged_to = selectedTasks[index]['assign_to'];
+                                selected_start_date =
+                                    DateFormat("dd/MM/yyyy HH:mm").parse(
+                                        selectedTasks[index]['start_date']);
+                                selected_end_date =
+                                    DateFormat("dd/MM/yyyy HH:mm").parse(
+                                        selectedTasks[index]['end_date']);
+                                percent_done =
+                                    selectedTasks[index]['percent_done'];
                                 projects
                                     .where((element) =>
                                         element['id'] ==
