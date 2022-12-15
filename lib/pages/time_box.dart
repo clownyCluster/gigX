@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:auto_size_text/auto_size_text.dart';
@@ -133,6 +134,7 @@ class _TimeBoxPageState extends State<TimeBoxPage> {
           }));
 
       if (response.statusCode == 200) {
+        getTimeBoxDetails();
         Fluttertoast.showToast(
             msg: "Timebox added!",
             toastLength: Toast.LENGTH_SHORT,
@@ -157,6 +159,7 @@ class _TimeBoxPageState extends State<TimeBoxPage> {
 
   Future<void> getTimeBoxDetails() async {
     final _dio = Dio();
+    var taskList = [];
 
     this.preferences = await SharedPreferences.getInstance();
     setState(() {
@@ -169,7 +172,6 @@ class _TimeBoxPageState extends State<TimeBoxPage> {
               'todo-timebox?timebox_date=${DateFormat('dd/MM/yyyy').format(DateTime.parse(timebox_date))}',
           options: Options(headers: {"authorization": "Bearer $access_token"}));
       Map result = response.data;
-      print('Status Code ' + response.statusCode.toString());
 
       if (response.statusCode == 200) {
         this.preferences?.setBool('someoneLoggedIn', false);
@@ -180,9 +182,16 @@ class _TimeBoxPageState extends State<TimeBoxPage> {
             print(timeboxDetails['top_priorities']);
             txttopPriorController.text = timeboxDetails['top_priorities'];
             txtbrainDumpController.text = timeboxDetails['brain_dump'];
+            taskList = jsonDecode(timeboxDetails['task_list']);
+
+            taskList.forEach((element) {
+              setTaskList(element['time'], element['task']);
+            });
           });
         } else {
           print('Not found');
+          txttopPriorController.clear();
+          txtbrainDumpController.clear();
         }
       } else if (response.statusCode == 401) {
         await this.preferences?.remove('access_token');
@@ -250,6 +259,30 @@ class _TimeBoxPageState extends State<TimeBoxPage> {
             );
           });
         });
+  }
+
+  void setTaskList(String time, String task) {
+    if (time == '09:00') txttaskController1.text = task;
+    if (time == '09:30') txttaskController2.text = task;
+    if (time == '10:00') txttaskController3.text = task;
+    if (time == '10:30') txttaskController4.text = task;
+    if (time == '11:00') txttaskController5.text = task;
+    if (time == '11:30') txttaskController6.text = task;
+    if (time == '12:00') txttaskController7.text = task;
+    if (time == '12:30') txttaskController8.text = task;
+    if (time == '01:00') txttaskController9.text = task;
+    if (time == '01:30') txttaskController10.text = task;
+    if (time == '02:00') txttaskController11.text = task;
+    if (time == '02:30') txttaskController12.text = task;
+    if (time == '03:00') txttaskController13.text = task;
+    if (time == '03:30') txttaskController14.text = task;
+    if (time == '04:00') txttaskController15.text = task;
+    if (time == '04:30') txttaskController16.text = task;
+    if (time == '05:00') txttaskController17.text = task;
+    if (time == '05:30') txttaskController18.text = task;
+    if (time == '06:00') txttaskController19.text = task;
+    if (time == '06:30') txttaskController20.text = task;
+    if (time == '07:00') txttaskController20.text = task;
   }
 
   @override
@@ -332,6 +365,8 @@ class _TimeBoxPageState extends State<TimeBoxPage> {
                                           timebox_date =
                                               DateFormat('yyyy-MM-dd')
                                                   .format(prevDateTime);
+
+                                          getTimeBoxDetails();
                                         });
                                       },
                                       child:
@@ -369,55 +404,13 @@ class _TimeBoxPageState extends State<TimeBoxPage> {
                                           timebox_date =
                                               DateFormat('yyyy-MM-dd')
                                                   .format(nextDateTime);
+                                          getTimeBoxDetails();
                                         });
                                       },
                                       child: Image.asset(
                                           'assets/box_forward.png')),
                                 ],
                               )),
-                          // Container(
-                          //   padding: EdgeInsets.all(16.0),
-                          //   margin: EdgeInsets.only(top: 29.0, left: 16),
-                          //   child: AutoSizeText(
-                          //     'Today’s Priorities',
-                          //     style: TextStyle(
-                          //         fontSize: 15.0, fontWeight: FontWeight.w500),
-                          //   ),
-                          // ),
-                          // Container(
-                          //   height: 110,
-                          //   padding: EdgeInsets.all(16.0),
-                          //   margin: EdgeInsets.only(left: 16.0),
-                          //   child: MediaQuery.removePadding(
-                          //       context: context,
-                          //       removeTop: true,
-                          //       child: ListView.builder(
-                          //           itemCount: 5,
-                          //           itemBuilder: (context, index) {
-                          //             return Container(
-                          //               height: 49.0,
-                          //               width: width * 0.85,
-                          //               alignment: Alignment.centerLeft,
-                          //               margin: EdgeInsets.only(bottom: 9.0),
-                          //               decoration: BoxDecoration(
-                          //                 color: Color(0xffF7F8F9),
-                          //                 borderRadius:
-                          //                     BorderRadius.circular(4.0),
-                          //               ),
-                          //               child: Container(
-                          //                 margin: EdgeInsets.only(left: 12.0),
-                          //                 width: width * 0.8,
-                          //                 child: AutoSizeText(
-                          //                   'HTML/CSS  - eFleetPass Mobile App',
-                          //                   maxLines: 2,
-                          //                   style: TextStyle(
-                          //                       color: ColorsTheme.txtDescColor,
-                          //                       fontSize: 15.0),
-                          //                 ),
-                          //               ),
-                          //             );
-                          //           })),
-                          // ),
                           Container(
                             padding: EdgeInsets.all(16.0),
                             margin: EdgeInsets.only(top: 29.0),
@@ -458,33 +451,6 @@ class _TimeBoxPageState extends State<TimeBoxPage> {
                               ),
                             ),
                           ),
-                          // Center(
-                          //   child: Container(
-                          //     width: orientation == Orientation.portrait
-                          //         ? width * 0.85
-                          //         : width * 0.94,
-                          //     margin: EdgeInsets.only(left: 20.0, top: 30.0),
-                          //     height: 48.0,
-                          //     child: TextButton(
-                          //       onPressed: () async {},
-                          //       style: ButtonStyle(
-                          //           alignment: Alignment.center,
-                          //           shape: MaterialStateProperty.all(
-                          //               RoundedRectangleBorder(
-                          //                   borderRadius:
-                          //                       BorderRadius.circular(30.0))),
-                          //           backgroundColor: MaterialStateProperty.all(
-                          //               ColorsTheme.btnColor)),
-                          //       child: AutoSizeText(
-                          //         'Save',
-                          //         style: TextStyle(
-                          //             color: Colors.white,
-                          //             fontSize: 16.0,
-                          //             fontWeight: FontWeight.w600),
-                          //       ),
-                          //     ),
-                          //   ),
-                          // ),
                           Container(
                             padding: EdgeInsets.all(16.0),
                             margin: EdgeInsets.only(top: 30),
@@ -523,33 +489,6 @@ class _TimeBoxPageState extends State<TimeBoxPage> {
                               ),
                             ),
                           ),
-                          // Center(
-                          //   child: Container(
-                          //     width: orientation == Orientation.portrait
-                          //         ? width * 0.85
-                          //         : width * 0.94,
-                          //     margin: EdgeInsets.only(left: 28.0, top: 30.0),
-                          //     height: 48.0,
-                          //     child: TextButton(
-                          //       onPressed: () async {},
-                          //       style: ButtonStyle(
-                          //           alignment: Alignment.center,
-                          //           shape: MaterialStateProperty.all(
-                          //               RoundedRectangleBorder(
-                          //                   borderRadius:
-                          //                       BorderRadius.circular(30.0))),
-                          //           backgroundColor: MaterialStateProperty.all(
-                          //               ColorsTheme.btnColor)),
-                          //       child: AutoSizeText(
-                          //         'Save',
-                          //         style: TextStyle(
-                          //             color: Colors.white,
-                          //             fontSize: 16.0,
-                          //             fontWeight: FontWeight.w600),
-                          //       ),
-                          //     ),
-                          //   ),
-                          // ),
                           Container(
                             padding: EdgeInsets.all(16.0),
                             margin: EdgeInsets.only(top: 39),
