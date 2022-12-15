@@ -111,7 +111,7 @@ class _HomePageState extends State<HomePage> {
       ),
       bottomNavigationBar: BottomNavigationBar(
         key: bottomWidgetKey,
-        
+
         items: const <BottomNavigationBarItem>[
           BottomNavigationBarItem(
               icon: Image(image: AssetImage('assets/navbaricon_home.png')),
@@ -138,7 +138,7 @@ class _HomePageState extends State<HomePage> {
         selectedItemColor: ColorsTheme.btnColor,
         selectedFontSize: 12,
         unselectedFontSize: 12,
-        
+
         // iconSize: 40,
         onTap: _onItemTapped,
       ),
