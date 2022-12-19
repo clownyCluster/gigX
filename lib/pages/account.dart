@@ -251,7 +251,10 @@ class _AccountTabPageState extends State<AccountTabPage> {
                   MaterialPageRoute(builder: (context) => const TimeBox()));
             },
             child: ListTile(
-              leading: Icon(Icons.timer, color: ColorsTheme.btnColor,),
+              leading: Icon(
+                Icons.timer,
+                color: ColorsTheme.btnColor,
+              ),
               title: Text(
                 'Time Box',
                 style: TextStyle(
@@ -327,9 +330,11 @@ class _AccountTabPageState extends State<AccountTabPage> {
             children: [
               Container(
                 width: width,
-                height: orientation == Orientation.portrait
+                height: orientation == Orientation.portrait && height < 820
                     ? height * 0.87
-                    : height * 2.2,
+                    : orientation == Orientation.portrait && height > 820
+                        ? height * 0.75
+                        : height * 2.2,
                 child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [

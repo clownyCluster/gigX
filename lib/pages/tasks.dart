@@ -2488,9 +2488,11 @@ class _TaskTabPageState extends State<TaskTabPage> {
                 // height: height * 1.9,
                 // height: height * 1.9,
 
-                height: orientation == Orientation.portrait
+                height: orientation == Orientation.portrait && height < 820
                     ? height * 4.62
-                    : height * 10.42,
+                    : orientation == Orientation.portrait && height > 820
+                        ? height * 4.12
+                        : height * 10.42,
                 child: MediaQuery.removePadding(
                   context: context,
                   removeTop: true,

@@ -481,12 +481,12 @@ class _HomeTabPageState extends State<HomeTabPage> {
 
   show_loading() async {
     setState(() {
-      is_loading = true;
+      _is_loading = true;
     });
     Future.delayed(const Duration(seconds: 4), () {
       if (this.mounted)
         setState(() {
-          is_loading = false;
+          _is_loading = false;
         });
     });
   }
@@ -553,7 +553,7 @@ class _HomeTabPageState extends State<HomeTabPage> {
 
   void setSearchResults(String query) {
     setState(() {
-      is_loading = true;
+      _is_loading = true;
       projects = projects
           .where((elem) =>
               elem['title']
@@ -565,7 +565,7 @@ class _HomeTabPageState extends State<HomeTabPage> {
                   .toLowerCase()
                   .contains(query.toLowerCase()))
           .toList();
-      is_loading = false;
+      _is_loading = false;
     });
   }
 
@@ -945,7 +945,7 @@ class _HomeTabPageState extends State<HomeTabPage> {
                             shrinkWrap: true,
                             itemExtent: 120.0,
                             itemBuilder: (BuildContext context, index) {
-                              if (index == list.length)
+                              if (index == list.length && _is_loading == true)
                                 return Center(
                                     child: CircularProgressIndicator(
                                   color: ColorsTheme.btnColor,

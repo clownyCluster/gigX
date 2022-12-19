@@ -101,6 +101,7 @@ class _TimeBoxPageState extends State<TimeBoxPage> {
       setState(() {
         timebox_date = DateTime.now().toString();
       });
+      getTimeBoxDetails();
       KeyboardVisibilityController().onChange.listen((isVisible) {
         setState(() {
           keyboardVisible = isVisible;
@@ -117,15 +118,17 @@ class _TimeBoxPageState extends State<TimeBoxPage> {
       is_loading = true;
     });
 
+    Map<String, dynamic> timeboxMap = {
+      'timebox_date':
+          DateFormat('dd/MM/yyyy').format(DateTime.parse(timebox_date)),
+      'top_priorities': top_priorities,
+      'brain_dump': brain_dump,
+      'task_time[]': time_list.toSet().toList(),
+      'task_list[]': task_list.toSet().toList()
+    };
+
     try {
-      final formData = FormData.fromMap({
-        'timebox_date':
-            DateFormat('dd/MM/yyyy').format(DateTime.parse(timebox_date)),
-        'top_priorities': top_priorities,
-        'brain_dump': brain_dump,
-        'task_time[]': time_list,
-        'task_list[]': task_list
-      });
+      final formData = FormData.fromMap(timeboxMap);
       Response response = await _dio.post(API.base_url + 'todo-timebox',
           data: formData,
           options: Options(headers: {
@@ -304,9 +307,11 @@ class _TimeBoxPageState extends State<TimeBoxPage> {
                 children: [
                   Container(
                     width: width,
-                    height: orientation == Orientation.portrait
-                        ? height * 2.8
-                        : height * 6.4,
+                    height: orientation == Orientation.portrait && height < 820
+                        ? height * 2.6
+                        : orientation == Orientation.portrait && height > 820
+                            ? height * 2.16
+                            : height * 6.4,
                     child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
@@ -412,7 +417,7 @@ class _TimeBoxPageState extends State<TimeBoxPage> {
                                 ],
                               )),
                           Container(
-                            padding: EdgeInsets.all(16.0),
+                            padding: EdgeInsets.only(left: 16.0, right: 16.0),
                             margin: EdgeInsets.only(top: 29.0),
                             child: AutoSizeText(
                               'Top Priorities',
@@ -422,38 +427,36 @@ class _TimeBoxPageState extends State<TimeBoxPage> {
                           ),
                           Container(
                             // padding: EdgeInsets.only(left: 35, top: 5, right: 10),
-                            padding: EdgeInsets.all(16.0),
-                            margin: EdgeInsets.only(top: 5.0),
+                            padding: EdgeInsets.only(left: 16.0, right: 16.0),
+                            // margin: EdgeInsets.only(top: 5.0),
                             child: Container(
                               color: Colors.white,
-                              child: Padding(
-                                padding: EdgeInsets.all(2.0),
-                                child: TextField(
-                                  maxLines: 6, //or null
-                                  textInputAction: TextInputAction.next,
-                                  controller: txttopPriorController,
-                                  onChanged: (value) {
-                                    setState(() {
-                                      top_priorities = value.toString();
-                                      print(top_priorities);
-                                    });
-                                  },
 
-                                  decoration: InputDecoration(
-                                      hintText: 'Details about priority',
-                                      hintStyle: TextStyle(fontSize: 14.0),
-                                      enabledBorder: OutlineInputBorder(
-                                          borderSide: BorderSide(
-                                              width: 0.5,
-                                              color:
-                                                  ColorsTheme.txtDescColor))),
-                                ),
+                              // padding: EdgeInsets.all(2.0),
+                              child: TextField(
+                                maxLines: 6, //or null
+                                textInputAction: TextInputAction.next,
+                                controller: txttopPriorController,
+                                onChanged: (value) {
+                                  setState(() {
+                                    top_priorities = value.toString();
+                                    print(top_priorities);
+                                  });
+                                },
+
+                                decoration: InputDecoration(
+                                    hintText: 'Details about priority',
+                                    hintStyle: TextStyle(fontSize: 14.0),
+                                    enabledBorder: OutlineInputBorder(
+                                        borderSide: BorderSide(
+                                            width: 0.5,
+                                            color: ColorsTheme.txtDescColor))),
                               ),
                             ),
                           ),
                           Container(
-                            padding: EdgeInsets.all(16.0),
-                            margin: EdgeInsets.only(top: 30),
+                            padding: EdgeInsets.only(left: 16.0, right: 16.0),
+                            margin: EdgeInsets.only(top: 20),
                             child: AutoSizeText(
                               'Brain Dump',
                               style: TextStyle(
@@ -461,8 +464,8 @@ class _TimeBoxPageState extends State<TimeBoxPage> {
                             ),
                           ),
                           Container(
-                            padding: EdgeInsets.all(16.0),
-                            margin: EdgeInsets.only(top: 5.0),
+                            padding: EdgeInsets.only(left: 16.0, right: 16.0),
+                            // margin: EdgeInsets.only(top: 5.0),
                             child: Container(
                               color: Colors.white,
                               child: Padding(
@@ -494,8 +497,12 @@ class _TimeBoxPageState extends State<TimeBoxPage> {
                             margin: EdgeInsets.only(top: 39),
                             child: Table(
                               columnWidths: {
-                                0: FractionColumnWidth(.35),
-                                1: FractionColumnWidth(.65)
+                                0: height < 820
+                                    ? FractionColumnWidth(.35)
+                                    : FractionColumnWidth(.25),
+                                1: height < 820
+                                    ? FractionColumnWidth(.65)
+                                    : FractionColumnWidth(.75)
                               },
                               border: TableBorder(
                                 verticalInside: BorderSide(
