@@ -106,7 +106,6 @@ class _HomeTabPageState extends State<HomeTabPage> {
         setState(() {
           getMoreProjects();
         }); // if add this, Reload your futurebuilder and load more data
-
       }
     });
 
@@ -1072,9 +1071,9 @@ class _HomeTabPageState extends State<HomeTabPage> {
               _addProjectModalBottomSheet(context);
             },
             child: Container(
-              margin: EdgeInsets.only(bottom: 40.0),
-              height: 90,
-              width: 90,
+              // margin: EdgeInsets.only(bottom: 40.0),
+              height: 100,
+              width: 100,
               decoration: BoxDecoration(
                   image: DecorationImage(
                       image: AssetImage('assets/tasks_floating_button.png'))),

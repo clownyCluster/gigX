@@ -3,6 +3,8 @@ import 'package:back_button_interceptor/back_button_interceptor.dart';
 import 'package:calendar_date_picker2/calendar_date_picker2.dart';
 import 'package:gigX/colors.dart';
 import 'package:gigX/pages/account.dart';
+import 'package:gigX/pages/chat_module/chat_screen.dart';
+import 'package:gigX/pages/chat_module/chat_screen_state.dart';
 import 'package:gigX/pages/home.dart';
 import 'package:gigX/pages/notifications.dart';
 import 'package:gigX/pages/tasks.dart';
@@ -11,6 +13,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/src/widgets/container.dart';
 import 'package:flutter/src/widgets/framework.dart';
 import 'package:flutter_rounded_date_picker/flutter_rounded_date_picker.dart';
+import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class Home extends StatelessWidget {
@@ -50,11 +53,14 @@ class _HomePageState extends State<HomePage> {
   SharedPreferences? preferences;
 
   int _selectedIndex = 0;
-  static const List<Widget> _widgetOptions = <Widget>[
+   List<Widget> _widgetOptions = <Widget>[
     HomeTab(),
     TaskTab(),
     NotificationTab(),
-    AccountTab()
+    AccountTab(),
+    ChangeNotifierProvider(
+      create: (_) => ChatScreenState(),
+      child: ChatScreen())
   ];
 
   void _onItemTapped(int index) {
@@ -130,6 +136,12 @@ class _HomePageState extends State<HomePage> {
           BottomNavigationBarItem(
             icon: Image(image: AssetImage('assets/navbaricon_account.png')),
             label: 'Account',
+            backgroundColor: Colors.white,
+          ),
+          BottomNavigationBarItem(
+            // icon: Image(image: AssetImage('assets/navbaricon_account.png')),
+            icon: Icon(Icons.chat),
+            label: 'Chats',
             backgroundColor: Colors.white,
           ),
         ],

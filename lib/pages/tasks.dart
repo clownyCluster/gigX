@@ -1,24 +1,19 @@
-import 'dart:math';
-
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:calendar_builder/calendar_builder.dart';
-import 'package:calendar_date_picker2/calendar_date_picker2.dart';
 import 'package:dio/dio.dart';
-import 'package:dropdown_button2/dropdown_button2.dart';
 import 'package:gigX/api.dart';
+import 'package:gigX/apiModels/myTodosModel.dart';
 import 'package:gigX/colors.dart';
-import 'package:gigX/home.dart';
+import 'package:gigX/constant/constants.dart';
 import 'package:gigX/login.dart';
-import 'package:gigX/pages/home.dart';
-import 'package:gigX/pages/projectdetails.dart';
-import 'package:gigX/utils/notification_service.dart';
 import 'package:f_datetimerangepicker/f_datetimerangepicker.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/src/widgets/container.dart';
-import 'package:flutter/src/widgets/framework.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:gigX/pages/single_day_task_module/singleDayTask.dart';
+import 'package:gigX/pages/single_day_task_module/single_day_task_state.dart';
+import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:syncfusion_flutter_calendar/calendar.dart';
 import 'package:intl/intl.dart';
@@ -147,6 +142,8 @@ class _TaskTabPageState extends State<TaskTabPage> {
     access_token = this.preferences?.getString('access_token');
   }
 
+  MyTodos myTodosResponse = MyTodos();
+
   Future<void> getUserTasks() async {
     final _dio = Dio();
     is_loading = true;
@@ -165,7 +162,8 @@ class _TaskTabPageState extends State<TaskTabPage> {
         setState(() {
           tempList = response.data['data'];
           // tasks = response.data['data'];
-          is_loading = false;
+          myTodosResponse = MyTodos.fromJson(response.data);
+
           tempList.forEach((element) {
             taskMap = {
               'id': element['id'],
@@ -181,6 +179,7 @@ class _TaskTabPageState extends State<TaskTabPage> {
               'selected_project_id': 2
             };
             tasks.add(taskMap);
+            is_loading = false;
 
             // tasks.add(element);
             // tasks.add({'newKey': 2});
@@ -2430,8 +2429,10 @@ class _TaskTabPageState extends State<TaskTabPage> {
                             },
                             child: Container(
                               width: width * 0.8,
-                              height: 200.0,
-                              color: ColorsTheme.uIUxColor,
+                              // height: 200.0,
+                              margin: EdgeInsets.only(bottom: 10),
+                              padding: EdgeInsets.all(20),
+                              color: ColorsTheme.uIUxColor.withOpacity(0.8),
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
@@ -2443,11 +2444,9 @@ class _TaskTabPageState extends State<TaskTabPage> {
                                         fontWeight: FontWeight.w600,
                                         color: Colors.white),
                                   )),
-                                  Flexible(
-                                    child: Container(
-                                        child: AutoSizeText(selectedTasks[index]
-                                            ['description'])),
-                                  ),
+                                  Container(
+                                      child: AutoSizeText(
+                                          selectedTasks[index]['description'])),
                                 ],
                               ),
                             ),
@@ -2488,26 +2487,33 @@ class _TaskTabPageState extends State<TaskTabPage> {
                 // height: height * 1.9,
                 // height: height * 1.9,
 
-                height: orientation == Orientation.portrait && height < 820
-                    ? height * 4.62
-                    : orientation == Orientation.portrait && height > 820
-                        ? height * 4.12
-                        : height * 10.42,
+                // height: orientation == Orientation.portrait && height < 820
+                //     ? height * 4.62
+                //     : orientation == Orientation.portrait && height > 820
+                //         ? height * 4.12
+                //         : height * 10.42,
                 child: MediaQuery.removePadding(
                   context: context,
                   removeTop: true,
                   child: CbMonthBuilder(
                     onDateClicked: (onDateSelected) {
-                      {
-                        if (onDateSelected.hasEvent)
-                          getSelectedTasks(onDateSelected.selectedDate);
-                      }
+                      // {
+                      //   if (onDateSelected.hasEvent)
+                      //     getSelectedTasks(onDateSelected.selectedDate);
+                      // }
+                      print('kuri kuri puppy shame');
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => ChangeNotifierProvider(
+                                  create: (_) => SingleDayTaskState(context),
+                                  child: SingleDayTask())));
                     },
                     cbConfig: CbConfig(
                         startDate: DateTime(2020),
                         endDate: DateTime(2123),
-                        selectedDate: DateTime(2022),
-                        selectedYear: DateTime(2022),
+                        selectedDate: DateTime.now(),
+                        selectedYear: DateTime(DateTime.now().year),
                         weekStartsFrom: WeekStartsFrom.sunday,
 
                         // eventDates: [
@@ -2754,7 +2760,18 @@ class _TaskTabPageState extends State<TaskTabPage> {
                 //     );
                 //   },
                 // ),
-              )
+              ),
+              // Expanded(
+              //   child: ListView.builder(
+              //     physics: NeverScrollableScrollPhysics(),
+              //     itemCount: 3,
+              //     itemBuilder: (
+
+              //       context, index) {
+              //       return Text('turi');
+              //     },
+              //   ),
+              // ),
             ],
           ),
         ));

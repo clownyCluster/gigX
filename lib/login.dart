@@ -5,6 +5,7 @@ import 'package:auto_size_text/auto_size_text.dart';
 import 'package:dio/dio.dart';
 import 'package:gigX/api.dart';
 import 'package:gigX/colors.dart';
+import 'package:gigX/constant/constants.dart';
 import 'package:gigX/home.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
@@ -13,6 +14,7 @@ import 'package:flutter/src/widgets/container.dart';
 import 'package:flutter/src/widgets/framework.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:gigX/pages/register_module/register_screen.dart';
 import 'package:local_auth/local_auth.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -342,7 +344,7 @@ class _LoginPageState extends State<LoginPage> {
                               labelText: 'Enter your password',
                               isDense: true,
                               suffixIcon: IconButton(
-                                iconSize: 40.0,
+                                iconSize: 20.0,
                                 onPressed: () {
                                   setState(() {
                                     is_password_hidden = !is_password_hidden;
@@ -434,6 +436,33 @@ class _LoginPageState extends State<LoginPage> {
                   ),
                 ),
               ),
+              LSizedBox(),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    'Don\'t have an account yet?',
+                    style: kTextStyle().copyWith(
+                      fontWeight: FontWeight.w300,
+                    ),
+                  ),
+                  InkWell(
+                    onTap: () {
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => RegisterScreen()));
+                    },
+                    child: Text(
+                      ' Register here',
+                      style: kTextStyle().copyWith(
+                        color: ColorsTheme.btnColor,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              kSizedBox(),
               Container(
                 alignment: Alignment.center,
                 margin: EdgeInsets.only(top: 20.0),
