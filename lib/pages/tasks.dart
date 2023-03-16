@@ -31,7 +31,14 @@ class TaskTab extends StatelessWidget {
         primarySwatch: Colors.blue,
         fontFamily: 'Poppins',
       ),
-      home: const TaskTabPage(),
+      // home: const TaskTabPage(),
+      initialRoute: '/',
+      routes: {
+        '/' :(context) => TaskTabPage(),
+        '/singleTask' :(context) => ChangeNotifierProvider(
+          create: (_) => SingleDayTaskState(context),
+          child: SingleDayTask())
+      },
     );
   }
 }
@@ -2501,13 +2508,14 @@ class _TaskTabPageState extends State<TaskTabPage> {
                       //   if (onDateSelected.hasEvent)
                       //     getSelectedTasks(onDateSelected.selectedDate);
                       // }
+                      print('Date ho: ${onDateSelected.selectedDate}');
                       print('kuri kuri puppy shame');
-                      Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => ChangeNotifierProvider(
-                                  create: (_) => SingleDayTaskState(context),
-                                  child: SingleDayTask())));
+                      Navigator.pushNamed(
+                        context,
+                        '/singleTask',
+                        arguments: onDateSelected.selectedDate
+                        
+                      );
                     },
                     cbConfig: CbConfig(
                         startDate: DateTime(2020),
@@ -2776,18 +2784,21 @@ class _TaskTabPageState extends State<TaskTabPage> {
           ),
         ));
       }),
-      floatingActionButton: GestureDetector(
-        onTap: () {
+      floatingActionButton: FloatingActionButton(
+        backgroundColor: blueColor,
+        onPressed: () {
           _addTaskModalBottomSheet(context);
         },
-        child: Container(
-          margin: EdgeInsets.only(bottom: 40.0),
-          height: 90,
-          width: 90,
-          decoration: BoxDecoration(
-              image: DecorationImage(
-                  image: AssetImage('assets/plus_floating_button.png'))),
-        ),
+        child: Icon(Icons.add, color: Colors.white,),
+        
+        // child: Container(
+        //   margin: EdgeInsets.only(bottom: 40.0),
+        //   height: 90,
+        //   width: 90,
+        //   decoration: BoxDecoration(
+        //       image: DecorationImage(
+        //           image: AssetImage('assets/plus_floating_button.png'))),
+        // ),
       ),
     );
   }
