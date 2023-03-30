@@ -64,6 +64,10 @@ dependencies:
   calendar_builder: ^0.0.6
   intl: ^0.18.0
   jiffy: ^5.0.0
+  oktoast: ^3.3.1
+  web_socket_channel: ^2.3.0
+  flutter_expandable_fab: ^1.7.1
+  flutter_speed_dial: ^6.2.0
 
 dev_dependencies:
   flutter_test:

@@ -58,6 +58,7 @@ class _LoginPageState extends State<LoginPage> {
   TextEditingController txtPasswordController = new TextEditingController();
   final storage = new FlutterSecureStorage();
   final LocalAuthentication auth = LocalAuthentication();
+  bool isLoading = false;
 
   @override
   void initState() {
@@ -71,6 +72,9 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   Future<bool> login() async {
+    setState(() {
+      isLoading = true;
+    });
     this.preferences = await SharedPreferences.getInstance();
     await storage.write(key: 'email', value: txtEmailController.text);
     await storage.write(key: 'password', value: txtPasswordController.text);
@@ -98,6 +102,9 @@ class _LoginPageState extends State<LoginPage> {
       access_token = result['access_token'];
 
       this.preferences?.setString('access_token', access_token);
+      setState(() {
+        isLoading = false;
+      });
 
       return (response.statusCode == 200) ? true : false;
     } catch (error) {
@@ -111,6 +118,9 @@ class _LoginPageState extends State<LoginPage> {
             backgroundColor: ColorsTheme.btnColor,
             textColor: Colors.white,
             fontSize: 16.0);
+        setState(() {
+          isLoading = false;
+        });
         return false;
       } else
         Fluttertoast.showToast(
@@ -122,6 +132,9 @@ class _LoginPageState extends State<LoginPage> {
             textColor: Colors.white,
             fontSize: 16.0);
       print(error.toString());
+      setState(() {
+        isLoading = false;
+      });
       return false;
     }
   }
@@ -412,28 +425,35 @@ class _LoginPageState extends State<LoginPage> {
                     : width * 0.91,
                 height: 48.0,
                 child: TextButton(
-                  onPressed: () async {
-                    is_logged_in = await login();
+                  onPressed: isLoading
+                      ? null
+                      : () async {
+                          is_logged_in = await login();
 
-                    if (is_logged_in) {
-                      Navigator.of(context).push(MaterialPageRoute(
-                          builder: (context) => Home(),
-                          fullscreenDialog: true));
-                    }
-                  },
+                          if (is_logged_in) {
+                            Navigator.of(context).push(MaterialPageRoute(
+                                builder: (context) => Home(),
+                                fullscreenDialog: true));
+                          }
+                        },
                   style: ButtonStyle(
                       alignment: Alignment.center,
                       shape: MaterialStateProperty.all(RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(30.0))),
-                      backgroundColor:
-                          MaterialStateProperty.all(ColorsTheme.btnColor)),
-                  child: AutoSizeText(
-                    'Sign In',
-                    style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 16.0,
-                        fontWeight: FontWeight.w600),
-                  ),
+                      backgroundColor: MaterialStateProperty.all(isLoading
+                          ? ColorsTheme.btnColor.withOpacity(0.5)
+                          : ColorsTheme.btnColor)),
+                  child: isLoading
+                      ? Center(
+                          child: CircularProgressIndicator(color: Colors.white,),
+                        )
+                      : AutoSizeText(
+                          'Sign In',
+                          style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 16.0,
+                              fontWeight: FontWeight.w600),
+                        ),
                 ),
               ),
               LSizedBox(),

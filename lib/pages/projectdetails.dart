@@ -1,6 +1,7 @@
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:calendar_date_picker2/calendar_date_picker2.dart';
 import 'package:dio/dio.dart';
+import 'package:flutter_expandable_fab/flutter_expandable_fab.dart';
 import 'package:gigX/api.dart';
 import 'package:gigX/colors.dart';
 import 'package:gigX/home.dart';
@@ -11,6 +12,7 @@ import 'package:f_datetimerangepicker/f_datetimerangepicker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:gigX/pages/time_box.dart';
 import 'package:intl/intl.dart';
 import 'package:flutter/src/widgets/container.dart';
 import 'package:flutter/src/widgets/framework.dart';
@@ -113,7 +115,6 @@ class _ProjectDetailsPageState extends State<ProjectDetailsPage> {
         setState(() {
           getMoreProjects();
         }); // if add this, Reload your futurebuilder and load more data
-
       }
     });
   }
@@ -1710,22 +1711,60 @@ class _ProjectDetailsPageState extends State<ProjectDetailsPage> {
           ),
         );
       }),
-      floatingActionButton: Visibility(
-        visible: !keyboardVisible,
-        child: GestureDetector(
-          onTap: () {
-            _addTaskModalBottomSheet(context);
-          },
-          child: Container(
-            margin: EdgeInsets.only(bottom: 40.0),
-            height: 90,
-            width: 90,
-            decoration: BoxDecoration(
-                image: DecorationImage(
-                    image: AssetImage('assets/plus_floating_button.png'))),
+      // floatingActionButton: Visibility(
+      //   visible: !keyboardVisible,
+      //   child: GestureDetector(
+      //     onTap: () {
+      //       _addTaskModalBottomSheet(context);
+      //     },
+      //     child: Container(
+      //       margin: EdgeInsets.only(bottom: 40.0),
+      //       height: 90,
+      //       width: 90,
+      //       decoration: BoxDecoration(
+      //           image: DecorationImage(
+      //               image: AssetImage('assets/plus_floating_button.png'))),
+      //     ),
+      //   ),
+      // ),
+      // floatingActionButton: FloatingActionButton(
+      //   onPressed: () {
+      //     _addProjectModalBottomSheet(context);
+      //   },
+      //   child: Icon(Icons.add),
+      //   backgroundColor: ColorsTheme.btnColor,
+      // ),
+/////////////////////////////////
+      floatingActionButtonLocation: ExpandableFab.location,
+      floatingActionButton: ExpandableFab(
+        backgroundColor: ColorsTheme.btnColor,
+        distance: 75,
+        children: [
+          FloatingActionButton.extended(
+            backgroundColor: ColorsTheme.btnColor,
+            heroTag: null,
+            label: Text('TimeBox'),
+            icon: Icon(Icons.timer),
+            // child: const Icon(Icons.edit),
+            onPressed: () {
+              Navigator.push(context,
+                  MaterialPageRoute(builder: (context) => TimeBoxPage()));
+            },
           ),
-        ),
+          FloatingActionButton.extended(
+            backgroundColor: ColorsTheme.btnColor,
+
+            heroTag: null,
+            label: Text('Tasks'),
+            icon: Icon(Icons.task),
+            // child: const Icon(Icons.search),
+            onPressed: () {
+              _addTaskModalBottomSheet(context);
+            },
+          ),
+        ],
       ),
+//////////////////////////////////
     );
   }
 }
@@ -1739,6 +1778,7 @@ void _addProjectModalBottomSheet(BuildContext context) async {
         return StatefulBuilder(builder: (BuildContext context,
             StateSetter setState /*You can rename this!*/) {
           return Container(
+            color: Colors.white,
             height: 480.0,
             padding: EdgeInsets.all(20.0),
             child: Column(

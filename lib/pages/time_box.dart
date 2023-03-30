@@ -323,10 +323,11 @@ class _TimeBoxPageState extends State<TimeBoxPage> {
                                   margin: EdgeInsets.only(top: 40.0),
                                   child: IconButton(
                                       onPressed: () async {
-                                        Navigator.of(context).push(
-                                            MaterialPageRoute(
-                                                builder: (context) =>
-                                                    AccountTab()));
+                                        // Navigator.of(context).push(
+                                        //     MaterialPageRoute(
+                                        //         builder: (context) =>
+                                        //             AccountTab()));
+                                        Navigator.pop(context);
                                       },
                                       icon: Icon(
                                         Icons.arrow_back,

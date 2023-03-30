@@ -15,21 +15,30 @@ import 'package:flutter_image_compress/flutter_image_compress.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:oktoast/oktoast.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+
+import '../constant/constants.dart';
+import '../service/toastService.dart';
 
 class AccountTab extends StatelessWidget {
   const AccountTab({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Account Tab Page',
-      debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-          primarySwatch: Colors.blue,
-          fontFamily: 'Poppins',
-          scaffoldBackgroundColor: ColorsTheme.bgColor),
-      home: const AccountTabPage(),
+    return OKToast(
+      child: MaterialApp(
+        title: 'Account Tab Page',
+        debugShowCheckedModeBanner: false,
+        theme: ThemeData(
+            primarySwatch: Colors.blue,
+            fontFamily: 'Poppins',
+            scaffoldBackgroundColor: ColorsTheme.bgColor),
+        home: const AccountTabPage(),
+        routes: {
+          '/time_box': (context) => TimeBoxPage(),
+        },
+      ),
     );
   }
 }
@@ -49,6 +58,11 @@ class AccountTabPage extends StatefulWidget {
 class _AccountTabPageState extends State<AccountTabPage> {
   SharedPreferences? preferences;
   bool is_loading = false;
+  final storage = FlutterSecureStorage();
+  String? access_token;
+  TextEditingController passwordController = TextEditingController();
+  TextEditingController newPasswordController = TextEditingController();
+  TextEditingController confirmPasswordController = TextEditingController();
 
   @override
   void initState() {
@@ -57,6 +71,186 @@ class _AccountTabPageState extends State<AccountTabPage> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       getUserProfile();
     });
+  }
+
+  Future<void> changePassword() async {
+    this.preferences = await SharedPreferences.getInstance();
+
+    access_token = preferences?.getString('access_token').toString();
+    Dio dio = Dio();
+
+    var data = {
+      "password": newPasswordController.text,
+      "current_password": passwordController.text,
+      "confirm_password": confirmPasswordController.text
+    };
+    print(data);
+    try {
+      Response response = await dio.put(
+          'https://api.efleetpass.com.au/update/password',
+          data: data,
+          options: Options(headers: {"authorization": "Bearer $access_token"}));
+      print(response);
+      ToastService().s('Password Changed Successfully');
+    } on DioError catch (e) {
+      ToastService().e(e.response!.data['error'].toString(),
+          duration: Duration(seconds: 6));
+      print(e.response!.data['error'].toString());
+    }
+  }
+
+  showChangePasswordDialog(BuildContext context) async {
+    return showDialog(
+        context: context,
+        builder: (context) {
+          return StatefulBuilder(
+            builder: (context, setState) {
+              return AlertDialog(
+                // shape: RoundedRectangleBorder(
+                //     borderRadius: BorderRadius.all(Radius.circular(10.0))),
+                // insetPadding: EdgeInsets.zero,
+                title: Text('Change Password!', style: kBoldTextStyle()),
+                // content: const Text('Are you sure you want to logout?', style:TextStyle(
+                //   fontFamily: 'Barlow',
+                //   fontSize: 15
+                // ),),
+                content: SingleChildScrollView(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Current Pasword',
+                        style: kBoldTextStyle(),
+                      ),
+                      sSizedBox(),
+                      TextFormField(
+                        controller: passwordController,
+                        decoration: InputDecoration(
+                            isDense: true,
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                            focusedBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(10),
+                                borderSide: BorderSide(
+                                  color: primaryColor,
+                                ))),
+                      ),
+                      kSizedBox(),
+                      Text(
+                        'New Pasword',
+                        style: kBoldTextStyle(),
+                      ),
+                      sSizedBox(),
+                      TextFormField(
+                        controller: newPasswordController,
+                        decoration: InputDecoration(
+                            isDense: true,
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                            focusedBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(10),
+                                borderSide: BorderSide(
+                                  color: primaryColor,
+                                ))),
+                      ),
+                      kSizedBox(),
+                      Text(
+                        'Confirm Pasword',
+                        style: kBoldTextStyle(),
+                      ),
+                      sSizedBox(),
+                      TextFormField(
+                        controller: confirmPasswordController,
+                        decoration: InputDecoration(
+                            isDense: true,
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                            focusedBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(10),
+                                borderSide: BorderSide(
+                                  color: primaryColor,
+                                ))),
+                      )
+                    ],
+                  ),
+                ),
+
+                actions: <Widget>[
+                  TextButton(
+                    child: Text(
+                      "Cancel",
+                      style: kTextStyle().copyWith(color: Colors.grey),
+                    ),
+                    onPressed: () {
+                      Navigator.pop(context);
+                    },
+                  ),
+                  TextButton(
+                      child: Text(
+                        'Update',
+                        style: kTextStyle().copyWith(color: primaryColor),
+                      ),
+                      onPressed: () async {
+                        Navigator.pop(context);
+                        changePassword();
+
+                        //   userResponse.remove('userResponse');
+                        // Navigator.pushNamedAndRemoveUntil(context, LoginScreen.id, (route) => false,);
+                      }),
+                ],
+              );
+            },
+          );
+        });
+  }
+
+  showLogoutConfirmationDialog(BuildContext context) async {
+    return showDialog(
+        context: context,
+        builder: (context) {
+          return StatefulBuilder(
+            builder: (context, setState) {
+              return AlertDialog(
+                // shape: RoundedRectangleBorder(
+                //     borderRadius: BorderRadius.all(Radius.circular(10.0))),
+                // insetPadding: EdgeInsets.zero,
+                title: Text('Log Out!', style: kBoldTextStyle()),
+                content: const Text('Are you sure you want to logout?'),
+
+                actions: <Widget>[
+                  TextButton(
+                    child: Text(
+                      "Cancel",
+                      style: kTextStyle().copyWith(color: Colors.grey),
+                    ),
+                    onPressed: () {
+                      Navigator.pop(context);
+                    },
+                  ),
+                  TextButton(
+                      child: Text(
+                        'Log Out',
+                        style: kTextStyle().copyWith(color: primaryColor),
+                      ),
+                      onPressed: () async {
+                        Navigator.pop(context);
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) =>
+                                    LoginPage(is_logged_out: true)));
+                        // userResponse.remove('userResponse');
+                        // Navigator.pushNamed(context, LoginScreen.id);
+                        // Navigator.pushNamedAndRemoveUntil(context, LoginScreen.id, (route) => false,);
+                      }),
+                ],
+              );
+            },
+          );
+        });
   }
 
   Future<void> getUserProfile() async {
@@ -247,8 +441,9 @@ class _AccountTabPageState extends State<AccountTabPage> {
           ),
           InkWell(
             onTap: () {
-              Navigator.of(context).push(
-                  MaterialPageRoute(builder: (context) => const TimeBox()));
+              // Navigator.push(context,
+              //     MaterialPageRoute(builder: (context) => const TimeBox()));
+              Navigator.pushNamed(context, '/time_box');
             },
             child: ListTile(
               leading: Icon(
@@ -300,6 +495,9 @@ class _AccountTabPageState extends State<AccountTabPage> {
             ),
           ),
           ListTile(
+            onTap: () {
+              showChangePasswordDialog(context);
+            },
             leading: Image(
               image: AssetImage('assets/change_password_icon.png'),
             ),
@@ -310,8 +508,7 @@ class _AccountTabPageState extends State<AccountTabPage> {
                   fontWeight: FontWeight.w600,
                   fontSize: 16.0),
             ),
-            trailing: GestureDetector(
-                onTap: () {}, child: Image.asset('assets/arrow_right.png')),
+            trailing: Image.asset('assets/arrow_right.png'),
           ),
         ],
       ),
@@ -461,17 +658,18 @@ class _AccountTabPageState extends State<AccountTabPage> {
                           height: 58.0,
                           child: TextButton(
                             onPressed: () async {
-                              Navigator.of(context, rootNavigator: true)
-                                  .pushAndRemoveUntil(
-                                MaterialPageRoute(
-                                  builder: (BuildContext context) {
-                                    return LoginPage(
-                                      is_logged_out: true,
-                                    );
-                                  },
-                                ),
-                                (_) => false,
-                              );
+                              showLogoutConfirmationDialog(context);
+                              // Navigator.of(context, rootNavigator: true)
+                              //     .pushAndRemoveUntil(
+                              //   MaterialPageRoute(
+                              //     builder: (BuildContext context) {
+                              //       return LoginPage(
+                              //         is_logged_out: true,
+                              //       );
+                              //     },
+                              //   ),
+                              //   (_) => false,
+                              // );
                             },
                             style: ButtonStyle(
                               shape: MaterialStateProperty.all(

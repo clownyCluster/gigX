@@ -1,6 +1,7 @@
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:calendar_builder/calendar_builder.dart';
 import 'package:dio/dio.dart';
+import 'package:flutter_expandable_fab/flutter_expandable_fab.dart';
 import 'package:gigX/api.dart';
 import 'package:gigX/apiModels/myTodosModel.dart';
 import 'package:gigX/colors.dart';
@@ -19,6 +20,8 @@ import 'package:syncfusion_flutter_calendar/calendar.dart';
 import 'package:intl/intl.dart';
 import 'package:syncfusion_flutter_sliders/sliders.dart';
 
+import 'time_box.dart';
+
 class TaskTab extends StatelessWidget {
   const TaskTab({super.key});
 
@@ -34,10 +37,9 @@ class TaskTab extends StatelessWidget {
       // home: const TaskTabPage(),
       initialRoute: '/',
       routes: {
-        '/' :(context) => TaskTabPage(),
-        '/singleTask' :(context) => ChangeNotifierProvider(
-          create: (_) => SingleDayTaskState(context),
-          child: SingleDayTask())
+        '/': (context) => TaskTabPage(),
+        '/singleTask': (context) => ChangeNotifierProvider(
+            create: (_) => SingleDayTaskState(context), child: SingleDayTask())
       },
     );
   }
@@ -2475,6 +2477,7 @@ class _TaskTabPageState extends State<TaskTabPage> {
     width = MediaQuery.of(context).size.width;
 
     return Scaffold(
+      backgroundColor: Colors.white,
       resizeToAvoidBottomInset: false,
       body: OrientationBuilder(builder: (context, orientation) {
         return SingleChildScrollView(
@@ -2510,12 +2513,8 @@ class _TaskTabPageState extends State<TaskTabPage> {
                       // }
                       print('Date ho: ${onDateSelected.selectedDate}');
                       print('kuri kuri puppy shame');
-                      Navigator.pushNamed(
-                        context,
-                        '/singleTask',
-                        arguments: onDateSelected.selectedDate
-                        
-                      );
+                      Navigator.pushNamed(context, '/singleTask',
+                          arguments: onDateSelected.selectedDate);
                     },
                     cbConfig: CbConfig(
                         startDate: DateTime(2020),
@@ -2523,6 +2522,7 @@ class _TaskTabPageState extends State<TaskTabPage> {
                         selectedDate: DateTime.now(),
                         selectedYear: DateTime(DateTime.now().year),
                         weekStartsFrom: WeekStartsFrom.sunday,
+                        currentDay: DateTime.now(),
 
                         // eventDates: [
                         //   // DateTime(2022, 1, 2),
@@ -2560,19 +2560,19 @@ class _TaskTabPageState extends State<TaskTabPage> {
                       monthMinWidth: 450,
                       padding: const EdgeInsets.all(20),
                       monthHeaderBuilder:
-                          (month, headerHeight, headerWidth, paddingLeft) {
+                          (month, headerHeight, headerWidth, paddingLeft,) {
                         return Container(
-                          color: Colors.grey[200],
+                          // color: Colors.grey[200],
                           height: headerHeight,
                           width: headerWidth,
                           child: Padding(
                             padding: EdgeInsets.only(left: paddingLeft),
                             child: Align(
-                              alignment: Alignment.center,
+                              alignment: Alignment.topLeft,
                               child: Text(
-                                month,
+                                '${month}',
                                 style: const TextStyle(
-                                  fontSize: 22,
+                                  fontSize: 18,
                                   fontWeight: FontWeight.w600,
                                 ),
                               ),
@@ -2587,18 +2587,19 @@ class _TaskTabPageState extends State<TaskTabPage> {
                           child: Padding(
                             padding: const EdgeInsets.all(4.0),
                             child: Container(
-                              decoration: BoxDecoration(
-                                  color: Colors.red.withOpacity(0.1),
-                                  borderRadius: BorderRadius.circular(10),
-                                  border: Border.all(color: Colors.red)),
+                              // decoration: BoxDecoration(
+                              //     color: Colors.red.withOpacity(0.1),
+                              //     borderRadius: BorderRadius.circular(10),
+                              //     border: Border.all(color: Colors.red)),
                               child: Align(
                                 child: Text(
                                   weeks,
-                                  style: const TextStyle(
-                                    fontSize: 14,
-                                    color: Colors.red,
-                                    fontWeight: FontWeight.w500,
-                                  ),
+                                  // style: const TextStyle(
+                                  //   fontSize: 14,
+                                  //   color: Colors.red,
+                                  //   fontWeight: FontWeight.w500,
+                                  // ),
+                                  style: kBoldTextStyle(),
                                   overflow: TextOverflow.ellipsis,
                                   maxLines: 1,
                                 ),
@@ -2645,7 +2646,7 @@ class _TaskTabPageState extends State<TaskTabPage> {
                           return Container(
                             decoration: const BoxDecoration(
                               color: Colors.red,
-                              shape: BoxShape.rectangle,
+                              shape: BoxShape.circle,
                             ),
                             margin: const EdgeInsets.all(2),
                             child: daysText,
@@ -2653,17 +2654,26 @@ class _TaskTabPageState extends State<TaskTabPage> {
                         }
                         return Container(
                           decoration: BoxDecoration(
-                              color: Colors.white,
-                              borderRadius: BorderRadius.circular(14.0),
+                              // shape: BoxShape.circle,
+                              // color: Colors.white,
+                              color: hasEvent ? Colors.green : Colors.white,
+                              // borderRadius: BorderRadius.circular(14.0),
+                              shape: BoxShape.circle,
                               border: hasEvent || isHighlighted
                                   ? Border.all(
                                       color: isHighlighted
                                           ? Colors.red
-                                          : Colors.blue,
+                                          : Colors.green,
                                       width: 2)
                                   : null),
                           margin: const EdgeInsets.all(2),
-                          child: daysText,
+                          // child: daysText,
+                          child: Center(
+                              child: Text(
+                            '${dateTime.day}',
+                            style:
+                                hasEvent ? kWhiteBoldTextStyle() : kTextStyle(),
+                          )),
                         );
                       },
                     ),
@@ -2784,21 +2794,50 @@ class _TaskTabPageState extends State<TaskTabPage> {
           ),
         ));
       }),
-      floatingActionButton: FloatingActionButton(
-        backgroundColor: blueColor,
-        onPressed: () {
-          _addTaskModalBottomSheet(context);
-        },
-        child: Icon(Icons.add, color: Colors.white,),
-        
-        // child: Container(
-        //   margin: EdgeInsets.only(bottom: 40.0),
-        //   height: 90,
-        //   width: 90,
-        //   decoration: BoxDecoration(
-        //       image: DecorationImage(
-        //           image: AssetImage('assets/plus_floating_button.png'))),
-        // ),
+      // floatingActionButton: FloatingActionButton(
+      //   backgroundColor: blueColor,
+      //   onPressed: () {
+      //     _addTaskModalBottomSheet(context);
+      //   },
+      //   child: Icon(Icons.add, color: Colors.white,),
+
+      //   // child: Container(
+      //   //   margin: EdgeInsets.only(bottom: 40.0),
+      //   //   height: 90,
+      //   //   width: 90,
+      //   //   decoration: BoxDecoration(
+      //   //       image: DecorationImage(
+      //   //           image: AssetImage('assets/plus_floating_button.png'))),
+      //   // ),
+      // ),
+      floatingActionButtonLocation: ExpandableFab.location,
+      floatingActionButton: ExpandableFab(
+        backgroundColor: ColorsTheme.btnColor,
+        distance: 75,
+        children: [
+          FloatingActionButton.extended(
+            backgroundColor: ColorsTheme.btnColor,
+            heroTag: null,
+            label: Text('TimeBox'),
+            icon: Icon(Icons.timer),
+            // child: const Icon(Icons.edit),
+            onPressed: () {
+              Navigator.push(context,
+                  MaterialPageRoute(builder: (context) => TimeBoxPage()));
+            },
+          ),
+          FloatingActionButton.extended(
+            backgroundColor: ColorsTheme.btnColor,
+
+            heroTag: null,
+            label: Text('Tasks'),
+            icon: Icon(Icons.task),
+            // child: const Icon(Icons.search),
+            onPressed: () {
+              _addTaskModalBottomSheet(context);
+            },
+          ),
+        ],
       ),
     );
   }

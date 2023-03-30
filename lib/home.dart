@@ -2,6 +2,7 @@ import 'package:auto_size_text/auto_size_text.dart';
 import 'package:back_button_interceptor/back_button_interceptor.dart';
 import 'package:calendar_date_picker2/calendar_date_picker2.dart';
 import 'package:gigX/colors.dart';
+import 'package:gigX/constant/constants.dart';
 import 'package:gigX/pages/account.dart';
 import 'package:gigX/pages/chat_module/chat_screen.dart';
 import 'package:gigX/pages/chat_module/chat_screen_state.dart';
@@ -49,7 +50,7 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  GlobalKey globalKey = new GlobalKey(debugLabel: 'btm_app_bar');
+  static GlobalKey globalKey = new GlobalKey(debugLabel: 'btm_app_bar');
   SharedPreferences? preferences;
 
   int _selectedIndex = 0;
@@ -118,23 +119,23 @@ class _HomePageState extends State<HomePage> {
       bottomNavigationBar: BottomNavigationBar(
         key: bottomWidgetKey,
 
-        items: const <BottomNavigationBarItem>[
+        items: <BottomNavigationBarItem>[
           BottomNavigationBarItem(
-              icon: Image(image: AssetImage('assets/navbaricon_home.png')),
+              icon: Image(image: AssetImage('assets/navbaricon_home.png',), color: _selectedIndex == 0 ? ColorsTheme.btnColor : darkGrey,),
               label: 'Home',
               backgroundColor: Colors.white),
           BottomNavigationBarItem(
-              icon: Image(image: AssetImage('assets/navbaricon_tasks.png')),
+              icon: Image(image: AssetImage('assets/navbaricon_tasks.png'), color: _selectedIndex == 1 ? ColorsTheme.btnColor : darkGrey,),
               label: 'Tasks',
               backgroundColor: Colors.white),
           BottomNavigationBarItem(
             icon:
-                Image(image: AssetImage('assets/navbaricon_notifications.png')),
+                Image(image: AssetImage('assets/navbaricon_notifications.png'), color: _selectedIndex == 2 ? ColorsTheme.btnColor : darkGrey,),
             label: 'Notifications',
             backgroundColor: Colors.white,
           ),
           BottomNavigationBarItem(
-            icon: Image(image: AssetImage('assets/navbaricon_account.png')),
+            icon: Image(image: AssetImage('assets/navbaricon_account.png'), color: _selectedIndex == 3 ? ColorsTheme.btnColor : darkGrey,),
             label: 'Account',
             backgroundColor: Colors.white,
           ),
@@ -148,6 +149,7 @@ class _HomePageState extends State<HomePage> {
         type: BottomNavigationBarType.fixed,
         currentIndex: _selectedIndex,
         selectedItemColor: ColorsTheme.btnColor,
+        
         selectedFontSize: 12,
         unselectedFontSize: 12,
 

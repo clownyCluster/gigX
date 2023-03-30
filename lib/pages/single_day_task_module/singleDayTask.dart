@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:gigX/colors.dart';
 import 'package:gigX/pages/single_day_task_module/single_day_task_state.dart';
 import 'package:jiffy/jiffy.dart';
 import 'package:provider/provider.dart';
@@ -18,6 +19,10 @@ class SingleDayTask extends StatelessWidget {
         title: Text('Tasks', style: kkBoldTextStyle().copyWith(fontSize: 24, color: Colors.grey[800]),),
         iconTheme: IconThemeData().copyWith(color: darkGrey),
         elevation: 0,
+        actions: [
+          InkWell(child: Icon(Icons.filter_alt_outlined, color: ColorsTheme.btnColor,size: 35,)),
+          largeWidthSpan()
+        ],
       ),
       body: state.isLoading
           ? Center(
