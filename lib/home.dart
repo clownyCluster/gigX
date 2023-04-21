@@ -17,6 +17,9 @@ import 'package:flutter_rounded_date_picker/flutter_rounded_date_picker.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+GlobalKey bottomWidgetKey = GlobalKey<State<BottomNavigationBar>>();
+GlobalKey globalKey = new GlobalKey(debugLabel: 'btm_app_bar');
+
 class Home extends StatelessWidget {
   const Home({super.key});
 
@@ -39,7 +42,6 @@ class Home extends StatelessWidget {
 var height, width;
 int _current_index = 0;
 bool? viewed_project_details = false;
-var bottomWidgetKey = new GlobalKey<State<BottomNavigationBar>>();
 
 class HomePage extends StatefulWidget {
   final int initialPage;
@@ -50,18 +52,16 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  static GlobalKey globalKey = new GlobalKey(debugLabel: 'btm_app_bar');
   SharedPreferences? preferences;
 
   int _selectedIndex = 0;
-   List<Widget> _widgetOptions = <Widget>[
+  List<Widget> _widgetOptions = <Widget>[
     HomeTab(),
     TaskTab(),
     NotificationTab(),
     AccountTab(),
     ChangeNotifierProvider(
-      create: (_) => ChatScreenState(),
-      child: ChatScreen())
+        create: (_) => ChatScreenState(), child: ChatScreen())
   ];
 
   void _onItemTapped(int index) {
@@ -121,27 +121,43 @@ class _HomePageState extends State<HomePage> {
 
         items: <BottomNavigationBarItem>[
           BottomNavigationBarItem(
-              icon: Image(image: AssetImage('assets/navbaricon_home.png',), color: _selectedIndex == 0 ? ColorsTheme.btnColor : darkGrey,),
+              icon: Image(
+                image: AssetImage(
+                  'assets/navbaricon_home.png',
+                ),
+                color: _selectedIndex == 0 ? ColorsTheme.btnColor : darkGrey,
+              ),
               label: 'Home',
               backgroundColor: Colors.white),
           BottomNavigationBarItem(
-              icon: Image(image: AssetImage('assets/navbaricon_tasks.png'), color: _selectedIndex == 1 ? ColorsTheme.btnColor : darkGrey,),
+              icon: Image(
+                image: AssetImage('assets/navbaricon_tasks.png'),
+                color: _selectedIndex == 1 ? ColorsTheme.btnColor : darkGrey,
+              ),
               label: 'Tasks',
               backgroundColor: Colors.white),
           BottomNavigationBarItem(
-            icon:
-                Image(image: AssetImage('assets/navbaricon_notifications.png'), color: _selectedIndex == 2 ? ColorsTheme.btnColor : darkGrey,),
+            icon: Image(
+              image: AssetImage('assets/navbaricon_notifications.png'),
+              color: _selectedIndex == 2 ? ColorsTheme.btnColor : darkGrey,
+            ),
             label: 'Notifications',
             backgroundColor: Colors.white,
           ),
           BottomNavigationBarItem(
-            icon: Image(image: AssetImage('assets/navbaricon_account.png'), color: _selectedIndex == 3 ? ColorsTheme.btnColor : darkGrey,),
+            icon: Image(
+              image: AssetImage('assets/navbaricon_account.png'),
+              color: _selectedIndex == 3 ? ColorsTheme.btnColor : darkGrey,
+            ),
             label: 'Account',
             backgroundColor: Colors.white,
           ),
           BottomNavigationBarItem(
             // icon: Image(image: AssetImage('assets/navbaricon_account.png')),
-            icon: Icon(Icons.chat),
+            icon: Image(
+              image: AssetImage('assets/chat.png'),
+              color: _selectedIndex == 4 ? ColorsTheme.btnColor : darkGrey,
+            ),
             label: 'Chats',
             backgroundColor: Colors.white,
           ),
@@ -149,7 +165,7 @@ class _HomePageState extends State<HomePage> {
         type: BottomNavigationBarType.fixed,
         currentIndex: _selectedIndex,
         selectedItemColor: ColorsTheme.btnColor,
-        
+
         selectedFontSize: 12,
         unselectedFontSize: 12,
 

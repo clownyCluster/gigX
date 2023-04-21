@@ -85,10 +85,10 @@ class _LoginPageState extends State<LoginPage> {
     try {
       var map = new Map<String, dynamic>();
       map['grant_type'] = 'password';
-      // map['client_id'] = '14';
-      // map['client_secret'] = 'PYZTnOaDfJWM0X9eyIUlXZMJU1z6ZKkAEtLHlbiI';
-      map['client_id'] = '20';
-      map['client_secret'] = 'VDt8JhTzNdBrCWoKTwWNGOw0SQ5bPg99J2HI2BLL';
+      map['client_id'] = '14';
+      map['client_secret'] = 'PYZTnOaDfJWM0X9eyIUlXZMJU1z6ZKkAEtLHlbiI';
+      // map['client_id'] = '20';
+      // map['client_secret'] = 'VDt8JhTzNdBrCWoKTwWNGOw0SQ5bPg99J2HI2BLL';
       // email = 'leonardo@myfleetmanager.com.au';
       // password = 'Efleet@02dev';
       map['username'] = email;
@@ -283,241 +283,249 @@ class _LoginPageState extends State<LoginPage> {
     return Scaffold(
       body: OrientationBuilder(builder: (context, orientation) {
         return SingleChildScrollView(
-          child: Container(
-            height: orientation == Orientation.portrait ? height : height * 2.6,
-            width: width,
-            child: Column(children: <Widget>[
-              Container(
-                margin: EdgeInsets.only(top: 80.0),
-                width: width * 0.8,
-                height: 120,
-                alignment: Alignment.bottomCenter,
-                child: Image(
-                  image: AssetImage('assets/logo_title.png'),
-                  fit: BoxFit.contain,
-                ),
+          child: Column(children: <Widget>[
+            Container(
+              margin: EdgeInsets.only(top: 80.0),
+              width: width * 0.8,
+              height: 120,
+              alignment: Alignment.bottomCenter,
+              child: Image(
+                image: AssetImage('assets/logo_title.png'),
+                fit: BoxFit.contain,
               ),
-              Container(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: <Widget>[
-                    SizedBox(
-                      height: 60.0,
+            ),
+            Container(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: <Widget>[
+                  SizedBox(
+                    height: 60.0,
+                  ),
+                  Container(
+                    padding: EdgeInsets.only(left: 40.0, right: 40.0),
+                    child: AutoSizeText(
+                      'EMAIL',
+                      style: TextStyle(
+                          color: Colors.black,
+                          fontSize: 16.0,
+                          fontWeight: FontWeight.w600),
                     ),
-                    Container(
-                      padding: EdgeInsets.only(left: 40.0, right: 40.0),
-                      child: AutoSizeText(
-                        'EMAIL',
-                        style: TextStyle(
-                            color: Colors.black,
-                            fontSize: 16.0,
-                            fontWeight: FontWeight.w600),
+                  ),
+                  Container(
+                    padding: EdgeInsets.only(left: 40.0, right: 40.0),
+                    child: TextField(
+                      controller: txtEmailController,
+                      keyboardType: TextInputType.emailAddress,
+                      decoration: InputDecoration(
+                        isDense: true,
+                        labelText: 'Enter your email',
                       ),
+                      onChanged: (value) {
+                        setState(() {
+                          email = value.toString();
+                        });
+                      },
                     ),
-                    Container(
-                      padding: EdgeInsets.only(left: 40.0, right: 40.0),
-                      child: TextField(
-                        controller: txtEmailController,
-                        keyboardType: TextInputType.emailAddress,
-                        decoration: InputDecoration(
-                          isDense: true,
-                          labelText: 'Enter your email',
-                        ),
+                  ),
+                  Container(
+                    padding: EdgeInsets.only(left: 40.0, right: 40.0),
+                    margin: EdgeInsets.only(top: 50.0),
+                    child: AutoSizeText(
+                      'PASSWORD',
+                      style: TextStyle(
+                          color: Colors.black,
+                          fontSize: 16.0,
+                          fontWeight: FontWeight.w600),
+                    ),
+                  ),
+                  Container(
+                    padding: EdgeInsets.only(left: 40.0, right: 40.0),
+                    child: TextField(
+                        controller: txtPasswordController,
+                        obscureText: is_password_hidden,
+                        keyboardType: TextInputType.visiblePassword,
                         onChanged: (value) {
                           setState(() {
-                            email = value.toString();
+                            password = value.toString();
                           });
                         },
-                      ),
-                    ),
-                    Container(
-                      padding: EdgeInsets.only(left: 40.0, right: 40.0),
-                      margin: EdgeInsets.only(top: 50.0),
-                      child: AutoSizeText(
-                        'PASSWORD',
-                        style: TextStyle(
-                            color: Colors.black,
-                            fontSize: 16.0,
-                            fontWeight: FontWeight.w600),
-                      ),
-                    ),
-                    Container(
-                      padding: EdgeInsets.only(left: 40.0, right: 40.0),
-                      child: TextField(
-                          controller: txtPasswordController,
-                          obscureText: is_password_hidden,
-                          keyboardType: TextInputType.visiblePassword,
-                          onChanged: (value) {
-                            setState(() {
-                              password = value.toString();
-                            });
-                          },
-                          decoration: InputDecoration(
-                              labelText: 'Enter your password',
-                              isDense: true,
-                              suffixIcon: IconButton(
-                                iconSize: 20.0,
-                                onPressed: () {
-                                  setState(() {
-                                    is_password_hidden = !is_password_hidden;
-                                  });
-                                },
-                                icon: Icon(is_password_hidden == true
-                                    ? Icons.visibility
-                                    : Icons.visibility_off),
-                              ))),
-                    ),
-                    Container(
-                      padding: EdgeInsets.all(10.0),
-                      child: Row(
-                        mainAxisAlignment: orientation == Orientation.portrait
-                            ? MainAxisAlignment.spaceAround
-                            : MainAxisAlignment.spaceEvenly,
-                        children: <Widget>[
-                          Container(
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.start,
-                              children: [
-                                Container(
-                                  child: Checkbox(
-                                    value: stay_logged_in,
-                                    onChanged: (value) async {
-                                      this.preferences =
-                                          await SharedPreferences.getInstance();
-                                      setState(() {
-                                        stay_logged_in = value!;
-                                      });
+                        decoration: InputDecoration(
+                            labelText: 'Enter your password',
+                            isDense: true,
+                            suffixIcon: IconButton(
+                              iconSize: 20.0,
+                              onPressed: () {
+                                setState(() {
+                                  is_password_hidden = !is_password_hidden;
+                                });
+                              },
+                              icon: Icon(is_password_hidden == true
+                                  ? Icons.visibility
+                                  : Icons.visibility_off),
+                            ))),
+                  ),
+                  Container(
+                    padding: EdgeInsets.all(10.0),
+                    child: Row(
+                      mainAxisAlignment: orientation == Orientation.portrait
+                          ? MainAxisAlignment.spaceAround
+                          : MainAxisAlignment.spaceEvenly,
+                      children: <Widget>[
+                        Container(
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            children: [
+                              Container(
+                                child: Checkbox(
+                                  value: stay_logged_in,
+                                  onChanged: (value) async {
+                                    this.preferences =
+                                        await SharedPreferences.getInstance();
+                                    setState(() {
+                                      stay_logged_in = value!;
+                                    });
 
-                                      this.preferences?.setBool(
-                                          'stay_logged_in', stay_logged_in);
-                                    },
-                                  ),
+                                    this.preferences?.setBool(
+                                        'stay_logged_in', stay_logged_in);
+                                  },
                                 ),
-                                Container(
-                                  child: AutoSizeText(
-                                    'Stay Logged In?',
-                                    style: TextStyle(
-                                        color: ColorsTheme.txtDescColor,
-                                        fontSize: 12.0),
-                                  ),
-                                )
-                              ],
-                            ),
+                              ),
+                              Container(
+                                child: Text(
+                                  'Stay Logged In?',
+                                  style: TextStyle(
+                                      color: ColorsTheme.txtDescColor,
+                                      fontSize: 12.0),
+                                ),
+                              )
+                            ],
                           ),
-                          Container(
+                        ),
+                        Expanded(
+                          child: Container(
                             child: AutoSizeText(
                               'Forgot Password?',
                               style: TextStyle(
                                   color: ColorsTheme.txtDescColor,
                                   fontSize: 12.0),
                             ),
-                          )
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              Container(
-                width: orientation == Orientation.portrait
-                    ? width * 0.82
-                    : width * 0.91,
-                height: 48.0,
-                child: TextButton(
-                  onPressed: isLoading
-                      ? null
-                      : () async {
-                          is_logged_in = await login();
-
-                          if (is_logged_in) {
-                            Navigator.of(context).push(MaterialPageRoute(
-                                builder: (context) => Home(),
-                                fullscreenDialog: true));
-                          }
-                        },
-                  style: ButtonStyle(
-                      alignment: Alignment.center,
-                      shape: MaterialStateProperty.all(RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(30.0))),
-                      backgroundColor: MaterialStateProperty.all(isLoading
-                          ? ColorsTheme.btnColor.withOpacity(0.5)
-                          : ColorsTheme.btnColor)),
-                  child: isLoading
-                      ? Center(
-                          child: CircularProgressIndicator(color: Colors.white,),
+                          ),
                         )
-                      : AutoSizeText(
-                          'Sign In',
-                          style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 16.0,
-                              fontWeight: FontWeight.w600),
-                        ),
-                ),
-              ),
-              LSizedBox(),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text(
-                    'Don\'t have an account yet?',
-                    style: kTextStyle().copyWith(
-                      fontWeight: FontWeight.w300,
+                      ],
                     ),
                   ),
-                  InkWell(
-                    onTap: () {
-                      Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => RegisterScreen()));
-                    },
+                ],
+              ),
+            ),
+            Container(
+              width: orientation == Orientation.portrait
+                  ? width * 0.82
+                  : width * 0.91,
+              height: 48.0,
+              child: TextButton(
+                onPressed: isLoading
+                    ? null
+                    : () async {
+                        is_logged_in = await login();
+
+                        if (is_logged_in) {
+                          Navigator.of(context).push(MaterialPageRoute(
+                              builder: (context) => Home(),
+                              fullscreenDialog: true));
+                        }
+                      },
+                style: ButtonStyle(
+                    alignment: Alignment.center,
+                    shape: MaterialStateProperty.all(RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(30.0))),
+                    backgroundColor: MaterialStateProperty.all(isLoading
+                        ? ColorsTheme.btnColor.withOpacity(0.5)
+                        : ColorsTheme.btnColor)),
+                child: isLoading
+                    ? Center(
+                        child: CircularProgressIndicator(
+                          color: Colors.white,
+                        ),
+                      )
+                    : AutoSizeText(
+                        'Sign In',
+                        style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 16.0,
+                            fontWeight: FontWeight.w600),
+                      ),
+              ),
+            ),
+            LSizedBox(),
+            Padding(
+              padding: EdgeInsets.only(left: 40.0, right: 40.0),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Expanded(
                     child: Text(
-                      ' Register here',
+                      'Don\'t have an account yet?',
                       style: kTextStyle().copyWith(
-                        color: ColorsTheme.btnColor,
+                        fontWeight: FontWeight.w300,
+                      ),
+                    ),
+                  ),
+                  Expanded(
+                    child: InkWell(
+                      onTap: () {
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => RegisterScreen()));
+                      },
+                      child: Expanded(
+                        child: Text(
+                          'Register here',
+                          style: kTextStyle().copyWith(
+                            color: ColorsTheme.btnColor,
+                          ),
+                          overflow: TextOverflow.ellipsis,
+                        ),
                       ),
                     ),
                   ),
                 ],
               ),
-              kSizedBox(),
-              Container(
-                alignment: Alignment.center,
-                margin: EdgeInsets.only(top: 20.0),
-                child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: [
-                      Container(
-                        child:
-                            Image(image: AssetImage('assets/login_line.png')),
+            ),
+            kSizedBox(),
+            Container(
+              alignment: Alignment.center,
+              margin: EdgeInsets.only(top: 20.0),
+              child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    Container(
+                      child: Image(image: AssetImage('assets/login_line.png')),
+                    ),
+                    Container(
+                      child: AutoSizeText(
+                        'Or login with',
+                        style: TextStyle(
+                            color: ColorsTheme.txtDescColor,
+                            fontSize: 13.0,
+                            fontWeight: FontWeight.w400),
                       ),
-                      Container(
-                        child: AutoSizeText(
-                          'Or login with',
-                          style: TextStyle(
-                              color: ColorsTheme.txtDescColor,
-                              fontSize: 13.0,
-                              fontWeight: FontWeight.w400),
-                        ),
-                      ),
-                      Container(
-                        child:
-                            Image(image: AssetImage('assets/login_line.png')),
-                      )
-                    ]),
+                    ),
+                    Container(
+                      child: Image(image: AssetImage('assets/login_line.png')),
+                    )
+                  ]),
+            ),
+            GestureDetector(
+              onTap: () {
+                authenticateFaceID();
+              },
+              child: Center(
+                child: Image(image: AssetImage('assets/face_id_icon.png')),
               ),
-              GestureDetector(
-                onTap: () {
-                  authenticateFaceID();
-                },
-                child: Center(
-                  child: Image(image: AssetImage('assets/face_id_icon.png')),
-                ),
-              )
-            ]),
-          ),
+            )
+          ]),
         );
       }),
     );

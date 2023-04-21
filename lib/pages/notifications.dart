@@ -1,6 +1,7 @@
 import 'package:dio/dio.dart';
 import 'package:gigX/api.dart';
 import 'package:gigX/colors.dart';
+import 'package:gigX/constant/constants.dart';
 import 'package:gigX/login.dart';
 import 'package:gigX/utils/notification_service.dart';
 import 'package:flutter/material.dart';
@@ -234,85 +235,170 @@ class _NotificationTabPageState extends State<NotificationTabPage> {
     height = MediaQuery.of(context).size.height;
     width = MediaQuery.of(context).size.width;
     return Scaffold(
+      backgroundColor: whiteColor,
       resizeToAvoidBottomInset: false,
+      appBar: AppBar(
+        backgroundColor: Colors.white,
+        centerTitle: true,
+        elevation: 0,
+        
+        
+        title: Column(
+          children: [
+            is_search_visible == true
+                ? Container(
+                    // padding: EdgeInsets.only(
+                    //     left: 30, right: 30, top: 40, bottom: 10),
+                    padding: EdgeInsets.symmetric(horizontal: 20),
+                    // margin: EdgeInsets.only(top: 40.0),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: <Widget>[
+                        Container(
+                          // padding: EdgeInsets.all(50.0),
+
+                          child: Text(
+                            'Notifications',
+                            style: kkBoldTextStyle().copyWith(
+                                fontSize: 20, color: Colors.grey[800]),
+                          ),
+                        ),
+                        GestureDetector(
+                          onTap: () {
+                            if (this.mounted)
+                              setState(() {
+                                if (is_search_visible == true)
+                                  setState(() {
+                                    is_search_visible = false;
+                                  });
+                              });
+                          },
+                          child: Container(
+                            child: Image(
+                                image: AssetImage('assets/icon_search.png')),
+                          ),
+                        )
+                      ],
+                    ),
+                  )
+                : Container(
+                    // padding: EdgeInsets.all(40.0),
+                    // margin: EdgeInsets.only(top: 20.0),
+                    padding: EdgeInsets.symmetric(horizontal: 20),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        Expanded(
+                          child: TextField(
+                            decoration:
+                                InputDecoration(hintText: 'Search here'),
+                            onChanged: (value) {
+                              if (this.mounted)
+                                setState(() {
+                                  search_query = value.toString();
+                                  getNotificationsFromSearch(search_query);
+                                });
+                            },
+                          ),
+                        ),
+                        GestureDetector(
+                          onTap: () {
+                            if (this.mounted)
+                              setState(() {
+                                is_search_visible = true;
+                              });
+                            print(search_query);
+                          },
+                          child: Container(
+                            child: Image(
+                                image: AssetImage('assets/icon_search.png')),
+                          ),
+                        )
+                      ],
+                    ),
+                  ),
+          ],
+        ),
+      ),
       body: OrientationBuilder(builder: (context, orientation) {
         return SingleChildScrollView(
           child: Container(
             height: orientation == Orientation.portrait ? height : height * 2.0,
             width: width,
             child: Column(children: [
-              is_search_visible == true
-                  ? Container(
-                      padding: EdgeInsets.all(40.0),
-                      margin: EdgeInsets.only(top: 40.0),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: <Widget>[
-                          Container(
-                              // padding: EdgeInsets.all(50.0),
+              // is_search_visible == true
+              //     ? Container(
+              //         padding: EdgeInsets.all(40.0),
+              //         margin: EdgeInsets.only(top: 40.0),
+              //         child: Row(
+              //           mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              //           children: <Widget>[
+              //             Container(
+              //                 // padding: EdgeInsets.all(50.0),
 
-                              child: Text(
-                            'Messages',
-                            style: TextStyle(
-                                fontWeight: FontWeight.w600,
-                                fontSize: 20.0,
-                                color: Colors.black),
-                          )),
-                          GestureDetector(
-                            onTap: () {
-                              if (this.mounted)
-                                setState(() {
-                                  if (is_search_visible == true)
-                                    setState(() {
-                                      is_search_visible = false;
-                                    });
-                                });
-                            },
-                            child: Container(
-                              child: Image(
-                                  image: AssetImage('assets/icon_search.png')),
-                            ),
-                          )
-                        ],
-                      ),
-                    )
-                  : Container(
-                      padding: EdgeInsets.all(40.0),
-                      margin: EdgeInsets.only(top: 40.0),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: [
-                          SizedBox(
-                            width: width * 0.7,
-                            height: 60,
-                            child: TextField(
-                              decoration:
-                                  InputDecoration(hintText: 'Search here'),
-                              onChanged: (value) {
-                                if (this.mounted)
-                                  setState(() {
-                                    search_query = value.toString();
-                                    getNotificationsFromSearch(search_query);
-                                  });
-                              },
-                            ),
-                          ),
-                          GestureDetector(
-                            onTap: () {
-                              if (this.mounted)
-                                setState(() {
-                                  is_search_visible = true;
-                                });
-                            },
-                            child: Container(
-                              child: Image(
-                                  image: AssetImage('assets/icon_search.png')),
-                            ),
-                          )
-                        ],
-                      ),
-                    ),
+              //                 child: Text(
+              //               'Messages',
+              //               style: TextStyle(
+              //                   fontWeight: FontWeight.w600,
+              //                   fontSize: 20.0,
+              //                   color: Colors.black),
+              //             )),
+              //             GestureDetector(
+              //               onTap: () {
+              //                 if (this.mounted)
+              //                   setState(() {
+              //                     if (is_search_visible == true)
+              //                       setState(() {
+              //                         is_search_visible = false;
+              //                       });
+              //                   });
+              //               },
+              //               child: Container(
+              //                 child: Image(
+              //                     image: AssetImage('assets/icon_search.png')),
+              //               ),
+              //             )
+              //           ],
+              //         ),
+              //       )
+              //     : Container(
+              //         padding: EdgeInsets.all(40.0),
+              //         margin: EdgeInsets.only(top: 40.0),
+              //         child: Row(
+              //           mainAxisAlignment: MainAxisAlignment.start,
+              //           crossAxisAlignment: CrossAxisAlignment.center,
+              //           children: [
+              //             SizedBox(
+              //               width: width * 0.7,
+              //               height: 60,
+              //               child: TextField(
+              //                 decoration:
+              //                     InputDecoration(hintText: 'Search here'),
+              //                 onChanged: (value) {
+              //                   if (this.mounted)
+              //                     setState(() {
+              //                       search_query = value.toString();
+              //                       getNotificationsFromSearch(search_query);
+              //                     });
+              //                 },
+              //               ),
+              //             ),
+              //             GestureDetector(
+              //               onTap: () {
+              //                 if (this.mounted)
+              //                   setState(() {
+              //                     is_search_visible = true;
+              //                   });
+              //               },
+              //               child: Container(
+              //                 child: Image(
+              //                     image: AssetImage('assets/icon_search.png')),
+              //               ),
+              //             )
+              //           ],
+              //         ),
+              //       ),
               if (notifications.isNotEmpty)
                 Container(
                   height: orientation == Orientation.portrait

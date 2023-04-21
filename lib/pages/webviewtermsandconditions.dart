@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'package:gigX/colors.dart';
+import 'package:gigX/constant/constants.dart';
 import 'package:gigX/home.dart';
 import 'package:flutter/material.dart';
 import 'package:webview_flutter/webview_flutter.dart';
@@ -22,15 +23,20 @@ class TermsConditionsState extends State<TermsConditions> {
     return WillPopScope(
       onWillPop: () async => false,
       child: Scaffold(
+        backgroundColor: whiteColor,
         appBar: AppBar(
-          title: Text('Terms & Conditions'),
+          
+          iconTheme: IconThemeData(color: Colors.grey[800]),
+          actionsIconTheme: IconThemeData(color: Colors.grey[800]),
+          title: Text('Terms & Conditions', style: kkBoldTextStyle().copyWith(fontSize: 20, color: Colors.grey[800]),),
           centerTitle: true,
-          backgroundColor: ColorsTheme.btnColor,
+          backgroundColor: whiteColor,
+          elevation: 0,
           actions: <Widget>[
             IconButton(
               icon: Icon(
                 Icons.refresh,
-                color: Colors.white,
+                // color: Colors.white,
               ),
               onPressed: () {
                 Navigator.pushReplacement(
@@ -53,18 +59,18 @@ class TermsConditionsState extends State<TermsConditions> {
                 ),
                 (_) => false,
               );
-              // BottomNavigationBar navigationBar =
-              //     bottomWidgetKey.currentWidget as BottomNavigationBar;
-              // navigationBar.onTap!(2);
+              BottomNavigationBar navigationBar =
+                  bottomWidgetKey.currentWidget as BottomNavigationBar;
+              navigationBar.onTap!(3);
             },
             child: Icon(
               Icons.arrow_back,
-              color: Colors.white,
+              // color: Colors.white,
             ),
           ),
         ),
         body: WebView(
-          initialUrl: 'https://efleetpass.com.au/terms-and-conditions',
+          initialUrl: 'https://gigxcoin.net/terms-conditions',
         ),
       ),
     );

@@ -38,32 +38,35 @@ class ChatScreen extends StatelessWidget {
               ],
             ),
             LSizedBox(),
-            Row(
-              children: [
-                StatusTile(
-                  state: state,
-                  title: 'Chats',
-                  onPressed: () {
-                    state.onSelectedStatusChanged('Chats');
-                  },
-                ),
-                largeWidthSpan(),
-                StatusTile(
-                  state: state,
-                  title: 'Calls',
-                  onPressed: () {
-                    state.onSelectedStatusChanged('Calls');
-                  },
-                ),
-                largeWidthSpan(),
-                StatusTile(
-                  state: state,
-                  title: 'Contacts',
-                  onPressed: () {
-                    state.onSelectedStatusChanged('Chats');
-                  },
-                ),
-              ],
+            SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              child: Row(
+                children: [
+                  StatusTile(
+                    state: state,
+                    title: 'Chats',
+                    onPressed: () {
+                      state.onSelectedStatusChanged('Chats');
+                    },
+                  ),
+                  largeWidthSpan(),
+                  StatusTile(
+                    state: state,
+                    title: 'Calls',
+                    onPressed: () {
+                      state.onSelectedStatusChanged('Calls');
+                    },
+                  ),
+                  largeWidthSpan(),
+                  StatusTile(
+                    state: state,
+                    title: 'Contacts',
+                    onPressed: () {
+                      state.onSelectedStatusChanged('Chats');
+                    },
+                  ),
+                ],
+              ),
             ),
             kSizedBox(),
             ChatTile(),

@@ -20,7 +20,8 @@ import 'package:syncfusion_flutter_calendar/calendar.dart';
 import 'package:intl/intl.dart';
 import 'package:syncfusion_flutter_sliders/sliders.dart';
 
-import 'time_box.dart';
+import 'timebox_module/time_box.dart';
+import 'timebox_module/time_box_state.dart';
 
 class TaskTab extends StatelessWidget {
   const TaskTab({super.key});
@@ -2479,19 +2480,56 @@ class _TaskTabPageState extends State<TaskTabPage> {
     return Scaffold(
       backgroundColor: Colors.white,
       resizeToAvoidBottomInset: false,
+      appBar: AppBar(
+        backgroundColor: whiteColor,
+        title: Text('Calendar', style: kkBoldTextStyle().copyWith(color: darkGrey, fontSize: 20),),
+        centerTitle: false,
+        elevation: 0,
+      ),
       body: OrientationBuilder(builder: (context, orientation) {
         return SingleChildScrollView(
             child: Container(
           child: Column(
             children: [
+              // Container(
+              //     padding: EdgeInsets.all(40.0),
+              //     margin: EdgeInsets.only(top: 40.0),
+              //     child: AutoSizeText(
+              //       'Tasks',
+              //       style:
+              //           TextStyle(fontWeight: FontWeight.w600, fontSize: 20.0),
+              //     )),
               Container(
-                  padding: EdgeInsets.all(40.0),
-                  margin: EdgeInsets.only(top: 40.0),
-                  child: AutoSizeText(
-                    'Tasks',
-                    style:
-                        TextStyle(fontWeight: FontWeight.w600, fontSize: 20.0),
-                  )),
+                padding: kStandardPadding(),
+                child: Row(
+
+                  children: [
+                    Row(
+                      children: [
+                        CircleAvatar(
+                          backgroundColor: successColor,
+                          radius: 10,
+                        ),
+                        minWidthSpan(),
+                        Text('Completed',)
+                      ],
+                    ),
+                    largeWidthSpan(),
+                    Row(
+                      children: [
+                        CircleAvatar(
+                          backgroundColor: errorColor,
+                          radius: 10,
+                        ),
+                        minWidthSpan(),
+                        Text('Incomplete',)
+                      ],
+                    ),
+
+
+                  ],
+                ),
+              ),
               Container(
                 width: width,
                 // height: height * 1.9,
@@ -2511,13 +2549,12 @@ class _TaskTabPageState extends State<TaskTabPage> {
                       //   if (onDateSelected.hasEvent)
                       //     getSelectedTasks(onDateSelected.selectedDate);
                       // }
-                      print('Date ho: ${onDateSelected.selectedDate}');
-                      print('kuri kuri puppy shame');
+                     
                       Navigator.pushNamed(context, '/singleTask',
                           arguments: onDateSelected.selectedDate);
                     },
                     cbConfig: CbConfig(
-                        startDate: DateTime(2020),
+                        startDate: DateTime(2000),
                         endDate: DateTime(2123),
                         selectedDate: DateTime.now(),
                         selectedYear: DateTime(DateTime.now().year),
@@ -2537,7 +2574,7 @@ class _TaskTabPageState extends State<TaskTabPage> {
                           selectedYear, year) {
                         return Container(
                           height: 40,
-                          color: ColorsTheme.uIUxColor,
+                          color: whiteColor,
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.center,
                             crossAxisAlignment: CrossAxisAlignment.center,
@@ -2558,6 +2595,7 @@ class _TaskTabPageState extends State<TaskTabPage> {
                     monthCustomizer: MonthCustomizer(
                       montMinhHeight: 200,
                       monthMinWidth: 450,
+                      
                       padding: const EdgeInsets.all(20),
                       monthHeaderBuilder:
                           (month, headerHeight, headerWidth, paddingLeft,) {
@@ -2823,7 +2861,9 @@ class _TaskTabPageState extends State<TaskTabPage> {
             // child: const Icon(Icons.edit),
             onPressed: () {
               Navigator.push(context,
-                  MaterialPageRoute(builder: (context) => TimeBoxPage()));
+                  MaterialPageRoute(builder: (context) => ChangeNotifierProvider(
+            create: (_) => TimeBoxState(),
+            child: TimeBoxPage())));
             },
           ),
           FloatingActionButton.extended(

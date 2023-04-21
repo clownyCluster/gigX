@@ -3,8 +3,10 @@ import 'dart:io';
 
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:dio/dio.dart';
+import 'package:flutter/services.dart';
 import 'package:gigX/api.dart';
 import 'package:gigX/colors.dart';
+import 'package:gigX/constant/constants.dart';
 import 'package:gigX/home.dart';
 import 'package:gigX/login.dart';
 import 'package:gigX/pages/projectdetails.dart';
@@ -458,9 +460,9 @@ class _HomeTabPageState extends State<HomeTabPage> {
               }));
       print(response.data);
       if (response.statusCode == 200) {
-        BottomNavigationBar navigationBar =
-            bottomWidgetKey.currentWidget as BottomNavigationBar;
-        navigationBar.onTap!(2);
+        // BottomNavigationBar navigationBar =
+        //     bottomWidgetKey.currentWidget as BottomNavigationBar;
+        // navigationBar.onTap!(2);
       }
     } on DioError catch (e) {
       print(e);
@@ -733,8 +735,11 @@ class _HomeTabPageState extends State<HomeTabPage> {
 
                                   setState(() {
                                     duration_selected = true;
+                                    print(formatted_end_date);
                                   });
                                 }).showPicker(context);
+                            print(formatted_end_date);
+                            print(formatted_start_date);
                           },
                           child: Container(
                             padding: EdgeInsets.only(right: 20.0),
@@ -744,7 +749,7 @@ class _HomeTabPageState extends State<HomeTabPage> {
                           ),
                         ),
                         duration_selected
-                            ? AutoSizeText('Duration Selected')
+                            ? AutoSizeText(formatted_end_date!)
                             : AutoSizeText('Select Duration')
                       ],
                     ),
@@ -836,153 +841,273 @@ class _HomeTabPageState extends State<HomeTabPage> {
         FocusScope.of(context).unfocus();
       },
       child: Scaffold(
-        resizeToAvoidBottomInset: false,
-        body: OrientationBuilder(builder: (context, orientation) {
-          return SingleChildScrollView(
-            child: Container(
-              height: orientation == Orientation.portrait
-                  ? height * 0.9
-                  : height * 2.6,
-              width: width,
-              child: Column(children: <Widget>[
-                is_search_visible == true
-                    ? Container(
-                        padding: EdgeInsets.all(40.0),
-                        margin: EdgeInsets.only(top: 40.0),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: <Widget>[
-                            Container(
-                              // padding: EdgeInsets.all(50.0),
+        backgroundColor: whiteColor,
+        appBar: AppBar(
+          backgroundColor: Colors.white,
+          centerTitle: false,
+          elevation: 0,
+          // title: Column(
+          //   children: [
+          //     Text(
+          //       'MFA Projects',
+          //       style:
+          //           kkBoldTextStyle().copyWith(fontSize: 24, color: darkGrey),
+          //     ),
+          //     Text(
+          //       '${projects.length} Projects',
+          //       style: kkTextStyle().copyWith(color: Colors.grey),
+          //     ),
+          //   ],
+          // ),
+          // actions: [
+          //   GestureDetector(
+          //     onTap: () {
+          //       if (this.mounted)
+          //         setState(() {
+          //           if (is_search_visible == true)
+          //             setState(() {
+          //               is_search_visible = false;
+          //             });
+          //         });
+          //     },
+          //     child: Container(
+          //       child: Image(image: AssetImage('assets/icon_search.png')),
+          //     ),
+          //   )
+          // ],
+          title: Column(
+            children: [
+              is_search_visible == true
+                  ? Container(
+                      // padding: EdgeInsets.only(
+                      //     left: 30, right: 30, top: 40, bottom: 10),
+                      padding: EdgeInsets.symmetric(horizontal: 20),
+                      // margin: EdgeInsets.only(top: 40.0),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: <Widget>[
+                          Container(
+                            // padding: EdgeInsets.all(50.0),
 
-                              child: new RichText(
-                                  text: new TextSpan(children: [
-                                new TextSpan(
-                                    text: 'MFA Projects \n',
-                                    style: TextStyle(
-                                        color: Colors.black,
-                                        fontSize: 20.0,
-                                        fontWeight: FontWeight.w600)),
-                                new TextSpan(
-                                    text: '${projects.length} Projects',
-                                    style: TextStyle(
-                                        color: ColorsTheme.txtDescColor))
-                              ])),
-                            ),
-                            GestureDetector(
-                              onTap: () {
-                                if (this.mounted)
-                                  setState(() {
-                                    if (is_search_visible == true)
-                                      setState(() {
-                                        is_search_visible = false;
-                                      });
-                                  });
-                              },
-                              child: Container(
-                                child: Image(
-                                    image:
-                                        AssetImage('assets/icon_search.png')),
-                              ),
-                            )
-                          ],
-                        ),
-                      )
-                    : Container(
-                        padding: EdgeInsets.all(40.0),
-                        margin: EdgeInsets.only(top: 40.0),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          children: [
-                            SizedBox(
-                              width: width * 0.7,
-                              height: 60,
-                              child: TextField(
-                                decoration:
-                                    InputDecoration(hintText: 'Search here'),
-                                onChanged: (value) {
-                                  if (this.mounted)
+                            child: new RichText(
+                                text: new TextSpan(children: [
+                              new TextSpan(
+                                  text: 'MFA Projects \n',
+                                  style: TextStyle(
+                                      color: Colors.black,
+                                      fontSize: 20.0,
+                                      fontWeight: FontWeight.w600)),
+                              new TextSpan(
+                                  text: '${projects.length} Projects',
+                                  style: TextStyle(
+                                      color: ColorsTheme.txtDescColor))
+                            ])),
+                          ),
+                          GestureDetector(
+                            onTap: () {
+                              if (this.mounted)
+                                setState(() {
+                                  if (is_search_visible == true)
                                     setState(() {
-                                      search_query = value.toString();
-                                      getProjectsFromSearch(search_query);
+                                      is_search_visible = false;
                                     });
-                                },
-                              ),
+                                });
+                            },
+                            child: Container(
+                              child: Image(
+                                  image: AssetImage('assets/icon_search.png')),
                             ),
-                            GestureDetector(
-                              onTap: () {
+                          )
+                        ],
+                      ),
+                    )
+                  : Container(
+                      // padding: EdgeInsets.all(40.0),
+                      // margin: EdgeInsets.only(top: 20.0),
+                      padding: EdgeInsets.symmetric(horizontal: 20),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          Expanded(
+                            child: TextField(
+                              decoration:
+                                  InputDecoration(hintText: 'Search here'),
+                              onChanged: (value) {
                                 if (this.mounted)
                                   setState(() {
-                                    is_search_visible = true;
+                                    search_query = value.toString();
+                                    getProjectsFromSearch(search_query);
                                   });
-                                print(search_query);
                               },
-                              child: Container(
-                                child: Image(
-                                    image:
-                                        AssetImage('assets/icon_search.png')),
-                              ),
-                            )
-                          ],
-                        ),
+                            ),
+                          ),
+                          GestureDetector(
+                            onTap: () {
+                              if (this.mounted)
+                                setState(() {
+                                  is_search_visible = true;
+                                });
+                              print(search_query);
+                            },
+                            child: Container(
+                              child: Image(
+                                  image: AssetImage('assets/icon_search.png')),
+                            ),
+                          )
+                        ],
                       ),
-                if (projects.isNotEmpty)
-                  Container(
-                    padding: EdgeInsets.all(10.0),
-                    height: height * 0.6,
-                    child: LazyLoadScrollView(
-                      onEndOfPage: () => show_loading(),
-                      child: MediaQuery.removePadding(
-                        context: context,
-                        removeTop: true,
-                        child: ListView.builder(
-                            controller: controller,
-                            itemCount: list.length < projects.length
-                                ? list.length + 1
-                                : projects.length,
-                            shrinkWrap: true,
-                            itemExtent: 120.0,
-                            itemBuilder: (BuildContext context, index) {
-                              if (index == list.length && _is_loading == true)
-                                return Center(
-                                    child: CircularProgressIndicator(
-                                  color: ColorsTheme.btnColor,
-                                ));
-                              return GestureDetector(
-                                onTap: () async {
-                                  this.preferences =
-                                      await SharedPreferences.getInstance();
-                                  this.preferences?.setInt(
-                                      'project_id', projects[index]['id']);
-                                  this.preferences?.setString(
-                                      'logo_url', projects[index]['logo_url']);
-                                  this.preferences?.setString('project_title',
-                                      projects[index]['title']);
+                    ),
+            ],
+          ),
+        ),
 
-                                  Navigator.of(context).push(MaterialPageRoute(
-                                      builder: (context) => ProjectDetails()));
-                                },
-                                child: ListTile(
-                                  title: Container(
-                                    height: 100.0,
-                                    width: width * 0.85,
-                                    decoration: BoxDecoration(
-                                        borderRadius:
-                                            BorderRadius.circular(14.0),
-                                        border: Border.all(
-                                            color: Color(0xffEBEBEB),
-                                            width: 2.0)),
+        resizeToAvoidBottomInset: false,
+        body: SingleChildScrollView(
+          child: Container(
+            // height: orientation == Orientation.portrait
+            //     ? height * 0.9
+            //     : height * 2.6,
+            width: width,
+            child: Column(children: <Widget>[
+              // is_search_visible == true
+              //     ? Container(
+              //         padding: EdgeInsets.only(
+              //             left: 30, right: 30, top: 40, bottom: 10),
+              //         margin: EdgeInsets.only(top: 40.0),
+              //         child: Row(
+              //           mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              //           children: <Widget>[
+              //             Container(
+              //               // padding: EdgeInsets.all(50.0),
+
+              //               child: new RichText(
+              //                   text: new TextSpan(children: [
+              //                 new TextSpan(
+              //                     text: 'MFA Projects \n',
+              //                     style: TextStyle(
+              //                         color: Colors.black,
+              //                         fontSize: 20.0,
+              //                         fontWeight: FontWeight.w600)),
+              //                 new TextSpan(
+              //                     text: '${projects.length} Projects',
+              //                     style: TextStyle(
+              //                         color: ColorsTheme.txtDescColor))
+              //               ])),
+              //             ),
+              //             GestureDetector(
+              //               onTap: () {
+              //                 if (this.mounted)
+              //                   setState(() {
+              //                     if (is_search_visible == true)
+              //                       setState(() {
+              //                         is_search_visible = false;
+              //                       });
+              //                   });
+              //               },
+              //               child: Container(
+              //                 child: Image(
+              //                     image:
+              //                         AssetImage('assets/icon_search.png')),
+              //               ),
+              //             )
+              //           ],
+              //         ),
+              //       )
+              //     : Container(
+              //         padding: EdgeInsets.all(40.0),
+              //         margin: EdgeInsets.only(top: 20.0),
+              //         child: Row(
+              //           mainAxisAlignment: MainAxisAlignment.start,
+              //           crossAxisAlignment: CrossAxisAlignment.center,
+              //           children: [
+              //             SizedBox(
+              //               width: width * 0.7,
+              //               height: 60,
+              //               child: TextField(
+              //                 decoration:
+              //                     InputDecoration(hintText: 'Search here'),
+              //                 onChanged: (value) {
+              //                   if (this.mounted)
+              //                     setState(() {
+              //                       search_query = value.toString();
+              //                       getProjectsFromSearch(search_query);
+              //                     });
+              //                 },
+              //               ),
+              //             ),
+              //             GestureDetector(
+              //               onTap: () {
+              //                 if (this.mounted)
+              //                   setState(() {
+              //                     is_search_visible = true;
+              //                   });
+              //                 print(search_query);
+              //               },
+              //               child: Container(
+              //                 child: Image(
+              //                     image:
+              //                         AssetImage('assets/icon_search.png')),
+              //               ),
+              //             )
+              //           ],
+              //         ),
+              //       ),
+              if (projects.isNotEmpty)
+                Container(
+                  padding: EdgeInsets.all(10.0),
+                  height: height,
+                  child: ListView.builder(
+                      // controller: controller,
+                      itemCount: projects.length,
+                      // shrinkWrap: true,
+                      // itemExtent: 105.0,
+                      itemBuilder: (BuildContext context, index) {
+                        if (index == list.length && _is_loading == true)
+                          return Center(
+                              child: CircularProgressIndicator(
+                            color: ColorsTheme.btnColor,
+                          ));
+                        return GestureDetector(
+                          onTap: () async {
+                            this.preferences =
+                                await SharedPreferences.getInstance();
+                            this
+                                .preferences
+                                ?.setInt('project_id', projects[index]['id']);
+                            this.preferences?.setString(
+                                'logo_url', projects[index]['logo_url']);
+                            this.preferences?.setString(
+                                'project_title', projects[index]['title']);
+
+                            Navigator.of(context).push(MaterialPageRoute(
+                                builder: (context) => ProjectDetails()));
+                          },
+                          child: ListTile(
+                            title: Container(
+                              padding: EdgeInsets.only(right: 20),
+                              // height: 90.0,
+                              width: double.infinity,
+                              // width: width * 0.85,
+                              decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(20.0),
+                                  border: Border.all(
+                                      color: Color.fromARGB(255, 207, 205, 205),
+                                      width: 1.0)),
+                              child: Row(
+                                // crossAxisAlignment:
+                                //     CrossAxisAlignment.center,
+                                // mainAxisAlignment:
+                                //     MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Expanded(
                                     child: Row(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.center,
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.start,
                                       children: [
                                         Container(
-                                          padding: EdgeInsets.all(10.0),
+                                          padding: EdgeInsets.symmetric(
+                                              horizontal: 10),
                                           width: 60,
-                                          height: 60,
+                                          height: 40,
                                           child: projects[index]['logo_url'] ==
                                                   ''
                                               ? Image.asset(
@@ -992,94 +1117,108 @@ class _HomeTabPageState extends State<HomeTabPage> {
                                                   fit: BoxFit.fill,
                                                 ),
                                         ),
-                                        Container(
-                                          padding: EdgeInsets.all(10.0),
-                                          margin: EdgeInsets.only(top: 15.0),
-                                          width: width * 0.4,
-                                          child: Column(
-                                              crossAxisAlignment:
-                                                  CrossAxisAlignment.start,
-                                              children: [
-                                                AutoSizeText(
-                                                  projects[index]['title'],
-                                                  maxLines: 1,
-                                                  style: TextStyle(
-                                                      color: Colors.black,
-                                                      fontSize: 18.0),
-                                                ),
-                                                AutoSizeText(
-                                                  projects[index]
-                                                      ['description'],
-                                                  maxLines: 1,
-                                                  overflow:
-                                                      TextOverflow.ellipsis,
-                                                  style: TextStyle(
-                                                      color: Colors.black,
-                                                      fontSize: 12.0),
-                                                ),
-                                              ]),
-                                        ),
-                                        SizedBox(
-                                          width: orientation ==
-                                                  Orientation.portrait
-                                              ? width * 0.18
-                                              : width * 0.3,
-                                        ),
-                                        GestureDetector(
-                                          onTap: () {},
-                                          child: Image(
-                                            image: AssetImage(
-                                                'assets/arrow_details.png'),
+                                        Expanded(
+                                          child: Container(
+                                            padding: EdgeInsets.all(10.0),
+                                            margin: EdgeInsets.only(top: 15.0),
+                                            width: width * 0.4,
+                                            // width: double.infinity,
+                                            child: Column(
+                                                crossAxisAlignment:
+                                                    CrossAxisAlignment.start,
+                                                children: [
+                                                  Text(
+                                                    projects[index]['title'],
+                                                    maxLines: 1,
+                                                    style: kkBoldTextStyle()
+                                                        .copyWith(fontSize: 20),
+                                                    overflow:
+                                                        TextOverflow.ellipsis,
+                                                  ),
+                                                  AutoSizeText(
+                                                    projects[index]
+                                                        ['description'],
+                                                    maxLines: 1,
+                                                    overflow:
+                                                        TextOverflow.ellipsis,
+                                                    style: TextStyle(
+                                                        color: Colors.black,
+                                                        fontSize: 12.0),
+                                                  ),
+                                                ]),
                                           ),
-                                        )
+                                        ),
                                       ],
                                     ),
                                   ),
-                                ),
-                              );
-                            }),
-                      ),
-                    ),
+                                  maxWidthSpan(),
+                                  // SizedBox(
+                                  //   width: orientation ==
+                                  //           Orientation.portrait
+                                  //       ? width * 0.18
+                                  //       : width * 0.3,
+                                  // ),
+                                  InkWell(
+                                    onTap: () {},
+                                    child: Image(
+                                      image: AssetImage(
+                                          'assets/arrow_details.png'),
+                                    ),
+                                  )
+                                ],
+                              ),
+                            ),
+                          ),
+                        );
+                      }),
+                ),
+
+              if (_is_loading == true && projects.isEmpty)
+                Container(
+                  alignment: Alignment.bottomCenter,
+                  margin: EdgeInsets.only(top: height * 0.3),
+                  // margin: EdgeInsets.only(to),
+                  child: CircularProgressIndicator(
+                    valueColor:
+                        AlwaysStoppedAnimation<Color>(ColorsTheme.btnColor),
                   ),
-                if (_is_loading == true && projects.isEmpty)
-                  Container(
-                    alignment: Alignment.bottomCenter,
-                    margin: EdgeInsets.only(top: height * 0.3),
-                    // margin: EdgeInsets.only(to),
-                    child: CircularProgressIndicator(
-                      valueColor:
-                          AlwaysStoppedAnimation<Color>(ColorsTheme.btnColor),
-                    ),
+                ),
+              if (_is_loading == false && projects.length == 0)
+                Container(
+                  alignment: Alignment.bottomCenter,
+                  margin: EdgeInsets.only(top: height * 0.3),
+                  // margin: EdgeInsets.only(to),
+                  child: Text(
+                    'No Project Found',
                   ),
-                if (_is_loading == false && projects.length == 0)
-                  Container(
-                    alignment: Alignment.bottomCenter,
-                    margin: EdgeInsets.only(top: height * 0.3),
-                    // margin: EdgeInsets.only(to),
-                    child: Text(
-                      'No Project Found',
-                    ),
-                  ),
-              ]),
-            ),
-          );
-        }),
-        floatingActionButton: Visibility(
-          visible: !keyboardVisible,
-          child: GestureDetector(
-            onTap: () {
-              _addProjectModalBottomSheet(context);
-            },
-            child: Container(
-              // margin: EdgeInsets.only(bottom: 40.0),
-              height: 100,
-              width: 100,
-              decoration: BoxDecoration(
-                  image: DecorationImage(
-                      image: AssetImage('assets/tasks_floating_button.png'))),
-            ),
+                ),
+            ]),
           ),
         ),
+
+        // floatingActionButton: Visibility(
+        //   visible: !keyboardVisible,
+        //   child: GestureDetector(
+        //     onTap: () {
+        //       _addProjectModalBottomSheet(context);
+        //     },
+        //     child: Container(
+        //       // margin: EdgeInsets.only(bottom: 40.0),
+        //       height: 100,
+        //       width: 100,
+        //       decoration: BoxDecoration(
+        //           image: DecorationImage(
+        //               image: AssetImage('assets/tasks_floating_button.png'))),
+        //     ),
+        //   ),
+        // ),
+        floatingActionButtonLocation: FloatingActionButtonLocation.endDocked,
+        floatingActionButton: FloatingActionButton(
+            backgroundColor: blueColor,
+            child: Image.asset('assets/add_project.png'),
+            onPressed: () {
+              _addProjectModalBottomSheet(context);
+            }),
       ),
     );
   }

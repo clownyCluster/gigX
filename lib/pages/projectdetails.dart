@@ -4,6 +4,7 @@ import 'package:dio/dio.dart';
 import 'package:flutter_expandable_fab/flutter_expandable_fab.dart';
 import 'package:gigX/api.dart';
 import 'package:gigX/colors.dart';
+import 'package:gigX/constant/constants.dart';
 import 'package:gigX/home.dart';
 import 'package:gigX/login.dart';
 import 'package:gigX/pages/home.dart';
@@ -12,13 +13,16 @@ import 'package:f_datetimerangepicker/f_datetimerangepicker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-import 'package:gigX/pages/time_box.dart';
+import 'package:gigX/pages/timebox_module/time_box.dart';
 import 'package:intl/intl.dart';
 import 'package:flutter/src/widgets/container.dart';
 import 'package:flutter/src/widgets/framework.dart';
 import 'package:lazy_load_scrollview/lazy_load_scrollview.dart';
+import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:syncfusion_flutter_sliders/sliders.dart';
+
+import 'timebox_module/time_box_state.dart';
 
 class ProjectDetails extends StatelessWidget {
   const ProjectDetails({super.key});
@@ -59,7 +63,7 @@ String start_date = "";
 String end_date = "";
 String? project_title = "";
 String formatted_start_date = "";
-String formatted_end_date = "";
+String? formatted_end_date;
 String? access_token;
 int? selected_project_id = 0;
 bool is_loading = false;
@@ -203,6 +207,7 @@ class _ProjectDetailsPageState extends State<ProjectDetailsPage> {
     _addTaskModalBottomSheet(context);
   }
 
+  String? selectedProject;
   int? selectedIndex;
   Widget setupSelectProjectDialog() {
     return Container(
@@ -216,10 +221,12 @@ class _ProjectDetailsPageState extends State<ProjectDetailsPage> {
           itemBuilder: (BuildContext context, int index) {
             return InkWell(
               onTap: () {
-                print(projects[index]['id']);
+                print(projects);
                 setState(() {
                   selectedIndex = index;
                   project_id = projects[index]['id'];
+                  selectedProject = projects[index]['title'];
+                  print(selectedProject);
                 });
                 Navigator.of(context).pop();
                 Navigator.of(context).pop();
@@ -244,6 +251,8 @@ class _ProjectDetailsPageState extends State<ProjectDetailsPage> {
     );
   }
 
+  String? selectedName;
+
   int? selectedIndex2;
   Widget setupSelectUserDialog() {
     return Container(
@@ -255,12 +264,16 @@ class _ProjectDetailsPageState extends State<ProjectDetailsPage> {
           shrinkWrap: true,
           itemCount: users.length,
           itemBuilder: (BuildContext context, int index) {
+            // print(users);
             return InkWell(
               onTap: () {
                 print(users[index]['id']);
+                print(users[index]['username']);
+
                 setState(() {
                   selectedIndex2 = index;
                   user_id = users[index]['id'];
+                  selectedName = users[index]['username'];
                 });
                 Navigator.of(context).pop();
                 Navigator.of(context).pop();
@@ -300,6 +313,7 @@ class _ProjectDetailsPageState extends State<ProjectDetailsPage> {
           API.base_url + 'todos/$selected_project_id/0',
           options: Options(headers: {"authorization": "Bearer $access_token"}));
       Map result = response.data;
+      print('task ho yo : $tasks');
 
       if (response.statusCode == 200) {
         this.preferences?.setBool('someoneLoggedIn', false);
@@ -487,7 +501,7 @@ class _ProjectDetailsPageState extends State<ProjectDetailsPage> {
                           ),
                         ),
                         selectedIndex != null
-                            ? AutoSizeText('Project Selected')
+                            ? AutoSizeText(selectedProject!)
                             : AutoSizeText('Add Project')
                       ],
                     ),
@@ -495,63 +509,69 @@ class _ProjectDetailsPageState extends State<ProjectDetailsPage> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Container(
-                        margin: EdgeInsets.only(
-                            top: 20.0, left: 5.0, bottom: 20.0, right: 5.0),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          children: [
-                            InkWell(
-                              onTap: () {
-                                showDialog(
-                                  context: context,
-                                  builder: (BuildContext context) {
-                                    return StatefulBuilder(
-                                      builder: (BuildContext context,
-                                          StateSetter setState) {
-                                        return AlertDialog(
-                                          content: Column(
-                                            mainAxisSize: MainAxisSize.min,
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.start,
-                                            children: [
-                                              Text(
-                                                'Please select a user.',
-                                                style: TextStyle(
-                                                    color: Colors.black,
-                                                    fontWeight:
-                                                        FontWeight.w700),
-                                              ),
-                                              setupSelectUserDialog(),
-                                            ],
-                                          ),
-                                          actions: <Widget>[
-                                            // usually buttons at the bottom of the dialog
-                                            new TextButton(
-                                              child: new Text("Close"),
-                                              onPressed: () {
-                                                Navigator.of(context).pop();
-                                              },
+                      Expanded(
+                        child: Container(
+                          margin: EdgeInsets.only(
+                              top: 20.0, left: 5.0, bottom: 20.0, right: 5.0),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            children: [
+                              InkWell(
+                                onTap: () {
+                                  showDialog(
+                                    context: context,
+                                    builder: (BuildContext context) {
+                                      return StatefulBuilder(
+                                        builder: (BuildContext context,
+                                            StateSetter setState) {
+                                          return AlertDialog(
+                                            content: Column(
+                                              mainAxisSize: MainAxisSize.min,
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
+                                              children: [
+                                                Text(
+                                                  'Please select a user.',
+                                                  style: TextStyle(
+                                                      color: Colors.black,
+                                                      fontWeight:
+                                                          FontWeight.w700),
+                                                ),
+                                                setupSelectUserDialog(),
+                                              ],
                                             ),
-                                          ],
-                                        );
-                                      },
-                                    );
-                                  },
-                                );
-                              },
-                              child: Container(
-                                padding: EdgeInsets.only(right: 20.0),
-                                child: Image(
-                                  image:
-                                      AssetImage('assets/unassigned_icon.png'),
+                                            actions: <Widget>[
+                                              // usually buttons at the bottom of the dialog
+                                              new TextButton(
+                                                child: new Text("Close"),
+                                                onPressed: () {
+                                                  Navigator.of(context).pop();
+                                                },
+                                              ),
+                                            ],
+                                          );
+                                        },
+                                      );
+                                    },
+                                  );
+                                },
+                                child: Container(
+                                  padding: EdgeInsets.only(right: 20.0),
+                                  child: Image(
+                                    image: AssetImage(
+                                        'assets/unassigned_icon.png'),
+                                  ),
                                 ),
                               ),
-                            ),
-                            selectedIndex2 != null
-                                ? AutoSizeText('Assigned')
-                                : AutoSizeText('Unassigned'),
-                          ],
+                              Expanded(
+                                child: AutoSizeText(
+                                    selectedName ?? 'Assign a task'),
+                              ),
+                              // selectedIndex2 == null
+                              //     ? AutoSizeText('Unassigned')
+                              //     : AutoSizeText(selectedName ?? ''),
+                            ],
+                          ),
                         ),
                       ),
                       GestureDetector(
@@ -593,7 +613,9 @@ class _ProjectDetailsPageState extends State<ProjectDetailsPage> {
                                   image: AssetImage('assets/due_date_icon.png'),
                                 ),
                               ),
-                              AutoSizeText('Due Date'),
+                              formatted_end_date == null
+                                  ? AutoSizeText('Due Date')
+                                  : AutoSizeText(formatted_end_date!),
                             ],
                           ),
                         ),
@@ -665,146 +687,134 @@ class _ProjectDetailsPageState extends State<ProjectDetailsPage> {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Container(
-                          width: width * 0.23,
-                          height: 38.0,
-                          child: TextButton(
-                            style: ButtonStyle(
-                              shape: MaterialStateProperty.all(
-                                  RoundedRectangleBorder(
-                                side: BorderSide(
-                                    color: priority_id == 0
-                                        ? Colors.white
-                                        : ColorsTheme.txtDescColor),
-                                borderRadius: BorderRadius.circular(14.0),
-                              )),
-                              foregroundColor:
-                                  MaterialStateProperty.resolveWith<Color>(
-                                      (Set<MaterialState> states) {
-                                if (states.contains(MaterialState.hovered) ||
-                                    states.contains(MaterialState.focused))
-                                  return priority_id == 0
+                        TextButton(
+                          style: ButtonStyle(
+                            shape: MaterialStateProperty.all(
+                                RoundedRectangleBorder(
+                              side: BorderSide(
+                                  color: priority_id == 0
                                       ? Colors.white
-                                      : ColorsTheme.txtDescColor;
+                                      : ColorsTheme.txtDescColor),
+                              borderRadius: BorderRadius.circular(14.0),
+                            )),
+                            foregroundColor:
+                                MaterialStateProperty.resolveWith<Color>(
+                                    (Set<MaterialState> states) {
+                              if (states.contains(MaterialState.hovered) ||
+                                  states.contains(MaterialState.focused))
                                 return priority_id == 0
                                     ? Colors.white
                                     : ColorsTheme.txtDescColor;
-                              }),
-                              backgroundColor:
-                                  MaterialStateProperty.resolveWith<Color>(
-                                      (Set<MaterialState> states) {
-                                if (states.contains(MaterialState.hovered) ||
-                                    states.contains(MaterialState.focused))
-                                  return priority_id == 0
-                                      ? ColorsTheme.compbtnColor
-                                      : ColorsTheme.bgColor;
-
+                              return priority_id == 0
+                                  ? Colors.white
+                                  : ColorsTheme.txtDescColor;
+                            }),
+                            backgroundColor:
+                                MaterialStateProperty.resolveWith<Color>(
+                                    (Set<MaterialState> states) {
+                              if (states.contains(MaterialState.hovered) ||
+                                  states.contains(MaterialState.focused))
                                 return priority_id == 0
                                     ? ColorsTheme.compbtnColor
                                     : ColorsTheme.bgColor;
-                              }),
-                            ),
-                            child: Text('Low'),
-                            onPressed: () {
-                              setState(() {
-                                priority_id = 0;
-                              });
-                            },
+
+                              return priority_id == 0
+                                  ? ColorsTheme.compbtnColor
+                                  : ColorsTheme.bgColor;
+                            }),
                           ),
+                          child: Text('Low'),
+                          onPressed: () {
+                            setState(() {
+                              priority_id = 0;
+                            });
+                          },
                         ),
-                        Container(
-                          width: width * 0.23,
-                          height: 38.0,
-                          child: TextButton(
-                            style: ButtonStyle(
-                              shape: MaterialStateProperty.all(
-                                  RoundedRectangleBorder(
-                                side: BorderSide(
-                                    color: priority_id == 1
-                                        ? Colors.white
-                                        : ColorsTheme.txtDescColor),
-                                borderRadius: BorderRadius.circular(14.0),
-                              )),
-                              foregroundColor:
-                                  MaterialStateProperty.resolveWith<Color>(
-                                      (Set<MaterialState> states) {
-                                if (states.contains(MaterialState.hovered) ||
-                                    states.contains(MaterialState.focused))
-                                  return priority_id == 1
+                        TextButton(
+                          style: ButtonStyle(
+                            shape: MaterialStateProperty.all(
+                                RoundedRectangleBorder(
+                              side: BorderSide(
+                                  color: priority_id == 1
                                       ? Colors.white
-                                      : ColorsTheme.txtDescColor;
+                                      : ColorsTheme.txtDescColor),
+                              borderRadius: BorderRadius.circular(14.0),
+                            )),
+                            foregroundColor:
+                                MaterialStateProperty.resolveWith<Color>(
+                                    (Set<MaterialState> states) {
+                              if (states.contains(MaterialState.hovered) ||
+                                  states.contains(MaterialState.focused))
                                 return priority_id == 1
                                     ? Colors.white
                                     : ColorsTheme.txtDescColor;
-                              }),
-                              backgroundColor:
-                                  MaterialStateProperty.resolveWith<Color>(
-                                      (Set<MaterialState> states) {
-                                if (states.contains(MaterialState.hovered) ||
-                                    states.contains(MaterialState.focused))
-                                  return priority_id == 1
-                                      ? ColorsTheme.inCompbtnColor
-                                      : ColorsTheme.bgColor;
-
+                              return priority_id == 1
+                                  ? Colors.white
+                                  : ColorsTheme.txtDescColor;
+                            }),
+                            backgroundColor:
+                                MaterialStateProperty.resolveWith<Color>(
+                                    (Set<MaterialState> states) {
+                              if (states.contains(MaterialState.hovered) ||
+                                  states.contains(MaterialState.focused))
                                 return priority_id == 1
                                     ? ColorsTheme.inCompbtnColor
                                     : ColorsTheme.bgColor;
-                              }),
-                            ),
-                            child: Text('High'),
-                            onPressed: () {
-                              setState(() {
-                                priority_id = 1;
-                              });
-                            },
+
+                              return priority_id == 1
+                                  ? ColorsTheme.inCompbtnColor
+                                  : ColorsTheme.bgColor;
+                            }),
                           ),
+                          child: Text('High'),
+                          onPressed: () {
+                            setState(() {
+                              priority_id = 1;
+                            });
+                          },
                         ),
-                        Container(
-                          width: width * 0.23,
-                          height: 38.0,
-                          child: TextButton(
-                            style: ButtonStyle(
-                              shape: MaterialStateProperty.all(
-                                  RoundedRectangleBorder(
-                                side: BorderSide(
-                                    color: priority_id == 2
-                                        ? Colors.white
-                                        : ColorsTheme.txtDescColor),
-                                borderRadius: BorderRadius.circular(14.0),
-                              )),
-                              foregroundColor:
-                                  MaterialStateProperty.resolveWith<Color>(
-                                      (Set<MaterialState> states) {
-                                if (states.contains(MaterialState.hovered) ||
-                                    states.contains(MaterialState.focused))
-                                  return priority_id == 2
+                        TextButton(
+                          style: ButtonStyle(
+                            shape: MaterialStateProperty.all(
+                                RoundedRectangleBorder(
+                              side: BorderSide(
+                                  color: priority_id == 2
                                       ? Colors.white
-                                      : ColorsTheme.txtDescColor;
+                                      : ColorsTheme.txtDescColor),
+                              borderRadius: BorderRadius.circular(14.0),
+                            )),
+                            foregroundColor:
+                                MaterialStateProperty.resolveWith<Color>(
+                                    (Set<MaterialState> states) {
+                              if (states.contains(MaterialState.hovered) ||
+                                  states.contains(MaterialState.focused))
                                 return priority_id == 2
                                     ? Colors.white
                                     : ColorsTheme.txtDescColor;
-                              }),
-                              backgroundColor:
-                                  MaterialStateProperty.resolveWith<Color>(
-                                      (Set<MaterialState> states) {
-                                if (states.contains(MaterialState.hovered) ||
-                                    states.contains(MaterialState.focused))
-                                  return priority_id == 2
-                                      ? ColorsTheme.inProgbtnColor
-                                      : ColorsTheme.bgColor;
-
+                              return priority_id == 2
+                                  ? Colors.white
+                                  : ColorsTheme.txtDescColor;
+                            }),
+                            backgroundColor:
+                                MaterialStateProperty.resolveWith<Color>(
+                                    (Set<MaterialState> states) {
+                              if (states.contains(MaterialState.hovered) ||
+                                  states.contains(MaterialState.focused))
                                 return priority_id == 2
                                     ? ColorsTheme.inProgbtnColor
                                     : ColorsTheme.bgColor;
-                              }),
-                            ),
-                            child: Text('Urgent'),
-                            onPressed: () {
-                              setState(() {
-                                priority_id = 2;
-                              });
-                            },
+
+                              return priority_id == 2
+                                  ? ColorsTheme.inProgbtnColor
+                                  : ColorsTheme.bgColor;
+                            }),
                           ),
+                          child: Text('Urgent'),
+                          onPressed: () {
+                            setState(() {
+                              priority_id = 2;
+                            });
+                          },
                         ),
                       ],
                     ),
@@ -1082,7 +1092,7 @@ class _ProjectDetailsPageState extends State<ProjectDetailsPage> {
                               if (task_name.isNotEmpty &&
                                   task_desc.isNotEmpty &&
                                   formatted_start_date.isNotEmpty &&
-                                  formatted_end_date.isNotEmpty &&
+                                  formatted_end_date!.isNotEmpty &&
                                   project_id != 0) {
                                 result = await saveTask();
                                 if (result == true) {
@@ -1138,68 +1148,74 @@ class _ProjectDetailsPageState extends State<ProjectDetailsPage> {
     height = MediaQuery.of(context).size.height;
     width = MediaQuery.of(context).size.width;
     return Scaffold(
+      backgroundColor: whiteColor,
+      appBar: AppBar(
+        backgroundColor: whiteColor,
+        centerTitle: false,
+        elevation: 0,
+        title: Container(
+          // padding: EdgeInsets.all(15.0),
+          // margin: EdgeInsets.only(top: 40.0),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: <Widget>[
+              Row(
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: [
+                  Container(
+                    child: IconButton(
+                        onPressed: () async {
+                          Navigator.of(context).push(
+                              MaterialPageRoute(builder: (context) => Home()));
+                        },
+                        icon: Icon(
+                          Icons.arrow_back,
+                          color: Colors.black,
+                        )),
+                  ),
+                  Container(
+                    // padding: EdgeInsets.all(50.0),
+
+                    child: new RichText(
+                        text: new TextSpan(children: [
+                      new TextSpan(
+                          text: '$project_title \n',
+                          style: TextStyle(
+                              color: Colors.black,
+                              fontSize: 20.0,
+                              fontWeight: FontWeight.w600)),
+                      new TextSpan(
+                          text: '${tasks.length} Tasks',
+                          style: TextStyle(color: ColorsTheme.txtDescColor))
+                    ])),
+                  ),
+                ],
+              ),
+              // GestureDetector(
+              //   onTap: () {
+              //     showMemberDialog(context);
+              //   },
+              //   child: Container(
+              //     child: Image(
+              //         image: AssetImage('assets/add_member_icon.png')),
+              //   ),
+              // )
+            ],
+          ),
+        ),
+      ),
       resizeToAvoidBottomInset: false,
       body: OrientationBuilder(builder: (context, orientation) {
         return SingleChildScrollView(
           child: Container(
             width: width,
-            height: orientation == Orientation.portrait ? height : height * 2.2,
+            // height: orientation == Orientation.portrait ? height : height * 2.2,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+                kSizedBox(),
                 Container(
-                  padding: EdgeInsets.all(15.0),
-                  margin: EdgeInsets.only(top: 40.0),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: <Widget>[
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        children: [
-                          Container(
-                            child: IconButton(
-                                onPressed: () async {
-                                  Navigator.of(context).push(MaterialPageRoute(
-                                      builder: (context) => Home()));
-                                },
-                                icon: Icon(
-                                  Icons.arrow_back,
-                                  color: Colors.black,
-                                )),
-                          ),
-                          Container(
-                            // padding: EdgeInsets.all(50.0),
-
-                            child: new RichText(
-                                text: new TextSpan(children: [
-                              new TextSpan(
-                                  text: '$project_title \n',
-                                  style: TextStyle(
-                                      color: Colors.black,
-                                      fontSize: 20.0,
-                                      fontWeight: FontWeight.w600)),
-                              new TextSpan(
-                                  text: '${tasks.length} Tasks',
-                                  style: TextStyle(
-                                      color: ColorsTheme.txtDescColor))
-                            ])),
-                          ),
-                        ],
-                      ),
-                      // GestureDetector(
-                      //   onTap: () {
-                      //     showMemberDialog(context);
-                      //   },
-                      //   child: Container(
-                      //     child: Image(
-                      //         image: AssetImage('assets/add_member_icon.png')),
-                      //   ),
-                      // )
-                    ],
-                  ),
-                ),
-                Container(
-                  height: 40,
+                  height: 45,
                   width: width * 0.95,
                   margin: EdgeInsets.only(left: 30.0),
                   child: SingleChildScrollView(
@@ -1207,213 +1223,198 @@ class _ProjectDetailsPageState extends State<ProjectDetailsPage> {
                     child: Row(
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
-                        SizedBox(
-                          width: width * 0.3,
-                          height: 38.0,
-                          child: TextButton(
-                              onPressed: () {
-                                setState(() {
-                                  compColor = Colors.black;
-                                  inprogColor = Colors.black;
-                                  todoColor = Colors.black;
-                                  inCompColor = ColorsTheme.inCompbtnColor;
-                                  tasks = tasks_duplicate;
-                                  tasks = tasks
-                                      .where(
-                                          (element) => element['category'] == 2)
-                                      .toList();
-                                });
-                              },
-                              style: ButtonStyle(
-                                shape: MaterialStateProperty.all(
-                                    RoundedRectangleBorder(
-                                  side: BorderSide(color: inCompColor),
-                                  borderRadius: BorderRadius.circular(14.0),
-                                )),
-                                foregroundColor:
-                                    MaterialStateProperty.resolveWith<Color>(
-                                        (Set<MaterialState> states) {
-                                  if (states.contains(MaterialState.hovered) ||
-                                      states.contains(MaterialState.focused))
-                                    return ColorsTheme.txtDescColor;
-                                  return ColorsTheme.txtDescColor;
-                                }),
-                                backgroundColor:
-                                    MaterialStateProperty.resolveWith<Color>(
-                                        (Set<MaterialState> states) {
-                                  if (states.contains(MaterialState.hovered) ||
-                                      states.contains(MaterialState.focused))
-                                    return ColorsTheme.bgColor;
-
-                                  return ColorsTheme.bgColor;
-                                }),
-                              ),
-                              child: AutoSizeText(
-                                'Pending',
-                                style: TextStyle(
-                                    color: inCompColor,
-                                    fontSize: 12.0,
-                                    fontWeight: FontWeight.w400),
+                        
+                        TextButton(
+                            onPressed: () {
+                              setState(() {
+                                compColor = Colors.black;
+                                inprogColor = Colors.black;
+                                todoColor = Colors.black;
+                                inCompColor = ColorsTheme.inCompbtnColor;
+                                tasks = tasks_duplicate;
+                                tasks = tasks
+                                    .where(
+                                        (element) => element['category'] == 2)
+                                    .toList();
+                              });
+                            },
+                            style: ButtonStyle(
+                              shape: MaterialStateProperty.all(
+                                  RoundedRectangleBorder(
+                                side: BorderSide(color: inCompColor),
+                                borderRadius: BorderRadius.circular(14.0),
                               )),
-                        ),
+                              foregroundColor:
+                                  MaterialStateProperty.resolveWith<Color>(
+                                      (Set<MaterialState> states) {
+                                if (states.contains(MaterialState.hovered) ||
+                                    states.contains(MaterialState.focused))
+                                  return ColorsTheme.txtDescColor;
+                                return ColorsTheme.txtDescColor;
+                              }),
+                              backgroundColor:
+                                  MaterialStateProperty.resolveWith<Color>(
+                                      (Set<MaterialState> states) {
+                                if (states.contains(MaterialState.hovered) ||
+                                    states.contains(MaterialState.focused))
+                                  return ColorsTheme.bgColor;
+
+                                return ColorsTheme.bgColor;
+                              }),
+                            ),
+                            child: Text(
+                              'Pending',
+                              style: TextStyle(
+                                  color: inCompColor,
+                                  fontSize: 12.0,
+                                  fontWeight: FontWeight.w400),
+                            )),
                         SizedBox(
                           width: 10.0,
                         ),
-                        SizedBox(
-                          width: width * 0.2,
-                          height: 38.0,
-                          child: TextButton(
-                              onPressed: () {
-                                setState(() {
-                                  compColor = Colors.black;
-                                  inprogColor = Colors.black;
-                                  todoColor = ColorsTheme.uIUxColor;
-                                  inCompColor = Colors.black;
-                                  tasks = tasks_duplicate;
+                        TextButton(
+                            onPressed: () {
+                              setState(() {
+                                compColor = Colors.black;
+                                inprogColor = Colors.black;
+                                todoColor = ColorsTheme.uIUxColor;
+                                inCompColor = Colors.black;
+                                tasks = tasks_duplicate;
 
-                                  tasks = tasks
-                                      .where(
-                                          (element) => element['category'] == 0)
-                                      .toList();
-                                });
-                              },
-                              style: ButtonStyle(
-                                shape: MaterialStateProperty.all(
-                                    RoundedRectangleBorder(
-                                  side: BorderSide(color: todoColor),
-                                  borderRadius: BorderRadius.circular(14.0),
-                                )),
-                                foregroundColor:
-                                    MaterialStateProperty.resolveWith<Color>(
-                                        (Set<MaterialState> states) {
-                                  if (states.contains(MaterialState.hovered) ||
-                                      states.contains(MaterialState.focused))
-                                    return ColorsTheme.txtDescColor;
-                                  return ColorsTheme.txtDescColor;
-                                }),
-                                backgroundColor:
-                                    MaterialStateProperty.resolveWith<Color>(
-                                        (Set<MaterialState> states) {
-                                  if (states.contains(MaterialState.hovered) ||
-                                      states.contains(MaterialState.focused))
-                                    return ColorsTheme.bgColor;
-
-                                  return ColorsTheme.bgColor;
-                                }),
-                              ),
-                              child: Text(
-                                'Todo',
-                                style: TextStyle(
-                                    color: todoColor,
-                                    fontSize: 12.0,
-                                    fontWeight: FontWeight.w400),
+                                tasks = tasks
+                                    .where(
+                                        (element) => element['category'] == 0)
+                                    .toList();
+                              });
+                            },
+                            style: ButtonStyle(
+                              shape: MaterialStateProperty.all(
+                                  RoundedRectangleBorder(
+                                side: BorderSide(color: todoColor),
+                                borderRadius: BorderRadius.circular(14.0),
                               )),
-                        ),
+                              foregroundColor:
+                                  MaterialStateProperty.resolveWith<Color>(
+                                      (Set<MaterialState> states) {
+                                if (states.contains(MaterialState.hovered) ||
+                                    states.contains(MaterialState.focused))
+                                  return ColorsTheme.txtDescColor;
+                                return ColorsTheme.txtDescColor;
+                              }),
+                              backgroundColor:
+                                  MaterialStateProperty.resolveWith<Color>(
+                                      (Set<MaterialState> states) {
+                                if (states.contains(MaterialState.hovered) ||
+                                    states.contains(MaterialState.focused))
+                                  return ColorsTheme.bgColor;
+
+                                return ColorsTheme.bgColor;
+                              }),
+                            ),
+                            child: Text(
+                              'Todo',
+                              style: TextStyle(
+                                  color: todoColor,
+                                  fontSize: 12.0,
+                                  fontWeight: FontWeight.w400),
+                            )),
                         SizedBox(
                           width: 10.0,
                         ),
-                        SizedBox(
-                          width: width * 0.35,
-                          height: 38.0,
-                          child: TextButton(
-                              onPressed: () {
-                                setState(() {
-                                  inCompColor = Colors.black;
-                                  inprogColor = Colors.black;
-                                  todoColor = Colors.black;
-                                  compColor = ColorsTheme.compbtnColor;
-                                  tasks = tasks_duplicate;
-                                  tasks = tasks
-                                      .where(
-                                          (element) => element['category'] == 3)
-                                      .toList();
-                                });
-                              },
-                              style: ButtonStyle(
-                                shape: MaterialStateProperty.all(
-                                    RoundedRectangleBorder(
-                                  side: BorderSide(color: compColor),
-                                  borderRadius: BorderRadius.circular(14.0),
-                                )),
-                                foregroundColor:
-                                    MaterialStateProperty.resolveWith<Color>(
-                                        (Set<MaterialState> states) {
-                                  if (states.contains(MaterialState.hovered) ||
-                                      states.contains(MaterialState.focused))
-                                    return ColorsTheme.txtDescColor;
-                                  return ColorsTheme.txtDescColor;
-                                }),
-                                backgroundColor:
-                                    MaterialStateProperty.resolveWith<Color>(
-                                        (Set<MaterialState> states) {
-                                  if (states.contains(MaterialState.hovered) ||
-                                      states.contains(MaterialState.focused))
-                                    return ColorsTheme.bgColor;
-
-                                  return ColorsTheme.bgColor;
-                                }),
-                              ),
-                              child: Text(
-                                'Completed',
-                                style: TextStyle(
-                                    color: compColor,
-                                    fontSize: 12.0,
-                                    fontWeight: FontWeight.w400),
+                        TextButton(
+                            onPressed: () {
+                              setState(() {
+                                inCompColor = Colors.black;
+                                inprogColor = Colors.black;
+                                todoColor = Colors.black;
+                                compColor = ColorsTheme.compbtnColor;
+                                tasks = tasks_duplicate;
+                                tasks = tasks
+                                    .where(
+                                        (element) => element['category'] == 3)
+                                    .toList();
+                              });
+                            },
+                            style: ButtonStyle(
+                              shape: MaterialStateProperty.all(
+                                  RoundedRectangleBorder(
+                                side: BorderSide(color: compColor),
+                                borderRadius: BorderRadius.circular(14.0),
                               )),
-                        ),
+                              foregroundColor:
+                                  MaterialStateProperty.resolveWith<Color>(
+                                      (Set<MaterialState> states) {
+                                if (states.contains(MaterialState.hovered) ||
+                                    states.contains(MaterialState.focused))
+                                  return ColorsTheme.txtDescColor;
+                                return ColorsTheme.txtDescColor;
+                              }),
+                              backgroundColor:
+                                  MaterialStateProperty.resolveWith<Color>(
+                                      (Set<MaterialState> states) {
+                                if (states.contains(MaterialState.hovered) ||
+                                    states.contains(MaterialState.focused))
+                                  return ColorsTheme.bgColor;
+
+                                return ColorsTheme.bgColor;
+                              }),
+                            ),
+                            child: Text(
+                              'Completed',
+                              style: TextStyle(
+                                  color: compColor,
+                                  fontSize: 12.0,
+                                  fontWeight: FontWeight.w400),
+                            )),
                         SizedBox(
                           width: 10.0,
                         ),
-                        SizedBox(
-                          width: width * 0.4,
-                          height: 38.0,
-                          child: TextButton(
-                              onPressed: () {
-                                setState(() {
-                                  inCompColor = Colors.black;
-                                  compColor = Colors.black;
-                                  todoColor = Colors.black;
-                                  inprogColor = ColorsTheme.inProgbtnColor;
+                        TextButton(
+                            onPressed: () {
+                              setState(() {
+                                inCompColor = Colors.black;
+                                compColor = Colors.black;
+                                todoColor = Colors.black;
+                                inprogColor = ColorsTheme.inProgbtnColor;
 
-                                  tasks = tasks_duplicate;
-                                  tasks = tasks
-                                      .where(
-                                          (element) => element['category'] == 1)
-                                      .toList();
-                                });
-                              },
-                              style: ButtonStyle(
-                                shape: MaterialStateProperty.all(
-                                    RoundedRectangleBorder(
-                                  side: BorderSide(color: inprogColor),
-                                  borderRadius: BorderRadius.circular(14.0),
-                                )),
-                                foregroundColor:
-                                    MaterialStateProperty.resolveWith<Color>(
-                                        (Set<MaterialState> states) {
-                                  if (states.contains(MaterialState.hovered) ||
-                                      states.contains(MaterialState.focused))
-                                    return ColorsTheme.txtDescColor;
-                                  return ColorsTheme.txtDescColor;
-                                }),
-                                backgroundColor:
-                                    MaterialStateProperty.resolveWith<Color>(
-                                        (Set<MaterialState> states) {
-                                  if (states.contains(MaterialState.hovered) ||
-                                      states.contains(MaterialState.focused))
-                                    return ColorsTheme.bgColor;
-
-                                  return ColorsTheme.bgColor;
-                                }),
-                              ),
-                              child: Text(
-                                'In Progress',
-                                style: TextStyle(
-                                    color: inprogColor,
-                                    fontSize: 12.0,
-                                    fontWeight: FontWeight.w400),
+                                tasks = tasks_duplicate;
+                                tasks = tasks
+                                    .where(
+                                        (element) => element['category'] == 1)
+                                    .toList();
+                              });
+                            },
+                            style: ButtonStyle(
+                              shape: MaterialStateProperty.all(
+                                  RoundedRectangleBorder(
+                                side: BorderSide(color: inprogColor),
+                                borderRadius: BorderRadius.circular(14.0),
                               )),
-                        ),
+                              foregroundColor:
+                                  MaterialStateProperty.resolveWith<Color>(
+                                      (Set<MaterialState> states) {
+                                if (states.contains(MaterialState.hovered) ||
+                                    states.contains(MaterialState.focused))
+                                  return ColorsTheme.txtDescColor;
+                                return ColorsTheme.txtDescColor;
+                              }),
+                              backgroundColor:
+                                  MaterialStateProperty.resolveWith<Color>(
+                                      (Set<MaterialState> states) {
+                                if (states.contains(MaterialState.hovered) ||
+                                    states.contains(MaterialState.focused))
+                                  return ColorsTheme.bgColor;
+
+                                return ColorsTheme.bgColor;
+                              }),
+                            ),
+                            child: Text(
+                              'In Progress',
+                              style: TextStyle(
+                                  color: inprogColor,
+                                  fontSize: 12.0,
+                                  fontWeight: FontWeight.w400),
+                            )),
                       ],
                     ),
                   ),
@@ -1433,7 +1434,7 @@ class _ProjectDetailsPageState extends State<ProjectDetailsPage> {
                               ? list.length + 1
                               : tasks.length,
                           shrinkWrap: true,
-                          itemExtent: 250.0,
+                          // itemExtent: 250.0,
                           itemBuilder: (BuildContext context, index) {
                             if (index == list.length)
                               return Center(
@@ -1455,195 +1456,192 @@ class _ProjectDetailsPageState extends State<ProjectDetailsPage> {
                                           builder: (context) => TaskDetails()));
                                 },
                                 child: Container(
-                                  height: 180.0,
+                                  // height: 180.0,
                                   decoration: BoxDecoration(
                                       borderRadius: BorderRadius.circular(20.0),
                                       border: Border.all(
-                                          color: Color(0xffEBEBEB),
-                                          width: 2.0)),
+                                          color: Color.fromARGB(
+                                              255, 208, 203, 203),
+                                          width: 1.0)),
                                   child: Column(children: [
                                     Container(
-                                      padding: EdgeInsets.all(20.0),
+                                      // padding: EdgeInsets.all(20.0),
+                                      padding: kStandardPadding(),
                                       child: Row(
                                         mainAxisAlignment:
                                             MainAxisAlignment.start,
                                         children: [
-                                          SizedBox(
-                                            width: tasks[index]['title']
-                                                        .toString()
-                                                        .length >
-                                                    20
-                                                ? width * 0.5
-                                                : width * 0.4,
-                                            height: 40.0,
-                                            child: TextButton(
-                                              style: ButtonStyle(
-                                                shape:
-                                                    MaterialStateProperty.all(
-                                                        RoundedRectangleBorder(
-                                                  borderRadius:
-                                                      BorderRadius.circular(
-                                                          30.0),
-                                                )),
-                                                foregroundColor:
-                                                    MaterialStateProperty
-                                                        .resolveWith<Color>(
-                                                            (Set<MaterialState>
-                                                                states) {
-                                                  if (states.contains(
-                                                          MaterialState
-                                                              .hovered) ||
-                                                      states.contains(
-                                                          MaterialState
-                                                              .focused))
-                                                    return ColorsTheme
-                                                        .uIUxColor;
-                                                  return ColorsTheme.uIUxColor;
-                                                }),
-                                                backgroundColor:
-                                                    MaterialStateProperty
-                                                        .resolveWith<Color>(
-                                                            (Set<MaterialState>
-                                                                states) {
-                                                  if (states.contains(
-                                                          MaterialState
-                                                              .hovered) ||
-                                                      states.contains(
-                                                          MaterialState
-                                                              .focused))
-                                                    return Colors
-                                                        .purple.shade100;
+                                          // SizedBox(
+                                          //   width: tasks[index]['title']
+                                          //               .toString()
+                                          //               .length >
+                                          //           20
+                                          //       ? width * 0.5
+                                          //       : width * 0.4,
+                                          //   height: 40.0,
+                                          //   child: TextButton(
+                                          //     style: ButtonStyle(
+                                          //       shape:
+                                          //           MaterialStateProperty.all(
+                                          //               RoundedRectangleBorder(
+                                          //         borderRadius:
+                                          //             BorderRadius.circular(
+                                          //                 30.0),
+                                          //       )),
+                                          //       foregroundColor:
+                                          //           MaterialStateProperty
+                                          //               .resolveWith<Color>(
+                                          //                   (Set<MaterialState>
+                                          //                       states) {
+                                          //         if (states.contains(
+                                          //                 MaterialState
+                                          //                     .hovered) ||
+                                          //             states.contains(
+                                          //                 MaterialState
+                                          //                     .focused))
+                                          //           return ColorsTheme
+                                          //               .uIUxColor;
+                                          //         return ColorsTheme.uIUxColor;
+                                          //       }),
+                                          //       backgroundColor:
+                                          //           MaterialStateProperty
+                                          //               .resolveWith<Color>(
+                                          //                   (Set<MaterialState>
+                                          //                       states) {
+                                          //         if (states.contains(
+                                          //                 MaterialState
+                                          //                     .hovered) ||
+                                          //             states.contains(
+                                          //                 MaterialState
+                                          //                     .focused))
+                                          //           return Colors
+                                          //               .purple.shade100;
 
-                                                  return Colors.purple.shade100;
-                                                }),
-                                              ),
-                                              child: AutoSizeText(
-                                                tasks[index]['title'],
-                                                maxLines: 1,
-                                                style: TextStyle(
-                                                    color:
-                                                        ColorsTheme.uIUxColor,
-                                                    fontSize: 12.0,
-                                                    overflow:
-                                                        TextOverflow.ellipsis,
-                                                    fontWeight:
-                                                        FontWeight.w400),
-                                              ),
-                                              onPressed: () {},
-                                            ),
-                                          ),
+                                          //         return Colors.purple.shade100;
+                                          //       }),
+                                          //     ),
+                                          //     child: AutoSizeText(
+                                          //       tasks[index]['title'],
+                                          //       maxLines: 1,
+                                          //       style: TextStyle(
+                                          //           color:
+                                          //               ColorsTheme.uIUxColor,
+                                          //           fontSize: 12.0,
+                                          //           overflow:
+                                          //               TextOverflow.ellipsis,
+                                          //           fontWeight:
+                                          //               FontWeight.w400),
+                                          //     ),
+                                          //     onPressed: () {},
+                                          //   ),
+                                          // ),
                                           SizedBox(
                                             width: 10.0,
                                           ),
-                                          SizedBox(
-                                            width: width * 0.2,
-                                            height: 40.0,
-                                            child: TextButton(
-                                              style: ButtonStyle(
-                                                shape:
-                                                    MaterialStateProperty.all(
-                                                        RoundedRectangleBorder(
-                                                  borderRadius:
-                                                      BorderRadius.circular(
-                                                          30.0),
-                                                )),
-                                                foregroundColor:
-                                                    MaterialStateProperty
-                                                        .resolveWith<Color>(
-                                                            (Set<MaterialState>
-                                                                states) {
-                                                  if (states.contains(
-                                                          MaterialState
-                                                              .hovered) ||
-                                                      states.contains(
-                                                          MaterialState
-                                                              .focused))
-                                                    return tasks[index]
-                                                                ['priority'] ==
-                                                            0
-                                                        ? ColorsTheme
-                                                            .compbtnColor
-                                                        : tasks[index][
-                                                                    'priority'] ==
-                                                                1
-                                                            ? ColorsTheme
-                                                                .inCompbtnColor
-                                                            : ColorsTheme
-                                                                .inProgbtnColor;
-                                                  return ColorsTheme.uIUxColor;
-                                                }),
-                                                backgroundColor:
-                                                    MaterialStateProperty
-                                                        .resolveWith<Color>(
-                                                            (Set<MaterialState>
-                                                                states) {
-                                                  if (states.contains(
-                                                          MaterialState
-                                                              .hovered) ||
-                                                      states.contains(
-                                                          MaterialState
-                                                              .focused))
-                                                    return tasks[index]
-                                                                ['priority'] ==
-                                                            0
-                                                        ? ColorsTheme
-                                                            .compbtnColor
-                                                        : tasks[index][
-                                                                    'priority'] ==
-                                                                1
-                                                            ? ColorsTheme
-                                                                .inCompbtnColor
-                                                            : ColorsTheme
-                                                                .inProgbtnColor;
-                                                  ;
-
+                                          TextButton(
+                                            style: ButtonStyle(
+                                              shape:
+                                                  MaterialStateProperty.all(
+                                                      RoundedRectangleBorder(
+                                                borderRadius:
+                                                    BorderRadius.circular(
+                                                        30.0),
+                                              )),
+                                              foregroundColor:
+                                                  MaterialStateProperty
+                                                      .resolveWith<Color>(
+                                                          (Set<MaterialState>
+                                                              states) {
+                                                if (states.contains(
+                                                        MaterialState
+                                                            .hovered) ||
+                                                    states.contains(
+                                                        MaterialState
+                                                            .focused))
                                                   return tasks[index]
                                                               ['priority'] ==
                                                           0
-                                                      ? Colors.green.shade100
+                                                      ? ColorsTheme
+                                                          .compbtnColor
                                                       : tasks[index][
                                                                   'priority'] ==
                                                               1
-                                                          ? Colors.red.shade100
-                                                          : Colors
-                                                              .orange.shade100;
-                                                }),
-                                              ),
-                                              child: Text(
-                                                tasks[index]['priority'] == 0
-                                                    ? 'Low'
-                                                    : tasks[index]
-                                                                ['priority'] ==
+                                                          ? ColorsTheme
+                                                              .inCompbtnColor
+                                                          : ColorsTheme
+                                                              .inProgbtnColor;
+                                                return ColorsTheme.uIUxColor;
+                                              }),
+                                              backgroundColor:
+                                                  MaterialStateProperty
+                                                      .resolveWith<Color>(
+                                                          (Set<MaterialState>
+                                                              states) {
+                                                if (states.contains(
+                                                        MaterialState
+                                                            .hovered) ||
+                                                    states.contains(
+                                                        MaterialState
+                                                            .focused))
+                                                  return tasks[index]
+                                                              ['priority'] ==
+                                                          0
+                                                      ? ColorsTheme
+                                                          .compbtnColor
+                                                      : tasks[index][
+                                                                  'priority'] ==
+                                                              1
+                                                          ? ColorsTheme
+                                                              .inCompbtnColor
+                                                          : ColorsTheme
+                                                              .inProgbtnColor;
+                                                ;
+
+                                                return tasks[index]
+                                                            ['priority'] ==
+                                                        0
+                                                    ? Colors.green.shade100
+                                                    : tasks[index][
+                                                                'priority'] ==
                                                             1
-                                                        ? 'High'
-                                                        : 'Urgent',
-                                                style: TextStyle(
-                                                    color: tasks[index]
-                                                                ['priority'] ==
-                                                            0
-                                                        ? ColorsTheme
-                                                            .compbtnColor
-                                                        : tasks[index][
-                                                                    'priority'] ==
-                                                                1
-                                                            ? ColorsTheme
-                                                                .inCompbtnColor
-                                                            : ColorsTheme
-                                                                .inProgbtnColor,
-                                                    fontSize: 12.0,
-                                                    fontWeight:
-                                                        FontWeight.w400),
-                                              ),
-                                              onPressed: () {},
+                                                        ? Colors.red.shade100
+                                                        : Colors
+                                                            .orange.shade100;
+                                              }),
                                             ),
+                                            child: Text(
+                                              tasks[index]['priority'] == 0
+                                                  ? 'Low'
+                                                  : tasks[index]
+                                                              ['priority'] ==
+                                                          1
+                                                      ? 'High'
+                                                      : 'Urgent',
+                                              style: TextStyle(
+                                                  color: tasks[index]
+                                                              ['priority'] ==
+                                                          0
+                                                      ? ColorsTheme
+                                                          .compbtnColor
+                                                      : tasks[index][
+                                                                  'priority'] ==
+                                                              1
+                                                          ? ColorsTheme
+                                                              .inCompbtnColor
+                                                          : ColorsTheme
+                                                              .inProgbtnColor,
+                                                  fontSize: 12.0,
+                                                  fontWeight:
+                                                      FontWeight.w400),
+                                            ),
+                                            onPressed: () {},
                                           )
                                         ],
                                       ),
                                     ),
                                     Container(
                                       alignment: Alignment.centerLeft,
-                                      padding: EdgeInsets.only(
-                                          top: 20.0, bottom: 20.0),
+                                      padding: EdgeInsets.only(bottom: 20.0),
                                       margin:
                                           EdgeInsets.only(left: 20, right: 20),
                                       decoration: BoxDecoration(
@@ -1652,7 +1650,7 @@ class _ProjectDetailsPageState extends State<ProjectDetailsPage> {
                                         color: Colors.black,
                                       ))),
                                       child: AutoSizeText(
-                                        tasks[index]['description'],
+                                        tasks[index]['title'],
                                         overflow: TextOverflow.ellipsis,
                                         maxLines: 1,
                                         style: TextStyle(
@@ -1745,10 +1743,13 @@ class _ProjectDetailsPageState extends State<ProjectDetailsPage> {
             heroTag: null,
             label: Text('TimeBox'),
             icon: Icon(Icons.timer),
-            // child: const Icon(Icons.edit),
             onPressed: () {
-              Navigator.push(context,
-                  MaterialPageRoute(builder: (context) => TimeBoxPage()));
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => ChangeNotifierProvider(
+                          create: (_) => TimeBoxState(),
+                          child: TimeBoxPage())));
             },
           ),
           FloatingActionButton.extended(
@@ -1757,7 +1758,6 @@ class _ProjectDetailsPageState extends State<ProjectDetailsPage> {
             heroTag: null,
             label: Text('Tasks'),
             icon: Icon(Icons.task),
-            // child: const Icon(Icons.search),
             onPressed: () {
               _addTaskModalBottomSheet(context);
             },

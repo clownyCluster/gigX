@@ -5,7 +5,9 @@ import 'package:dio/dio.dart';
 import 'package:gigX/api.dart';
 import 'package:gigX/colors.dart';
 import 'package:gigX/login.dart';
-import 'package:gigX/pages/time_box.dart';
+import 'package:gigX/pages/disclaimer.dart';
+import 'package:gigX/pages/timebox_module/time_box.dart';
+import 'package:gigX/pages/timebox_module/time_box_state.dart';
 import 'package:gigX/pages/webviewprivacypolicy.dart';
 import 'package:gigX/pages/webviewtermsandconditions.dart';
 import 'package:flutter/material.dart';
@@ -16,6 +18,7 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:oktoast/oktoast.dart';
+import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../constant/constants.dart';
@@ -36,7 +39,8 @@ class AccountTab extends StatelessWidget {
             scaffoldBackgroundColor: ColorsTheme.bgColor),
         home: const AccountTabPage(),
         routes: {
-          '/time_box': (context) => TimeBoxPage(),
+          '/time_box': (context) => ChangeNotifierProvider(
+              create: (_) => TimeBoxState(), child: TimeBoxPage()),
         },
       ),
     );
@@ -420,25 +424,25 @@ class _AccountTabPageState extends State<AccountTabPage> {
       child: ListView(
         physics: NeverScrollableScrollPhysics(),
         children: [
-          ListTile(
-            leading: Image.asset('assets/language_icon.png'),
-            title: new RichText(
-                text: TextSpan(children: [
-              new TextSpan(
-                  text: 'Language \n',
-                  style: TextStyle(
-                      fontSize: 20.0,
-                      fontWeight: FontWeight.w600,
-                      color: Colors.black)),
-              new TextSpan(
-                  text: 'English',
-                  style: TextStyle(
-                      color: ColorsTheme.txtDescColor,
-                      fontWeight: FontWeight.w400,
-                      fontSize: 14.0)),
-            ])),
-            trailing: Image.asset('assets/arrow_right.png'),
-          ),
+          // ListTile(
+          //   leading: Image.asset('assets/language_icon.png'),
+          //   title: new RichText(
+          //       text: TextSpan(children: [
+          //     new TextSpan(
+          //         text: 'Language \n',
+          //         style: TextStyle(
+          //             fontSize: 20.0,
+          //             fontWeight: FontWeight.w600,
+          //             color: Colors.black)),
+          //     new TextSpan(
+          //         text: 'English',
+          //         style: TextStyle(
+          //             color: ColorsTheme.txtDescColor,
+          //             fontWeight: FontWeight.w400,
+          //             fontSize: 14.0)),
+          //   ])),
+          //   trailing: Image.asset('assets/arrow_right.png'),
+          // ),
           InkWell(
             onTap: () {
               // Navigator.push(context,
@@ -453,13 +457,14 @@ class _AccountTabPageState extends State<AccountTabPage> {
               title: Text(
                 'Time Box',
                 style: TextStyle(
-                    color: Colors.black,
+                    color: Colors.grey[700],
                     fontWeight: FontWeight.w600,
                     fontSize: 16.0),
               ),
               trailing: Image.asset('assets/arrow_right.png'),
             ),
           ),
+          Divider(),
           InkWell(
             onTap: () {
               Navigator.of(context).push(
@@ -470,13 +475,15 @@ class _AccountTabPageState extends State<AccountTabPage> {
               title: Text(
                 'Privacy Policy',
                 style: TextStyle(
-                    color: Colors.black,
+                    color: Colors.grey[700],
                     fontWeight: FontWeight.w600,
                     fontSize: 16.0),
               ),
               trailing: Image.asset('assets/arrow_right.png'),
             ),
           ),
+          Divider(),
+
           InkWell(
             onTap: () {
               Navigator.of(context).push(
@@ -487,13 +494,15 @@ class _AccountTabPageState extends State<AccountTabPage> {
               title: Text(
                 'Terms & Conditions',
                 style: TextStyle(
-                    color: Colors.black,
+                    color: Colors.grey[700],
                     fontWeight: FontWeight.w600,
                     fontSize: 16.0),
               ),
               trailing: Image.asset('assets/arrow_right.png'),
             ),
           ),
+          Divider(),
+
           ListTile(
             onTap: () {
               showChangePasswordDialog(context);
@@ -504,7 +513,7 @@ class _AccountTabPageState extends State<AccountTabPage> {
             title: Text(
               'Change Password',
               style: TextStyle(
-                  color: Colors.black,
+                  color: Colors.grey[700],
                   fontWeight: FontWeight.w600,
                   fontSize: 16.0),
             ),
@@ -520,205 +529,457 @@ class _AccountTabPageState extends State<AccountTabPage> {
     height = MediaQuery.of(context).size.height;
     width = MediaQuery.of(context).size.width;
     return Scaffold(
-      body: OrientationBuilder(builder: (context, orientation) {
-        return SingleChildScrollView(
-          child: Stack(
-            alignment: Alignment.center,
-            children: [
-              Container(
-                width: width,
-                height: orientation == Orientation.portrait && height < 820
-                    ? height * 0.87
-                    : orientation == Orientation.portrait && height > 820
-                        ? height * 0.75
-                        : height * 2.2,
-                child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Container(
-                        padding: EdgeInsets.all(40.0),
-                        margin: EdgeInsets.only(top: 40.0),
-                        child: AutoSizeText(
-                          'Account',
-                          style: TextStyle(
-                              color: Colors.black,
-                              fontWeight: FontWeight.w600,
-                              fontSize: 20.0),
-                        ),
-                      ),
-                      Container(
-                        padding: EdgeInsets.all(40.0),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.start,
-                              children: [
-                                InkWell(
-                                  onTap: () {
-                                    showDialog(
-                                      context: context,
-                                      builder: (BuildContext context) {
-                                        return AlertDialog(
-                                          title: Text(
-                                              'Pick Image From Gallery Or Camera'),
-                                          actions: [
-                                            TextButton(
-                                              onPressed: () {
-                                                _pickProfileImageFromGallery();
-                                                Navigator.pop(context);
-                                              },
-                                              child: Text(
-                                                'Gallery',
-                                                style: TextStyle(
-                                                    color: Colors.black),
-                                              ),
-                                            ),
-                                            TextButton(
-                                              onPressed: () {
-                                                _pickProfileImageFromCamera();
-                                                Navigator.pop(context);
-                                              },
-                                              child: Text(
-                                                'Camera',
-                                                style: TextStyle(
-                                                    color: Colors.black),
-                                              ),
-                                            ),
-                                          ],
-                                        );
-                                      },
-                                    );
-                                  },
-                                  child: CircleAvatar(
-                                    radius: 30.0,
-                                    backgroundImage:
-                                        NetworkImage(profileUrl.toString()),
-                                  ),
-                                ),
-                                Container(
-                                  width: width * 0.512,
-                                  margin: EdgeInsets.only(left: 10.0),
-                                  child: new Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        new AutoSizeText('$userName',
-                                            maxLines: 2,
-                                            style: TextStyle(
-                                                color: Colors.black,
-                                                fontWeight: FontWeight.w600,
-                                                fontSize: 16.0)),
-                                        new AutoSizeText(userEmail,
-                                            maxLines: 2,
-                                            style: TextStyle(
-                                                color: ColorsTheme.txtColor,
-                                                fontWeight: FontWeight.w400,
-                                                letterSpacing: -0.9,
-                                                fontSize: 6.0)),
-                                      ]),
-                                ),
-                              ],
-                            ),
-                            Container(
-                                child: Image.asset('assets/arrow_right.png'))
-                          ],
-                        ),
-                      ),
-                      if (orientation == Orientation.landscape)
-                        Container(
-                          alignment: Alignment.center,
-                          child: Container(
-                            height: 235,
-                            width: width * 0.90,
-                            decoration: BoxDecoration(
-                                color: Color(0xffD3D3D3),
-                                borderRadius: BorderRadius.circular(14.0)),
-                            child: showAccountListItems(context),
-                          ),
-                        ),
-                      if (orientation == Orientation.portrait)
-                        Container(
-                          padding: EdgeInsets.only(left: 40.0),
-                          child: Container(
-                              height: 310,
-                              width: width * 0.82,
-                              decoration: BoxDecoration(
-                                  color: Color(0xffD3D3D3),
-                                  borderRadius: BorderRadius.circular(14.0)),
-                              child: showAccountListItems(context)),
-                        ),
-                      Container(
-                        margin: EdgeInsets.only(top: 20.0),
-                        padding: EdgeInsets.only(left: 40.0),
-                        child: SizedBox(
-                          width: orientation == Orientation.portrait
-                              ? width * 0.82
-                              : width * 0.90,
-                          height: 58.0,
-                          child: TextButton(
-                            onPressed: () async {
-                              showLogoutConfirmationDialog(context);
-                              // Navigator.of(context, rootNavigator: true)
-                              //     .pushAndRemoveUntil(
-                              //   MaterialPageRoute(
-                              //     builder: (BuildContext context) {
-                              //       return LoginPage(
-                              //         is_logged_out: true,
-                              //       );
-                              //     },
-                              //   ),
-                              //   (_) => false,
-                              // );
-                            },
-                            style: ButtonStyle(
-                              shape: MaterialStateProperty.all(
-                                  RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(14.0),
-                              )),
-                              foregroundColor:
-                                  MaterialStateProperty.resolveWith<Color>(
-                                      (Set<MaterialState> states) {
-                                if (states.contains(MaterialState.hovered) ||
-                                    states.contains(MaterialState.focused))
-                                  return ColorsTheme.lightGrey;
-                                return ColorsTheme.lightGrey;
-                              }),
-                              backgroundColor:
-                                  MaterialStateProperty.resolveWith<Color>(
-                                      (Set<MaterialState> states) {
-                                if (states.contains(MaterialState.hovered) ||
-                                    states.contains(MaterialState.focused))
-                                  return ColorsTheme.lightGrey;
+      backgroundColor: whiteColor,
+      appBar: AppBar(
+        title: Text(
+          'Account',
+          style:
+              kkBoldTextStyle().copyWith(fontSize: 20, color: Colors.grey[800]),
+        ),
+        centerTitle: false,
+        backgroundColor: whiteColor,
+        elevation: 0,
+      ),
+      // body: OrientationBuilder(builder: (context, orientation) {
+      //   return SingleChildScrollView(
+      //     child: Stack(
+      //       alignment: Alignment.center,
+      //       children: [
+      //         Container(
+      //           width: width,
+      //           height: orientation == Orientation.portrait && height < 820
+      //               ? height * 0.87
+      //               : orientation == Orientation.portrait && height > 820
+      //                   ? height * 0.75
+      //                   : height * 2.2,
+      //           child: Column(
+      //             mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      //               crossAxisAlignment: CrossAxisAlignment.start,
+      //               children: [
+      //                 // Container(
+      //                 //   padding: EdgeInsets.all(40.0),
+      //                 //   margin: EdgeInsets.only(top: 10.0),
+      //                 //   child: AutoSizeText(
+      //                 //     'Account',
+      //                 //     style: TextStyle(
+      //                 //         color: Colors.black,
+      //                 //         fontWeight: FontWeight.w600,
+      //                 //         fontSize: 20.0),
+      //                 //   ),
+      //                 // ),
+      //                 Column(
+      //                   children: [
+      //                     Container(
+      //                   padding:
+      //                       EdgeInsets.symmetric(vertical: 10, horizontal: 20),
+      //                   child: Row(
+      //                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      //                     children: [
+      //                       Row(
+      //                         mainAxisAlignment: MainAxisAlignment.start,
+      //                         children: [
+      //                           InkWell(
+      //                             onTap: () {
+      //                               showDialog(
+      //                                 context: context,
+      //                                 builder: (BuildContext context) {
+      //                                   return AlertDialog(
+      //                                     title: Text(
+      //                                         'Pick Image From Gallery Or Camera'),
+      //                                     actions: [
+      //                                       TextButton(
+      //                                         onPressed: () {
+      //                                           _pickProfileImageFromGallery();
+      //                                           Navigator.pop(context);
+      //                                         },
+      //                                         child: Text(
+      //                                           'Gallery',
+      //                                           style: TextStyle(
+      //                                               color: Colors.black),
+      //                                         ),
+      //                                       ),
+      //                                       TextButton(
+      //                                         onPressed: () {
+      //                                           _pickProfileImageFromCamera();
+      //                                           Navigator.pop(context);
+      //                                         },
+      //                                         child: Text(
+      //                                           'Camera',
+      //                                           style: TextStyle(
+      //                                               color: Colors.black),
+      //                                         ),
+      //                                       ),
+      //                                     ],
+      //                                   );
+      //                                 },
+      //                               );
+      //                             },
+      //                             child: CircleAvatar(
+      //                               radius: 30.0,
+      //                               backgroundImage:
+      //                                   NetworkImage(profileUrl.toString()),
+      //                             ),
+      //                           ),
+      //                           Container(
+      //                             // width: width * 0.512,
+      //                             margin: EdgeInsets.only(left: 10.0),
+      //                             child: new Column(
+      //                                 crossAxisAlignment:
+      //                                     CrossAxisAlignment.start,
+      //                                 children: [
+      //                                   new AutoSizeText('$userName',
+      //                                       maxLines: 2,
+      //                                       style: TextStyle(
+      //                                           color: Colors.black,
+      //                                           fontWeight: FontWeight.w600,
+      //                                           fontSize: 16.0)),
+      //                                   new AutoSizeText(userEmail,
+      //                                       maxLines: 2,
+      //                                       style: TextStyle(
+      //                                           color: ColorsTheme.txtColor,
+      //                                           fontWeight: FontWeight.w400,
+      //                                           letterSpacing: -0.9,
+      //                                           fontSize: 6.0)),
+      //                                 ]),
+      //                           ),
+      //                         ],
+      //                       ),
+      //                       // Container(
+      //                       //     child: Image.asset('assets/arrow_right.png'))
+      //                     ],
+      //                   ),
+      //                 ),
+      //                 if (orientation == Orientation.landscape)
+      //                   Container(
+      //                     alignment: Alignment.center,
+      //                     child: Container(
+      //                       height: 235,
+      //                       width: double.infinity,
+      //                       decoration: BoxDecoration(
+      //                           color: Colors.grey[100],
+      //                           borderRadius: BorderRadius.circular(14.0)),
+      //                       child: showAccountListItems(context),
+      //                     ),
+      //                   ),
+      //                 if (orientation == Orientation.portrait)
+      //                   Container(
+      //                     // padding: kStandardPadding(),
+      //                     padding: EdgeInsets.all(20),
+      //                     child: Container(
+      //                       padding: kPadding(),
+      //                         height: 300,
+      //                         // width: width * 0.82,
+      //                         width: double.infinity,
+      //                         decoration: BoxDecoration(
+      //                             color: Colors.grey[100],
+      //                             borderRadius: BorderRadius.circular(14.0)),
+      //                         child: showAccountListItems(context)),
+      //                   ),
+      //                   ],
+      //                 ),
+      //                 Container(
+      //                   margin: EdgeInsets.only(top: 10.0),
+      //                   // padding: EdgeInsets.only(left: 40.0),
+      //                   padding: kStandardPadding(),
+      //                   child: SizedBox(
+      //                     width: orientation == Orientation.portrait
+      //                         ? double.infinity
+      //                         : double.infinity,
+      //                     height: 58.0,
+      //                     child: TextButton(
+      //                       onPressed: () async {
+      //                         showLogoutConfirmationDialog(context);
+      //                         // Navigator.of(context, rootNavigator: true)
+      //                         //     .pushAndRemoveUntil(
+      //                         //   MaterialPageRoute(
+      //                         //     builder: (BuildContext context) {
+      //                         //       return LoginPage(
+      //                         //         is_logged_out: true,
+      //                         //       );
+      //                         //     },
+      //                         //   ),
+      //                         //   (_) => false,
+      //                         // );
+      //                       },
+      //                       style: ButtonStyle(
+      //                         shape: MaterialStateProperty.all(
+      //                             RoundedRectangleBorder(
+      //                           borderRadius: BorderRadius.circular(14.0),
+      //                         )),
+      //                         foregroundColor:
+      //                             MaterialStateProperty.resolveWith<Color>(
+      //                                 (Set<MaterialState> states) {
+      //                           if (states.contains(MaterialState.hovered) ||
+      //                               states.contains(MaterialState.focused))
+      //                             return Colors.grey.withOpacity(0.1);
+      //                           return Colors.grey.withOpacity(0.1);
+      //                         }),
+      //                         backgroundColor:
+      //                             MaterialStateProperty.resolveWith<Color>(
+      //                                 (Set<MaterialState> states) {
+      //                           if (states.contains(MaterialState.hovered) ||
+      //                               states.contains(MaterialState.focused))
+      //                             return Colors.grey.withOpacity(0.1);
 
-                                return ColorsTheme.lightGrey;
-                              }),
-                            ),
-                            child: Text(
-                              'Logout',
-                              style: TextStyle(
-                                  color: ColorsTheme.dangerColor,
-                                  fontWeight: FontWeight.w600,
-                                  fontSize: 16.0),
-                            ),
+      //                           return Colors.grey.withOpacity(0.1);
+      //                         }),
+      //                       ),
+      //                       child: Text(
+      //                         'Logout',
+      //                         style: TextStyle(
+      //                             color: ColorsTheme.dangerColor,
+      //                             fontWeight: FontWeight.w600,
+      //                             fontSize: 16.0),
+      //                       ),
+      //                     ),
+      //                   ),
+      //                 ),
+      //               ]),
+      //         ),
+      //         if (is_loading == true && user.isEmpty)
+      //           Container(
+      //             alignment: Alignment.topCenter,
+      //             // margin: EdgeInsets.only(to),
+      //             child: CircularProgressIndicator(
+      //               valueColor:
+      //                   AlwaysStoppedAnimation<Color>(ColorsTheme.btnColor),
+      //             ),
+      //           ),
+      //       ],
+      //     ),
+      //   );
+      // }),
+
+      ///////        New One        //////////
+      ///
+      body: Container(
+        padding: kStandardPadding(),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Expanded(
+              child: SingleChildScrollView(
+                child: Column(
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: [
+                        InkWell(
+                          onTap: () {
+                            showDialog(
+                              context: context,
+                              builder: (BuildContext context) {
+                                return AlertDialog(
+                                  title: Text('Pick Image From Gallery Or Camera'),
+                                  actions: [
+                                    TextButton(
+                                      onPressed: () {
+                                        _pickProfileImageFromGallery();
+                                        Navigator.pop(context);
+                                      },
+                                      child: Text(
+                                        'Gallery',
+                                        style: TextStyle(color: Colors.black),
+                                      ),
+                                    ),
+                                    TextButton(
+                                      onPressed: () {
+                                        _pickProfileImageFromCamera();
+                                        Navigator.pop(context);
+                                      },
+                                      child: Text(
+                                        'Camera',
+                                        style: TextStyle(color: Colors.black),
+                                      ),
+                                    ),
+                                  ],
+                                );
+                              },
+                            );
+                          },
+                          child: CircleAvatar(
+                            radius: 30.0,
+                            backgroundImage: NetworkImage(profileUrl.toString()),
                           ),
                         ),
+                        Expanded(
+                          child: Container(
+                            // width: width * 0.512,
+                            margin: EdgeInsets.only(left: 10.0),
+                            child: new Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  new AutoSizeText('$userName',
+                                      maxLines: 2,
+                                      style: TextStyle(
+                                          color: Colors.black,
+                                          fontWeight: FontWeight.w600,
+                                          fontSize: 16.0)),
+                                  new AutoSizeText(userEmail,
+                                      maxLines: 2,
+                                      style: TextStyle(
+                                          color: ColorsTheme.txtColor,
+                                          fontWeight: FontWeight.w400,
+                                          letterSpacing: -0.9,
+                                          fontSize: 6.0)),
+                                ]),
+                          ),
+                        ),
+                      ],
+                    ),
+                    LSizedBox(),
+                    Container(
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(10),
+                      color: Colors.grey[100],
+                          
                       ),
-                    ]),
-              ),
-              if (is_loading == true && user.isEmpty)
-                Container(
-                  alignment: Alignment.topCenter,
-                  // margin: EdgeInsets.only(to),
-                  child: CircularProgressIndicator(
-                    valueColor:
-                        AlwaysStoppedAnimation<Color>(ColorsTheme.btnColor),
-                  ),
+                      padding: kPadding(),
+                      child: Column(
+                        children: [
+                          InkWell(
+                      onTap: () {
+                        // Navigator.push(context,
+                        //     MaterialPageRoute(builder: (context) => const TimeBox()));
+                        Navigator.pushNamed(context, '/time_box');
+                      },
+                      child: ListTile(
+                        leading: Icon(
+                          Icons.timer,
+                          color: ColorsTheme.btnColor,
+                        ),
+                        title: Text(
+                          'Time Box',
+                          style: TextStyle(
+                              color: Colors.grey[700],
+                              fontWeight: FontWeight.w600,
+                              fontSize: 16.0),
+                        ),
+                        trailing: Image.asset('assets/arrow_right.png'),
+                      ),
+                    ),
+                    Divider(),
+                    InkWell(
+                      onTap: () {
+                        Navigator.of(context).push(MaterialPageRoute(
+                            builder: (context) => PrivacyPolicy()));
+                      },
+                      child: ListTile(
+                        leading: Image.asset('assets/privacy_policy_icon.png'),
+                        title: Text(
+                          'Privacy Policy',
+                          style: TextStyle(
+                              color: Colors.grey[700],
+                              fontWeight: FontWeight.w600,
+                              fontSize: 16.0),
+                        ),
+                        trailing: Image.asset('assets/arrow_right.png'),
+                      ),
+                    ),
+                    Divider(),
+                    InkWell(
+                      onTap: () {
+                        Navigator.of(context).push(MaterialPageRoute(
+                            builder: (context) => TermsConditions()));
+                      },
+                      child: ListTile(
+                        leading: Image.asset('assets/terms_conditions_icon.png'),
+                        title: Text(
+                          'Terms & Conditions',
+                          style: TextStyle(
+                              color: Colors.grey[700],
+                              fontWeight: FontWeight.w600,
+                              fontSize: 16.0),
+                        ),
+                        trailing: Image.asset('assets/arrow_right.png'),
+                      ),
+                    ),
+                    Divider(),
+                    InkWell(
+                      onTap: () {
+                        Navigator.of(context).push(MaterialPageRoute(
+                            builder: (context) => DisclaimerScreen()));
+                      },
+                      child: ListTile(
+                        leading: Image.asset('assets/terms_conditions_icon.png'),
+                        title: Text(
+                          'Disclaimer',
+                          style: TextStyle(
+                              color: Colors.grey[700],
+                              fontWeight: FontWeight.w600,
+                              fontSize: 16.0),
+                        ),
+                        trailing: Image.asset('assets/arrow_right.png'),
+                      ),
+                    ),
+                    Divider(),
+                    ListTile(
+                      onTap: () {
+                        showChangePasswordDialog(context);
+                      },
+                      leading: Image(
+                        image: AssetImage('assets/change_password_icon.png'),
+                      ),
+                      title: Text(
+                        'Change Password',
+                        style: TextStyle(
+                            color: Colors.grey[700],
+                            fontWeight: FontWeight.w600,
+                            fontSize: 16.0),
+                      ),
+                      trailing: Image.asset('assets/arrow_right.png'),
+                    ),
+                        ],
+                      ),
+                    )
+                  ],
                 ),
-            ],
-          ),
-        );
-      }),
+              ),
+            ),
+
+            //////// Log out  ///////////
+            Container(
+              // margin: EdgeInsets.only(top: 10.0),
+              width: double.infinity,
+              // padding: EdgeInsets.only(left: 40.0),
+              padding: kVerticalPadding(),
+              child: TextButton(
+                onPressed: () async {
+                  showLogoutConfirmationDialog(context);
+                  
+                },
+                style: ButtonStyle(
+                  shape: MaterialStateProperty.all(RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(14.0),
+                  )),
+                  foregroundColor: MaterialStateProperty.resolveWith<Color>(
+                      (Set<MaterialState> states) {
+                    if (states.contains(MaterialState.hovered) ||
+                        states.contains(MaterialState.focused))
+                      return Colors.grey.withOpacity(0.1);
+                    return Colors.grey.withOpacity(0.1);
+                  }),
+                  backgroundColor: MaterialStateProperty.resolveWith<Color>(
+                      (Set<MaterialState> states) {
+                    if (states.contains(MaterialState.hovered) ||
+                        states.contains(MaterialState.focused))
+                      return Colors.grey.withOpacity(0.1);
+
+                    return Colors.grey.withOpacity(0.1);
+                  }),
+                ),
+                child: Text(
+                  'Logout',
+                  style: TextStyle(
+                      color: ColorsTheme.dangerColor,
+                      fontWeight: FontWeight.w600,
+                      fontSize: 16.0),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }

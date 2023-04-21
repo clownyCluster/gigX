@@ -68,6 +68,9 @@ dependencies:
   web_socket_channel: ^2.3.0
   flutter_expandable_fab: ^1.7.1
   flutter_speed_dial: ^6.2.0
+  table_calendar: ^3.0.0
+  calendar_view: ^1.0.3
+  add_2_calendar: ^2.2.3
 
 dev_dependencies:
   flutter_test:

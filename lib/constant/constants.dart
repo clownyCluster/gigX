@@ -123,7 +123,7 @@ TextStyle kWhiteBoldTextStyle() => TextStyle(
     );
 
 TextStyle kkBoldTextStyle() => TextStyle(
-      // color: Colors.grey[800],
+      color: Colors.grey[800],
       fontFamily: 'QuickSand',
       fontSize: 16,
       fontWeight: FontWeight.bold,
@@ -168,6 +168,8 @@ Color blueColor = Color(0xff1A469D);
 Color darkGrey = Color.fromARGB(255, 14, 14, 15);
 Color yellowColor = Color(0xffFFCF01);
 Color errorColor = Colors.red;
+Color whiteColor = Colors.white;
+
 
 Color successColor = Colors.green;
 

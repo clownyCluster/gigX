@@ -1,4 +1,6 @@
 PODS:
+  - add_2_calendar (0.0.1):
+    - Flutter
   - Firebase/CoreOnly (10.3.0):
     - FirebaseCore (= 10.3.0)
   - Firebase/Messaging (10.3.0):
@@ -103,6 +105,7 @@ PODS:
     - Flutter
 
 DEPENDENCIES:
+  - add_2_calendar (from `.symlinks/plugins/add_2_calendar/ios`)
   - firebase_core (from `.symlinks/plugins/firebase_core/ios`)
   - firebase_messaging (from `.symlinks/plugins/firebase_messaging/ios`)
   - Flutter (from `Flutter`)
@@ -134,6 +137,8 @@ SPEC REPOS:
     - Toast
 
 EXTERNAL SOURCES:
+  add_2_calendar:
+    :path: ".symlinks/plugins/add_2_calendar/ios"
   firebase_core:
     :path: ".symlinks/plugins/firebase_core/ios"
   firebase_messaging:
@@ -160,6 +165,7 @@ EXTERNAL SOURCES:
     :path: ".symlinks/plugins/webview_flutter_wkwebview/ios"
 
 SPEC CHECKSUMS:
+  add_2_calendar: e9d68636aed37fb18e12f5a3d74c2e0589487af0
   Firebase: f92fc551ead69c94168d36c2b26188263860acd9
   firebase_core: 128d8c43c3a453a4a67463314fc3761bedff860b
   firebase_messaging: 8ac28baba96e69a58ad26b4bb5f9ee67c3e5efe2
@@ -189,4 +195,4 @@ SPEC CHECKSUMS:
 
 PODFILE CHECKSUM: cc1f88378b4bfcf93a6ce00d2c587857c6008d3b
 
-COCOAPODS: 1.11.3
+COCOAPODS: 1.12.0

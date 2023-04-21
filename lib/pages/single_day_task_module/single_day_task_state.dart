@@ -1,24 +1,27 @@
+import 'package:calendar_builder/calendar_builder.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:gigX/service/toastService.dart';
 import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:table_calendar/table_calendar.dart';
 
 import '../../api.dart';
 import '../../apiModels/myTodosModel.dart';
 import '../../login.dart';
 
-var date;
-
 class SingleDayTaskState extends ChangeNotifier {
   // String date;
+  var date;
   SingleDayTaskState(context) {
     final args = ModalRoute.of(context)?.settings.arguments;
     if (args != null) {
       date = args;
       notifyListeners();
     }
+    
     print(date);
-    getUserTasks(context);
+    getUserTasks();
   }
   MyTodos myTodosResponse = MyTodos();
   bool isLoading = false;
@@ -28,11 +31,40 @@ class SingleDayTaskState extends ChangeNotifier {
     notifyListeners();
   }
 
+  DateTime focusedDate = DateTime.now();
+
   bool isPressed = false;
   onPressed() {
     isPressed = !isPressed;
     notifyListeners();
     print(isPressed);
+  }
+
+  onDateChanged(val, tempFocusedDay) {
+    focusedDate = tempFocusedDay;
+    date = val;
+    notifyListeners();
+    // print(focusedDate);
+    // print(date);
+    getUserTasks();
+  }
+
+  onHolidayChanged(day) {
+    if (day == DateTime.saturday && day == DateTime.sunday) {
+      return true;
+    }
+  }
+
+  CalendarFormat _calendarFormat = CalendarFormat.month;
+
+  onFormatChanged(format) {
+    if (_calendarFormat != format) {
+      // Call `setState()` when updating calendar format
+
+      _calendarFormat = format;
+      notifyListeners();
+      print(_calendarFormat);
+    }
   }
 
   Map<String, dynamic> commentMap = {};
@@ -51,7 +83,7 @@ class SingleDayTaskState extends ChangeNotifier {
     print(commentMap[val]);
   }
 
-  getUserTasks(context) async {
+  getUserTasks() async {
     String formattedDate = DateFormat('yyyy-MM-dd').format(date);
 
     setLoading(true);
@@ -72,27 +104,30 @@ class SingleDayTaskState extends ChangeNotifier {
         print(response.data);
       } else if (response.statusCode == 401) {
         await this.preferences?.remove('access_token');
-        Navigator.of(context, rootNavigator: true).pushAndRemoveUntil(
-          MaterialPageRoute(
-            builder: (BuildContext context) {
-              return const Login();
-            },
-          ),
-          (_) => false,
-        );
+        ToastService().e('Session Expired, Proceed to login');
+        // Navigator.of(context, rootNavigator: true).pushAndRemoveUntil(
+        //   MaterialPageRoute(
+        //     builder: (BuildContext context) {
+        //       return const Login();
+        //     },
+        //   ),
+        //   (_) => false,
+        // );
       }
     } on DioError catch (e) {
       if (e.response?.statusCode == 401) {
         this.preferences?.setBool('someoneLoggedIn', true);
         await this.preferences?.remove('access_token');
-        Navigator.of(context, rootNavigator: true).pushAndRemoveUntil(
-          MaterialPageRoute(
-            builder: (BuildContext context) {
-              return const Login();
-            },
-          ),
-          (_) => false,
-        );
+        ToastService().e('Session Expired, Proceed to login');
+
+        // Navigator.of(context, rootNavigator: true).pushAndRemoveUntil(
+        //   MaterialPageRoute(
+        //     builder: (BuildContext context) {
+        //       return const Login();
+        //     },
+        //   ),
+        //   (_) => false,
+        // );
       }
     }
     setLoading(false);

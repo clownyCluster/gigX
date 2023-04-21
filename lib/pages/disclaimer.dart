@@ -1,23 +1,13 @@
-import 'dart:io';
-import 'package:gigX/colors.dart';
-import 'package:gigX/home.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/src/widgets/framework.dart';
+import 'package:flutter/src/widgets/placeholder.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 
 import '../constant/constants.dart';
+import '../home.dart';
 
-class PrivacyPolicy extends StatefulWidget {
-  @override
-  PrivacyPolicyState createState() => PrivacyPolicyState();
-}
-
-class PrivacyPolicyState extends State<PrivacyPolicy> {
-  @override
-  void initState() {
-    super.initState();
-    // Enable virtual display.
-    if (Platform.isAndroid) WebView.platform = AndroidWebView();
-  }
+class DisclaimerScreen extends StatelessWidget {
+  const DisclaimerScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -27,7 +17,7 @@ class PrivacyPolicyState extends State<PrivacyPolicy> {
         appBar: AppBar(
           iconTheme: IconThemeData(color: Colors.grey[800]),
           actionsIconTheme: IconThemeData(color: Colors.grey[800]),
-          title: Text('Privacy Policy', style: kkBoldTextStyle().copyWith(fontSize: 20, color: Colors.grey[800]),),
+          title: Text('Disclaimer', style: kkBoldTextStyle().copyWith(fontSize: 20, color: Colors.grey[800]),),
           centerTitle: true,
           backgroundColor: whiteColor,
           elevation: 0,
@@ -40,10 +30,10 @@ class PrivacyPolicyState extends State<PrivacyPolicy> {
                 // color: Colors.white,
               ),
               onPressed: () {
-                Navigator.pushReplacement(
-                    context,
-                    MaterialPageRoute(
-                        builder: (BuildContext context) => super.widget));
+                // Navigator.pushReplacement(
+                //     context,
+                //     MaterialPageRoute(
+                //         builder: (BuildContext context) => super.widget));
                 // do something
               },
             )
@@ -71,7 +61,7 @@ class PrivacyPolicyState extends State<PrivacyPolicy> {
           ),
         ),
         body: WebView(
-          initialUrl: 'https://gigxcoin.net/privacy-policy',
+          initialUrl: 'https://gigxcoin.net/disclaimer',
         ),
       ),
     );

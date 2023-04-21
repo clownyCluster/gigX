@@ -2,6 +2,8 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
+	<key>NSCalendarsUsageDescription</key>
+	<string>This app uses calendar to access the date and time of the tasks and event in the project.</string>
 	<key>CADisableMinimumFrameDurationOnPhone</key>
 	<true/>
 	<key>CFBundleDevelopmentRegion</key>
@@ -19,23 +21,23 @@
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleShortVersionString</key>
-	<string>3.0.1</string>
+	<string>3.0.2</string>
 	<key>CFBundleSignature</key>
 	<string>????</string>
 	<key>CFBundleVersion</key>
-	<string>3.0.1</string>
+	<string>3.0.2</string>
 	<key>ITSAppUsesNonExemptEncryption</key>
 	<false/>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
-	<key>NSCameraUsageDescription</key>
-	<string>Granting access will allow you to add profile picture.</string>
 	<key>NSFaceIDUsageDescription</key>
-	<string>Authnticating for login in using face id?</string>
+	<string>This application uses faceId to authenticate users to the application for secure and convinient authentication.</string>
+	<key>NSCameraUsageDescription</key>
+	<string>This app requires camera access to allow users to set their profile picture, select project thumbnail and to verify the users face Id.</string>
 	<key>NSMicrophoneUsageDescription</key>
-	<string>Allow access to microphone</string>
+	<string>This app uses microphone access to allow users to record and send voice messages.</string>
 	<key>NSPhotoLibraryUsageDescription</key>
-	<string>Allow access to photo library to add profile picture</string>
+	<string>This application uses photo library to add profile picture and allow users to select project thumbnail.</string>
 	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
 	<key>UIBackgroundModes</key>
