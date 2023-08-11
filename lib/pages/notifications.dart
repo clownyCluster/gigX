@@ -12,23 +12,6 @@ import 'package:timezone/timezone.dart' as tz;
 import 'package:timezone/data/latest.dart' as tz;
 import 'package:intl/intl.dart';
 
-class NotificationTab extends StatelessWidget {
-  const NotificationTab({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Notification Tab Page',
-      debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-          primarySwatch: Colors.blue,
-          fontFamily: 'Poppins',
-          scaffoldBackgroundColor: ColorsTheme.bgColor),
-      home: const NotificationTabPage(),
-    );
-  }
-}
-
 var height, width;
 
 class NotificationTabPage extends StatefulWidget {

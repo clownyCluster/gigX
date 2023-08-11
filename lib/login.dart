@@ -10,8 +10,6 @@ import 'package:gigX/home.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter/src/widgets/container.dart';
-import 'package:flutter/src/widgets/framework.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:gigX/pages/register_module/register_screen.dart';
@@ -310,6 +308,7 @@ class _LoginPageState extends State<LoginPage> {
                         fontSize: 16.0,
                         fontWeight: FontWeight.w600),
                   ),
+                  kSizedBox(),
                   TextField(
                     controller: txtEmailController,
                     keyboardType: TextInputType.emailAddress,
@@ -324,13 +323,17 @@ class _LoginPageState extends State<LoginPage> {
                     },
                   ),
                   LSizedBox(),
-                  AutoSizeText(
-                    'PASSWORD',
-                    style: TextStyle(
-                        color: Colors.black,
-                        fontSize: 16.0,
-                        fontWeight: FontWeight.w600),
+                  Container(
+                    
+                    child: AutoSizeText(
+                      'PASSWORD',
+                      style: TextStyle(
+                          color: Colors.black,
+                          fontSize: 16.0,
+                          fontWeight: FontWeight.w600),
+                    ),
                   ),
+                  kSizedBox(),
                   TextField(
                       controller: txtPasswordController,
                       obscureText: is_password_hidden,
@@ -447,29 +450,25 @@ class _LoginPageState extends State<LoginPage> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Expanded(
-                        child: Text(
-                          'Don\'t have an account yet?',
-                          style: kTextStyle().copyWith(
-                            fontWeight: FontWeight.w300,
-                          ),
+                      Text(
+                        'Don\'t have an account yet? ',
+                        style: kTextStyle().copyWith(
+                          fontWeight: FontWeight.w300,
                         ),
                       ),
-                      Expanded(
-                        child: InkWell(
-                          onTap: () {
-                            Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (context) => RegisterScreen()));
-                          },
-                          child: Text(
-                            'Register here',
-                            style: kTextStyle().copyWith(
-                              color: ColorsTheme.btnColor,
-                            ),
-                            overflow: TextOverflow.ellipsis,
+                      InkWell(
+                        onTap: () {
+                          Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => RegisterScreen()));
+                        },
+                        child: Text(
+                          'Register here',
+                          style: kTextStyle().copyWith(
+                            color: ColorsTheme.btnColor,
                           ),
+                          overflow: TextOverflow.ellipsis,
                         ),
                       ),
                     ],

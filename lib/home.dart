@@ -56,10 +56,10 @@ class _HomePageState extends State<HomePage> {
 
   int _selectedIndex = 0;
   List<Widget> _widgetOptions = <Widget>[
-    HomeTab(),
-    TaskTab(),
-    NotificationTab(),
-    AccountTab(),
+    HomeTabPage(),
+    TaskTabPage(),
+    NotificationTabPage(),
+    AccountTabPage(),
     ChangeNotifierProvider(
         create: (_) => ChatScreenState(), child: ChatScreen())
   ];

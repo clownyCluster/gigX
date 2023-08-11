@@ -25,22 +25,22 @@ import 'package:flutter/src/widgets/framework.dart';
 import 'package:lazy_load_scrollview/lazy_load_scrollview.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-class HomeTab extends StatelessWidget {
-  const HomeTab({super.key});
+// class HomeTab extends StatelessWidget {
+//   const HomeTab({super.key});
 
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Home Tab',
-      debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-          primarySwatch: Colors.blue,
-          fontFamily: 'Poppins',
-          scaffoldBackgroundColor: ColorsTheme.bgColor),
-      home: const HomeTabPage(),
-    );
-  }
-}
+//   @override
+//   Widget build(BuildContext context) {
+//     return MaterialApp(
+//       title: 'Home Tab',
+//       debugShowCheckedModeBanner: false,
+//       theme: ThemeData(
+//           primarySwatch: Colors.blue,
+//           fontFamily: 'Poppins',
+//           scaffoldBackgroundColor: ColorsTheme.bgColor),
+//       home: const HomeTabPage(),
+//     );
+//   }
+// }
 
 var height, width;
 
@@ -174,11 +174,6 @@ class _HomeTabPageState extends State<HomeTabPage> {
 
   init() async {
     String deviceToken = await getDeviceToken();
-    print("###### PRINT DEVICE TOKEN TO USE FOR PUSH NOTIFCIATION ######");
-    print(deviceToken);
-    print("############################################################");
-
-    // listen for user to click on notification
     FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage remoteMessage) {
       String? title = remoteMessage.notification!.title;
       String? description = remoteMessage.notification!.body;

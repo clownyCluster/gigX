@@ -38,7 +38,7 @@ dependencies:
   cupertino_icons: ^1.0.2
   auto_size_text: ^3.0.0
   back_button_interceptor: ^6.0.1
-  syncfusion_flutter_calendar: ^20.3.47
+  syncfusion_flutter_calendar: ^20.4.54
   flutter_rounded_date_picker: ^3.0.2
   calendar_date_picker2: ^0.2.5
   shared_preferences: ^2.0.15
@@ -71,6 +71,12 @@ dependencies:
   table_calendar: ^3.0.0
   calendar_view: ^1.0.3
   add_2_calendar: ^2.2.3
+  get: ^4.6.5
+  get_storage:
+  flutter_easyloading: ^3.0.5
+  paged_vertical_calendar: ^1.1.6
+  scrollable_clean_calendar: ^1.4.1
+  flutter_colorpicker: ^1.0.3
 
 dev_dependencies:
   flutter_test:

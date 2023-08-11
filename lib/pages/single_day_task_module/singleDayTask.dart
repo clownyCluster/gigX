@@ -1,7 +1,9 @@
 import 'dart:math';
 
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:gigX/colors.dart';
+import 'package:gigX/main.dart';
 import 'package:gigX/pages/single_day_task_module/single_day_task_state.dart';
 import 'package:jiffy/jiffy.dart';
 import 'package:provider/provider.dart';
@@ -25,21 +27,21 @@ class SingleDayTask extends StatelessWidget {
 
     CalendarController? calendarController;
     return Scaffold(
-      backgroundColor: Colors.white,
+      
       appBar: AppBar(
-        backgroundColor: Colors.white,
+        
         title: Text(
           'Tasks',
-          style:
-              kkBoldTextStyle().copyWith(fontSize: 24, color: Colors.grey[800]),
+          // style:
+          //     kkBoldTextStyle().copyWith(fontSize: 24, color: Colors.grey[800]),
         ),
-        iconTheme: IconThemeData().copyWith(color: darkGrey),
+        // iconTheme: IconThemeData().copyWith(color: darkGrey),
         elevation: 0,
         actions: [
           InkWell(
               child: Icon(
             Icons.filter_alt_outlined,
-            color: ColorsTheme.btnColor,
+            // color: ColorsTheme.btnColor,
             size: 35,
           )),
           largeWidthSpan()
@@ -48,19 +50,9 @@ class SingleDayTask extends StatelessWidget {
       body: Container(
         child: Column(
           children: [
-            // Row(
-            //   children: [
-            //     Text(
-            //       'Tasks',
-            //       style: kkBoldTextStyle(),
-            //     ),
-            //   ],
-            // ),
+            
             TableCalendar(
-              // calendarStyle: CalendarStyle(
-              //   isTodayHighlighted: true,
-              // ),
-// headerVisible: false,
+              
               daysOfWeekHeight: 40,
 
               firstDay: DateTime.utc(2010, 10, 16),
@@ -76,6 +68,10 @@ class SingleDayTask extends StatelessWidget {
               onFormatChanged: (format) {
                 state.onFormatChanged(format);
               },
+              daysOfWeekStyle: DaysOfWeekStyle(
+                weekdayStyle: TextStyle(color: Get.isDarkMode ? customLightTheme.scaffoldBackgroundColor : customDarkTheme.scaffoldBackgroundColor),
+                weekendStyle: TextStyle(color: Colors.red)
+              ),
               holidayPredicate: (day) {
                 // Every 20th day of the month will be treated as a holiday
                 return day.weekday >= 6;
@@ -83,6 +79,7 @@ class SingleDayTask extends StatelessWidget {
               startingDayOfWeek: StartingDayOfWeek.monday,
               calendarStyle: CalendarStyle(
                   // holidayDecoration: Decoration
+                  
                   holidayTextStyle:
                       const TextStyle(color: Color.fromARGB(255, 249, 0, 0)),
                   holidayDecoration: BoxDecoration(

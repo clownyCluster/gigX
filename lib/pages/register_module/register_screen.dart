@@ -2,6 +2,8 @@ import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/src/widgets/container.dart';
 import 'package:flutter/src/widgets/framework.dart';
+import 'package:get/get.dart';
+import 'package:gigX/appRoute/routeName.dart';
 import 'package:gigX/colors.dart';
 import 'package:gigX/constant/constants.dart';
 import 'package:gigX/login.dart';
@@ -39,7 +41,8 @@ class RegisterScreen extends StatelessWidget {
               sSizedBox(),
               TextFormField(
                 decoration: InputDecoration(
-                    hintText: 'Enter your name', focusColor: ColorsTheme.btnColor
+                    hintText: 'Enter your name',
+                    focusColor: ColorsTheme.btnColor
                     // focusedBorder: OutlineInputBorder(borderSide: BorderSide(color: ColorsTheme.btnColor))
                     ),
               ),
@@ -51,7 +54,8 @@ class RegisterScreen extends StatelessWidget {
               sSizedBox(),
               TextFormField(
                 decoration: InputDecoration(
-                    hintText: 'Enter your email', focusColor: ColorsTheme.btnColor
+                    hintText: 'Enter your email',
+                    focusColor: ColorsTheme.btnColor
                     // focusedBorder: OutlineInputBorder(borderSide: BorderSide(color: ColorsTheme.btnColor))
                     ),
               ),
@@ -122,7 +126,7 @@ class RegisterScreen extends StatelessWidget {
                 child: TextButton(
                   onPressed: () async {
                     // is_logged_in = await login();
-        
+
                     // if (is_logged_in) {
                     //   Navigator.of(context).push(MaterialPageRoute(
                     //       builder: (context) => Home(),
@@ -156,8 +160,7 @@ class RegisterScreen extends StatelessWidget {
                   ),
                   InkWell(
                     onTap: () {
-                      Navigator.push(context,
-                          MaterialPageRoute(builder: (context) => Login()));
+                      Get.toNamed(RouteName.loginScreen);
                     },
                     child: Text(
                       ' Login',

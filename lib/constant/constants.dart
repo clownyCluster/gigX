@@ -23,8 +23,6 @@ SizedBox largeWidthSpan() => const SizedBox(
       width: 20,
     );
 
-    
-
 EdgeInsets kStandardPadding() =>
     const EdgeInsets.symmetric(horizontal: 20, vertical: 10);
 
@@ -92,7 +90,7 @@ TextStyle kTextStyle() => TextStyle(
     );
 
 TextStyle kkTextStyle() => TextStyle(
-      // color: Colors.grey[800],
+      color: Colors.grey[800],
       fontFamily: 'QuickSand',
       fontSize: 16,
     );
@@ -109,7 +107,7 @@ TextStyle sWhiteTextStyle() => TextStyle(
     );
 
 TextStyle kBoldTextStyle() => TextStyle(
-      // color: Colors.grey[800],
+      color: Colors.grey[800],
       fontFamily: 'QuickSand',
       fontSize: 14,
       fontWeight: FontWeight.w700,
@@ -123,7 +121,7 @@ TextStyle kWhiteBoldTextStyle() => TextStyle(
     );
 
 TextStyle kkBoldTextStyle() => TextStyle(
-      color: Colors.grey[800],
+      // color: Colors.grey[800],
       fontFamily: 'QuickSand',
       fontSize: 16,
       fontWeight: FontWeight.bold,
@@ -135,14 +133,14 @@ TextStyle kkWhiteBoldTextStyle() => TextStyle(
       fontSize: 18,
       fontWeight: FontWeight.bold,
     );
-    TextStyle kkWhiteTextStyle() => TextStyle(
+TextStyle kkWhiteTextStyle() => TextStyle(
       color: Colors.white,
       fontFamily: 'QuickSand',
       fontSize: 18,
       fontWeight: FontWeight.w400,
     );
 
-    TextStyle kWhiteTextStyle() => TextStyle(
+TextStyle kWhiteTextStyle() => TextStyle(
       color: Colors.white,
       fontFamily: 'QuickSand',
       fontSize: 14,
@@ -163,13 +161,14 @@ TextStyle sBoldTextStyle() => TextStyle(
       fontWeight: FontWeight.bold,
     );
 
-Color primaryColor = Color(0xFFC83030).withOpacity(0.96);
+Color primaryColor = Color(0xff083EA1);
 Color blueColor = Color(0xff1A469D);
 Color darkGrey = Color.fromARGB(255, 14, 14, 15);
 Color yellowColor = Color(0xffFFCF01);
 Color errorColor = Colors.red;
 Color whiteColor = Colors.white;
-
+Color greyColor = Color(0xff303131);
+Color buttonColor = Color(0xff65feda);
 
 Color successColor = Colors.green;
 
@@ -215,12 +214,8 @@ const kBodyTextStyle = TextStyle(
 
 class kText extends StatelessWidget {
   String? txt;
-  TextStyle ? style;
-   kText({
-    this.txt,
-    super.key,
-    this.style
-  });
+  TextStyle? style;
+  kText({this.txt, super.key, this.style});
 
   @override
   Widget build(BuildContext context) {

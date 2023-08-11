@@ -85,43 +85,43 @@ class _ProjectDetailsPageState extends State<ProjectDetailsPage> {
   late ScrollController controller;
 
   @override
-  void initState() {
-    // TODO: implement initState
-    WidgetsFlutterBinding.ensureInitialized();
+  // void initState() {
+  //   // TODO: implement initState
+  //   WidgetsFlutterBinding.ensureInitialized();
 
-    super.initState();
+  //   super.initState();
 
-    KeyboardVisibilityController().onChange.listen((isVisible) {
-      setState(() {
-        keyboardVisible = isVisible;
-      });
-    });
-    setState(() {
-      inCompColor = Colors.black;
-      compColor = Colors.black;
-      inprogColor = Colors.black;
-      todoColor = Colors.black;
-    });
-    controller = ScrollController();
+  //   KeyboardVisibilityController().onChange.listen((isVisible) {
+  //     setState(() {
+  //       keyboardVisible = isVisible;
+  //     });
+  //   });
+  //   setState(() {
+  //     inCompColor = Colors.black;
+  //     compColor = Colors.black;
+  //     inprogColor = Colors.black;
+  //     todoColor = Colors.black;
+  //   });
+  //   controller = ScrollController();
 
-    list = List.generate(4, (index) => null);
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      pref();
-      getTasks();
-      getUsers();
-      getProjects();
-    });
+  //   list = List.generate(4, (index) => null);
+  //   WidgetsBinding.instance.addPostFrameCallback((_) {
+  //     pref();
+  //     getTasks();
+  //     getUsers();
+  //     getProjects();
+  //   });
 
-    controller.addListener(() {
-      if (controller.position.pixels == controller.position.maxScrollExtent) {
-        // pageNumber++;
+  //   controller.addListener(() {
+  //     if (controller.position.pixels == controller.position.maxScrollExtent) {
+  //       // pageNumber++;
 
-        setState(() {
-          getMoreProjects();
-        }); // if add this, Reload your futurebuilder and load more data
-      }
-    });
-  }
+  //       setState(() {
+  //         getMoreProjects();
+  //       }); // if add this, Reload your futurebuilder and load more data
+  //     }
+  //   });
+  // }
 
   Future<void> pref() async {
     this.preferences = await SharedPreferences.getInstance();
@@ -1147,623 +1147,623 @@ class _ProjectDetailsPageState extends State<ProjectDetailsPage> {
   Widget build(BuildContext context) {
     height = MediaQuery.of(context).size.height;
     width = MediaQuery.of(context).size.width;
-    return Scaffold(
+  return Scaffold(
+    backgroundColor: whiteColor,
+    appBar: AppBar(
       backgroundColor: whiteColor,
-      appBar: AppBar(
-        backgroundColor: whiteColor,
-        centerTitle: false,
-        elevation: 0,
-        title: Container(
-          // padding: EdgeInsets.all(15.0),
-          // margin: EdgeInsets.only(top: 40.0),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: <Widget>[
-              Row(
-                mainAxisAlignment: MainAxisAlignment.start,
-                children: [
-                  Container(
-                    child: IconButton(
-                        onPressed: () async {
-                          Navigator.of(context).push(
-                              MaterialPageRoute(builder: (context) => Home()));
-                        },
-                        icon: Icon(
-                          Icons.arrow_back,
-                          color: Colors.black,
-                        )),
-                  ),
-                  Container(
-                    // padding: EdgeInsets.all(50.0),
+      centerTitle: false,
+      elevation: 0,
+      title: Container(
+        // padding: EdgeInsets.all(15.0),
+        // margin: EdgeInsets.only(top: 40.0),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: <Widget>[
+            Row(
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: [
+                Container(
+                  child: IconButton(
+                      onPressed: () async {
+                        Navigator.of(context).push(
+                            MaterialPageRoute(builder: (context) => Home()));
+                      },
+                      icon: Icon(
+                        Icons.arrow_back,
+                        color: Colors.black,
+                      )),
+                ),
+                Container(
+                  // padding: EdgeInsets.all(50.0),
 
-                    child: new RichText(
-                        text: new TextSpan(children: [
-                      new TextSpan(
-                          text: '$project_title \n',
-                          style: TextStyle(
-                              color: Colors.black,
-                              fontSize: 20.0,
-                              fontWeight: FontWeight.w600)),
-                      new TextSpan(
-                          text: '${tasks.length} Tasks',
-                          style: TextStyle(color: ColorsTheme.txtDescColor))
-                    ])),
-                  ),
-                ],
-              ),
-              // GestureDetector(
-              //   onTap: () {
-              //     showMemberDialog(context);
-              //   },
-              //   child: Container(
-              //     child: Image(
-              //         image: AssetImage('assets/add_member_icon.png')),
-              //   ),
-              // )
-            ],
-          ),
+                  child: new RichText(
+                      text: new TextSpan(children: [
+                    new TextSpan(
+                        text: '$project_title \n',
+                        style: TextStyle(
+                            color: Colors.black,
+                            fontSize: 20.0,
+                            fontWeight: FontWeight.w600)),
+                    new TextSpan(
+                        text: '${tasks.length} Tasks',
+                        style: TextStyle(color: ColorsTheme.txtDescColor))
+                  ])),
+                ),
+              ],
+            ),
+            // GestureDetector(
+            //   onTap: () {
+            //     showMemberDialog(context);
+            //   },
+            //   child: Container(
+            //     child: Image(
+            //         image: AssetImage('assets/add_member_icon.png')),
+            //   ),
+            // )
+          ],
         ),
       ),
-      resizeToAvoidBottomInset: false,
-      body: OrientationBuilder(builder: (context, orientation) {
-        return SingleChildScrollView(
-          child: Container(
-            width: width,
-            // height: orientation == Orientation.portrait ? height : height * 2.2,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                kSizedBox(),
-                Container(
-                  height: 45,
-                  width: width * 0.95,
-                  margin: EdgeInsets.only(left: 30.0),
-                  child: SingleChildScrollView(
-                    scrollDirection: Axis.horizontal,
-                    child: Row(
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      children: [
-                        
-                        TextButton(
-                            onPressed: () {
-                              setState(() {
-                                compColor = Colors.black;
-                                inprogColor = Colors.black;
-                                todoColor = Colors.black;
-                                inCompColor = ColorsTheme.inCompbtnColor;
-                                tasks = tasks_duplicate;
-                                tasks = tasks
-                                    .where(
-                                        (element) => element['category'] == 2)
-                                    .toList();
-                              });
-                            },
-                            style: ButtonStyle(
-                              shape: MaterialStateProperty.all(
-                                  RoundedRectangleBorder(
-                                side: BorderSide(color: inCompColor),
-                                borderRadius: BorderRadius.circular(14.0),
-                              )),
-                              foregroundColor:
-                                  MaterialStateProperty.resolveWith<Color>(
-                                      (Set<MaterialState> states) {
-                                if (states.contains(MaterialState.hovered) ||
-                                    states.contains(MaterialState.focused))
-                                  return ColorsTheme.txtDescColor;
-                                return ColorsTheme.txtDescColor;
-                              }),
-                              backgroundColor:
-                                  MaterialStateProperty.resolveWith<Color>(
-                                      (Set<MaterialState> states) {
-                                if (states.contains(MaterialState.hovered) ||
-                                    states.contains(MaterialState.focused))
-                                  return ColorsTheme.bgColor;
-
-                                return ColorsTheme.bgColor;
-                              }),
-                            ),
-                            child: Text(
-                              'Pending',
-                              style: TextStyle(
-                                  color: inCompColor,
-                                  fontSize: 12.0,
-                                  fontWeight: FontWeight.w400),
+    ),
+    resizeToAvoidBottomInset: false,
+    body: OrientationBuilder(builder: (context, orientation) {
+      return SingleChildScrollView(
+        child: Container(
+          width: width,
+          // height: orientation == Orientation.portrait ? height : height * 2.2,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              kSizedBox(),
+              Container(
+                height: 45,
+                width: width * 0.95,
+                margin: EdgeInsets.only(left: 30.0),
+                child: SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      
+                      TextButton(
+                          onPressed: () {
+                            setState(() {
+                              compColor = Colors.black;
+                              inprogColor = Colors.black;
+                              todoColor = Colors.black;
+                              inCompColor = ColorsTheme.inCompbtnColor;
+                              tasks = tasks_duplicate;
+                              tasks = tasks
+                                  .where(
+                                      (element) => element['category'] == 2)
+                                  .toList();
+                            });
+                          },
+                          style: ButtonStyle(
+                            shape: MaterialStateProperty.all(
+                                RoundedRectangleBorder(
+                              side: BorderSide(color: inCompColor),
+                              borderRadius: BorderRadius.circular(14.0),
                             )),
-                        SizedBox(
-                          width: 10.0,
-                        ),
-                        TextButton(
-                            onPressed: () {
-                              setState(() {
-                                compColor = Colors.black;
-                                inprogColor = Colors.black;
-                                todoColor = ColorsTheme.uIUxColor;
-                                inCompColor = Colors.black;
-                                tasks = tasks_duplicate;
-
-                                tasks = tasks
-                                    .where(
-                                        (element) => element['category'] == 0)
-                                    .toList();
-                              });
-                            },
-                            style: ButtonStyle(
-                              shape: MaterialStateProperty.all(
-                                  RoundedRectangleBorder(
-                                side: BorderSide(color: todoColor),
-                                borderRadius: BorderRadius.circular(14.0),
-                              )),
-                              foregroundColor:
-                                  MaterialStateProperty.resolveWith<Color>(
-                                      (Set<MaterialState> states) {
-                                if (states.contains(MaterialState.hovered) ||
-                                    states.contains(MaterialState.focused))
-                                  return ColorsTheme.txtDescColor;
+                            foregroundColor:
+                                MaterialStateProperty.resolveWith<Color>(
+                                    (Set<MaterialState> states) {
+                              if (states.contains(MaterialState.hovered) ||
+                                  states.contains(MaterialState.focused))
                                 return ColorsTheme.txtDescColor;
-                              }),
-                              backgroundColor:
-                                  MaterialStateProperty.resolveWith<Color>(
-                                      (Set<MaterialState> states) {
-                                if (states.contains(MaterialState.hovered) ||
-                                    states.contains(MaterialState.focused))
-                                  return ColorsTheme.bgColor;
-
+                              return ColorsTheme.txtDescColor;
+                            }),
+                            backgroundColor:
+                                MaterialStateProperty.resolveWith<Color>(
+                                    (Set<MaterialState> states) {
+                              if (states.contains(MaterialState.hovered) ||
+                                  states.contains(MaterialState.focused))
                                 return ColorsTheme.bgColor;
-                              }),
-                            ),
-                            child: Text(
-                              'Todo',
-                              style: TextStyle(
-                                  color: todoColor,
-                                  fontSize: 12.0,
-                                  fontWeight: FontWeight.w400),
+
+                              return ColorsTheme.bgColor;
+                            }),
+                          ),
+                          child: Text(
+                            'Pending',
+                            style: TextStyle(
+                                color: inCompColor,
+                                fontSize: 12.0,
+                                fontWeight: FontWeight.w400),
+                          )),
+                      SizedBox(
+                        width: 10.0,
+                      ),
+                      TextButton(
+                          onPressed: () {
+                            setState(() {
+                              compColor = Colors.black;
+                              inprogColor = Colors.black;
+                              todoColor = ColorsTheme.uIUxColor;
+                              inCompColor = Colors.black;
+                              tasks = tasks_duplicate;
+
+                              tasks = tasks
+                                  .where(
+                                      (element) => element['category'] == 0)
+                                  .toList();
+                            });
+                          },
+                          style: ButtonStyle(
+                            shape: MaterialStateProperty.all(
+                                RoundedRectangleBorder(
+                              side: BorderSide(color: todoColor),
+                              borderRadius: BorderRadius.circular(14.0),
                             )),
-                        SizedBox(
-                          width: 10.0,
-                        ),
-                        TextButton(
-                            onPressed: () {
-                              setState(() {
-                                inCompColor = Colors.black;
-                                inprogColor = Colors.black;
-                                todoColor = Colors.black;
-                                compColor = ColorsTheme.compbtnColor;
-                                tasks = tasks_duplicate;
-                                tasks = tasks
-                                    .where(
-                                        (element) => element['category'] == 3)
-                                    .toList();
-                              });
-                            },
-                            style: ButtonStyle(
-                              shape: MaterialStateProperty.all(
-                                  RoundedRectangleBorder(
-                                side: BorderSide(color: compColor),
-                                borderRadius: BorderRadius.circular(14.0),
-                              )),
-                              foregroundColor:
-                                  MaterialStateProperty.resolveWith<Color>(
-                                      (Set<MaterialState> states) {
-                                if (states.contains(MaterialState.hovered) ||
-                                    states.contains(MaterialState.focused))
-                                  return ColorsTheme.txtDescColor;
+                            foregroundColor:
+                                MaterialStateProperty.resolveWith<Color>(
+                                    (Set<MaterialState> states) {
+                              if (states.contains(MaterialState.hovered) ||
+                                  states.contains(MaterialState.focused))
                                 return ColorsTheme.txtDescColor;
-                              }),
-                              backgroundColor:
-                                  MaterialStateProperty.resolveWith<Color>(
-                                      (Set<MaterialState> states) {
-                                if (states.contains(MaterialState.hovered) ||
-                                    states.contains(MaterialState.focused))
-                                  return ColorsTheme.bgColor;
-
+                              return ColorsTheme.txtDescColor;
+                            }),
+                            backgroundColor:
+                                MaterialStateProperty.resolveWith<Color>(
+                                    (Set<MaterialState> states) {
+                              if (states.contains(MaterialState.hovered) ||
+                                  states.contains(MaterialState.focused))
                                 return ColorsTheme.bgColor;
-                              }),
-                            ),
-                            child: Text(
-                              'Completed',
-                              style: TextStyle(
-                                  color: compColor,
-                                  fontSize: 12.0,
-                                  fontWeight: FontWeight.w400),
-                            )),
-                        SizedBox(
-                          width: 10.0,
-                        ),
-                        TextButton(
-                            onPressed: () {
-                              setState(() {
-                                inCompColor = Colors.black;
-                                compColor = Colors.black;
-                                todoColor = Colors.black;
-                                inprogColor = ColorsTheme.inProgbtnColor;
 
-                                tasks = tasks_duplicate;
-                                tasks = tasks
-                                    .where(
-                                        (element) => element['category'] == 1)
-                                    .toList();
-                              });
-                            },
-                            style: ButtonStyle(
-                              shape: MaterialStateProperty.all(
-                                  RoundedRectangleBorder(
-                                side: BorderSide(color: inprogColor),
-                                borderRadius: BorderRadius.circular(14.0),
-                              )),
-                              foregroundColor:
-                                  MaterialStateProperty.resolveWith<Color>(
-                                      (Set<MaterialState> states) {
-                                if (states.contains(MaterialState.hovered) ||
-                                    states.contains(MaterialState.focused))
-                                  return ColorsTheme.txtDescColor;
+                              return ColorsTheme.bgColor;
+                            }),
+                          ),
+                          child: Text(
+                            'Todo',
+                            style: TextStyle(
+                                color: todoColor,
+                                fontSize: 12.0,
+                                fontWeight: FontWeight.w400),
+                          )),
+                      SizedBox(
+                        width: 10.0,
+                      ),
+                      TextButton(
+                          onPressed: () {
+                            setState(() {
+                              inCompColor = Colors.black;
+                              inprogColor = Colors.black;
+                              todoColor = Colors.black;
+                              compColor = ColorsTheme.compbtnColor;
+                              tasks = tasks_duplicate;
+                              tasks = tasks
+                                  .where(
+                                      (element) => element['category'] == 3)
+                                  .toList();
+                            });
+                          },
+                          style: ButtonStyle(
+                            shape: MaterialStateProperty.all(
+                                RoundedRectangleBorder(
+                              side: BorderSide(color: compColor),
+                              borderRadius: BorderRadius.circular(14.0),
+                            )),
+                            foregroundColor:
+                                MaterialStateProperty.resolveWith<Color>(
+                                    (Set<MaterialState> states) {
+                              if (states.contains(MaterialState.hovered) ||
+                                  states.contains(MaterialState.focused))
                                 return ColorsTheme.txtDescColor;
-                              }),
-                              backgroundColor:
-                                  MaterialStateProperty.resolveWith<Color>(
-                                      (Set<MaterialState> states) {
-                                if (states.contains(MaterialState.hovered) ||
-                                    states.contains(MaterialState.focused))
-                                  return ColorsTheme.bgColor;
-
+                              return ColorsTheme.txtDescColor;
+                            }),
+                            backgroundColor:
+                                MaterialStateProperty.resolveWith<Color>(
+                                    (Set<MaterialState> states) {
+                              if (states.contains(MaterialState.hovered) ||
+                                  states.contains(MaterialState.focused))
                                 return ColorsTheme.bgColor;
-                              }),
-                            ),
-                            child: Text(
-                              'In Progress',
-                              style: TextStyle(
-                                  color: inprogColor,
-                                  fontSize: 12.0,
-                                  fontWeight: FontWeight.w400),
+
+                              return ColorsTheme.bgColor;
+                            }),
+                          ),
+                          child: Text(
+                            'Completed',
+                            style: TextStyle(
+                                color: compColor,
+                                fontSize: 12.0,
+                                fontWeight: FontWeight.w400),
+                          )),
+                      SizedBox(
+                        width: 10.0,
+                      ),
+                      TextButton(
+                          onPressed: () {
+                            setState(() {
+                              inCompColor = Colors.black;
+                              compColor = Colors.black;
+                              todoColor = Colors.black;
+                              inprogColor = ColorsTheme.inProgbtnColor;
+
+                              tasks = tasks_duplicate;
+                              tasks = tasks
+                                  .where(
+                                      (element) => element['category'] == 1)
+                                  .toList();
+                            });
+                          },
+                          style: ButtonStyle(
+                            shape: MaterialStateProperty.all(
+                                RoundedRectangleBorder(
+                              side: BorderSide(color: inprogColor),
+                              borderRadius: BorderRadius.circular(14.0),
                             )),
-                      ],
-                    ),
+                            foregroundColor:
+                                MaterialStateProperty.resolveWith<Color>(
+                                    (Set<MaterialState> states) {
+                              if (states.contains(MaterialState.hovered) ||
+                                  states.contains(MaterialState.focused))
+                                return ColorsTheme.txtDescColor;
+                              return ColorsTheme.txtDescColor;
+                            }),
+                            backgroundColor:
+                                MaterialStateProperty.resolveWith<Color>(
+                                    (Set<MaterialState> states) {
+                              if (states.contains(MaterialState.hovered) ||
+                                  states.contains(MaterialState.focused))
+                                return ColorsTheme.bgColor;
+
+                              return ColorsTheme.bgColor;
+                            }),
+                          ),
+                          child: Text(
+                            'In Progress',
+                            style: TextStyle(
+                                color: inprogColor,
+                                fontSize: 12.0,
+                                fontWeight: FontWeight.w400),
+                          )),
+                    ],
                   ),
                 ),
-                if (tasks.isNotEmpty)
-                  Container(
-                    width: width,
-                    height: orientation == Orientation.portrait
-                        ? height * 0.735
-                        : height,
-                    padding: EdgeInsets.only(left: 15.0),
-                    child: LazyLoadScrollView(
-                      onEndOfPage: () => show_loading(),
-                      child: ListView.builder(
-                          controller: controller,
-                          itemCount: list.length < tasks.length
-                              ? list.length + 1
-                              : tasks.length,
-                          shrinkWrap: true,
-                          // itemExtent: 250.0,
-                          itemBuilder: (BuildContext context, index) {
-                            if (index == list.length)
-                              return Center(
-                                  child: CircularProgressIndicator(
-                                color: ColorsTheme.btnColor,
-                              ));
-                            return Container(
-                              margin: EdgeInsets.all(10),
-                              width: width,
-                              child: GestureDetector(
-                                onTap: () async {
-                                  this.preferences =
-                                      await SharedPreferences.getInstance();
-                                  this
-                                      .preferences
-                                      ?.setInt('task_id', tasks[index]['id']);
-                                  Navigator.of(context, rootNavigator: false)
-                                      .push(MaterialPageRoute(
-                                          builder: (context) => TaskDetails()));
-                                },
-                                child: Container(
-                                  // height: 180.0,
-                                  decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.circular(20.0),
-                                      border: Border.all(
-                                          color: Color.fromARGB(
-                                              255, 208, 203, 203),
-                                          width: 1.0)),
-                                  child: Column(children: [
-                                    Container(
-                                      // padding: EdgeInsets.all(20.0),
-                                      padding: kStandardPadding(),
-                                      child: Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.start,
-                                        children: [
-                                          // SizedBox(
-                                          //   width: tasks[index]['title']
-                                          //               .toString()
-                                          //               .length >
-                                          //           20
-                                          //       ? width * 0.5
-                                          //       : width * 0.4,
-                                          //   height: 40.0,
-                                          //   child: TextButton(
-                                          //     style: ButtonStyle(
-                                          //       shape:
-                                          //           MaterialStateProperty.all(
-                                          //               RoundedRectangleBorder(
-                                          //         borderRadius:
-                                          //             BorderRadius.circular(
-                                          //                 30.0),
-                                          //       )),
-                                          //       foregroundColor:
-                                          //           MaterialStateProperty
-                                          //               .resolveWith<Color>(
-                                          //                   (Set<MaterialState>
-                                          //                       states) {
-                                          //         if (states.contains(
-                                          //                 MaterialState
-                                          //                     .hovered) ||
-                                          //             states.contains(
-                                          //                 MaterialState
-                                          //                     .focused))
-                                          //           return ColorsTheme
-                                          //               .uIUxColor;
-                                          //         return ColorsTheme.uIUxColor;
-                                          //       }),
-                                          //       backgroundColor:
-                                          //           MaterialStateProperty
-                                          //               .resolveWith<Color>(
-                                          //                   (Set<MaterialState>
-                                          //                       states) {
-                                          //         if (states.contains(
-                                          //                 MaterialState
-                                          //                     .hovered) ||
-                                          //             states.contains(
-                                          //                 MaterialState
-                                          //                     .focused))
-                                          //           return Colors
-                                          //               .purple.shade100;
+              ),
+              if (tasks.isNotEmpty)
+                Container(
+                  width: width,
+                  height: orientation == Orientation.portrait
+                      ? height * 0.735
+                      : height,
+                  padding: EdgeInsets.only(left: 15.0),
+                  child: LazyLoadScrollView(
+                    onEndOfPage: () => show_loading(),
+                    child: ListView.builder(
+                        controller: controller,
+                        itemCount: list.length < tasks.length
+                            ? list.length + 1
+                            : tasks.length,
+                        shrinkWrap: true,
+                        // itemExtent: 250.0,
+                        itemBuilder: (BuildContext context, index) {
+                          if (index == list.length)
+                            return Center(
+                                child: CircularProgressIndicator(
+                              color: ColorsTheme.btnColor,
+                            ));
+                          return Container(
+                            margin: EdgeInsets.all(10),
+                            width: width,
+                            child: GestureDetector(
+                              onTap: () async {
+                                this.preferences =
+                                    await SharedPreferences.getInstance();
+                                this
+                                    .preferences
+                                    ?.setInt('task_id', tasks[index]['id']);
+                                Navigator.of(context, rootNavigator: false)
+                                    .push(MaterialPageRoute(
+                                        builder: (context) => TaskDetails()));
+                              },
+                              child: Container(
+                                // height: 180.0,
+                                decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(20.0),
+                                    border: Border.all(
+                                        color: Color.fromARGB(
+                                            255, 208, 203, 203),
+                                        width: 1.0)),
+                                child: Column(children: [
+                                  Container(
+                                    // padding: EdgeInsets.all(20.0),
+                                    padding: kStandardPadding(),
+                                    child: Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.start,
+                                      children: [
+                                        // SizedBox(
+                                        //   width: tasks[index]['title']
+                                        //               .toString()
+                                        //               .length >
+                                        //           20
+                                        //       ? width * 0.5
+                                        //       : width * 0.4,
+                                        //   height: 40.0,
+                                        //   child: TextButton(
+                                        //     style: ButtonStyle(
+                                        //       shape:
+                                        //           MaterialStateProperty.all(
+                                        //               RoundedRectangleBorder(
+                                        //         borderRadius:
+                                        //             BorderRadius.circular(
+                                        //                 30.0),
+                                        //       )),
+                                        //       foregroundColor:
+                                        //           MaterialStateProperty
+                                        //               .resolveWith<Color>(
+                                        //                   (Set<MaterialState>
+                                        //                       states) {
+                                        //         if (states.contains(
+                                        //                 MaterialState
+                                        //                     .hovered) ||
+                                        //             states.contains(
+                                        //                 MaterialState
+                                        //                     .focused))
+                                        //           return ColorsTheme
+                                        //               .uIUxColor;
+                                        //         return ColorsTheme.uIUxColor;
+                                        //       }),
+                                        //       backgroundColor:
+                                        //           MaterialStateProperty
+                                        //               .resolveWith<Color>(
+                                        //                   (Set<MaterialState>
+                                        //                       states) {
+                                        //         if (states.contains(
+                                        //                 MaterialState
+                                        //                     .hovered) ||
+                                        //             states.contains(
+                                        //                 MaterialState
+                                        //                     .focused))
+                                        //           return Colors
+                                        //               .purple.shade100;
 
-                                          //         return Colors.purple.shade100;
-                                          //       }),
-                                          //     ),
-                                          //     child: AutoSizeText(
-                                          //       tasks[index]['title'],
-                                          //       maxLines: 1,
-                                          //       style: TextStyle(
-                                          //           color:
-                                          //               ColorsTheme.uIUxColor,
-                                          //           fontSize: 12.0,
-                                          //           overflow:
-                                          //               TextOverflow.ellipsis,
-                                          //           fontWeight:
-                                          //               FontWeight.w400),
-                                          //     ),
-                                          //     onPressed: () {},
-                                          //   ),
-                                          // ),
-                                          SizedBox(
-                                            width: 10.0,
-                                          ),
-                                          TextButton(
-                                            style: ButtonStyle(
-                                              shape:
-                                                  MaterialStateProperty.all(
-                                                      RoundedRectangleBorder(
-                                                borderRadius:
-                                                    BorderRadius.circular(
-                                                        30.0),
-                                              )),
-                                              foregroundColor:
-                                                  MaterialStateProperty
-                                                      .resolveWith<Color>(
-                                                          (Set<MaterialState>
-                                                              states) {
-                                                if (states.contains(
-                                                        MaterialState
-                                                            .hovered) ||
-                                                    states.contains(
-                                                        MaterialState
-                                                            .focused))
-                                                  return tasks[index]
-                                                              ['priority'] ==
-                                                          0
-                                                      ? ColorsTheme
-                                                          .compbtnColor
-                                                      : tasks[index][
-                                                                  'priority'] ==
-                                                              1
-                                                          ? ColorsTheme
-                                                              .inCompbtnColor
-                                                          : ColorsTheme
-                                                              .inProgbtnColor;
-                                                return ColorsTheme.uIUxColor;
-                                              }),
-                                              backgroundColor:
-                                                  MaterialStateProperty
-                                                      .resolveWith<Color>(
-                                                          (Set<MaterialState>
-                                                              states) {
-                                                if (states.contains(
-                                                        MaterialState
-                                                            .hovered) ||
-                                                    states.contains(
-                                                        MaterialState
-                                                            .focused))
-                                                  return tasks[index]
-                                                              ['priority'] ==
-                                                          0
-                                                      ? ColorsTheme
-                                                          .compbtnColor
-                                                      : tasks[index][
-                                                                  'priority'] ==
-                                                              1
-                                                          ? ColorsTheme
-                                                              .inCompbtnColor
-                                                          : ColorsTheme
-                                                              .inProgbtnColor;
-                                                ;
-
+                                        //         return Colors.purple.shade100;
+                                        //       }),
+                                        //     ),
+                                        //     child: AutoSizeText(
+                                        //       tasks[index]['title'],
+                                        //       maxLines: 1,
+                                        //       style: TextStyle(
+                                        //           color:
+                                        //               ColorsTheme.uIUxColor,
+                                        //           fontSize: 12.0,
+                                        //           overflow:
+                                        //               TextOverflow.ellipsis,
+                                        //           fontWeight:
+                                        //               FontWeight.w400),
+                                        //     ),
+                                        //     onPressed: () {},
+                                        //   ),
+                                        // ),
+                                        SizedBox(
+                                          width: 10.0,
+                                        ),
+                                        TextButton(
+                                          style: ButtonStyle(
+                                            shape:
+                                                MaterialStateProperty.all(
+                                                    RoundedRectangleBorder(
+                                              borderRadius:
+                                                  BorderRadius.circular(
+                                                      30.0),
+                                            )),
+                                            foregroundColor:
+                                                MaterialStateProperty
+                                                    .resolveWith<Color>(
+                                                        (Set<MaterialState>
+                                                            states) {
+                                              if (states.contains(
+                                                      MaterialState
+                                                          .hovered) ||
+                                                  states.contains(
+                                                      MaterialState
+                                                          .focused))
                                                 return tasks[index]
                                                             ['priority'] ==
                                                         0
-                                                    ? Colors.green.shade100
+                                                    ? ColorsTheme
+                                                        .compbtnColor
                                                     : tasks[index][
                                                                 'priority'] ==
                                                             1
-                                                        ? Colors.red.shade100
-                                                        : Colors
-                                                            .orange.shade100;
-                                              }),
-                                            ),
-                                            child: Text(
-                                              tasks[index]['priority'] == 0
-                                                  ? 'Low'
-                                                  : tasks[index]
-                                                              ['priority'] ==
+                                                        ? ColorsTheme
+                                                            .inCompbtnColor
+                                                        : ColorsTheme
+                                                            .inProgbtnColor;
+                                              return ColorsTheme.uIUxColor;
+                                            }),
+                                            backgroundColor:
+                                                MaterialStateProperty
+                                                    .resolveWith<Color>(
+                                                        (Set<MaterialState>
+                                                            states) {
+                                              if (states.contains(
+                                                      MaterialState
+                                                          .hovered) ||
+                                                  states.contains(
+                                                      MaterialState
+                                                          .focused))
+                                                return tasks[index]
+                                                            ['priority'] ==
+                                                        0
+                                                    ? ColorsTheme
+                                                        .compbtnColor
+                                                    : tasks[index][
+                                                                'priority'] ==
+                                                            1
+                                                        ? ColorsTheme
+                                                            .inCompbtnColor
+                                                        : ColorsTheme
+                                                            .inProgbtnColor;
+                                              ;
+
+                                              return tasks[index]
+                                                          ['priority'] ==
+                                                      0
+                                                  ? Colors.green.shade100
+                                                  : tasks[index][
+                                                              'priority'] ==
                                                           1
-                                                      ? 'High'
-                                                      : 'Urgent',
-                                              style: TextStyle(
-                                                  color: tasks[index]
-                                                              ['priority'] ==
-                                                          0
-                                                      ? ColorsTheme
-                                                          .compbtnColor
-                                                      : tasks[index][
-                                                                  'priority'] ==
-                                                              1
-                                                          ? ColorsTheme
-                                                              .inCompbtnColor
-                                                          : ColorsTheme
-                                                              .inProgbtnColor,
-                                                  fontSize: 12.0,
-                                                  fontWeight:
-                                                      FontWeight.w400),
-                                            ),
-                                            onPressed: () {},
-                                          )
-                                        ],
-                                      ),
-                                    ),
-                                    Container(
-                                      alignment: Alignment.centerLeft,
-                                      padding: EdgeInsets.only(bottom: 20.0),
-                                      margin:
-                                          EdgeInsets.only(left: 20, right: 20),
-                                      decoration: BoxDecoration(
-                                          border: Border(
-                                              bottom: BorderSide(
-                                        color: Colors.black,
-                                      ))),
-                                      child: AutoSizeText(
-                                        tasks[index]['title'],
-                                        overflow: TextOverflow.ellipsis,
-                                        maxLines: 1,
-                                        style: TextStyle(
-                                            fontWeight: FontWeight.w600,
-                                            fontSize: 18.0),
-                                      ),
-                                    ),
-                                    Row(
-                                      children: [
-                                        Container(
-                                          padding: EdgeInsets.all(20.0),
-                                          child: Row(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.start,
-                                            children: [
-                                              Image.asset(
-                                                  'assets/due_date_icon.png'),
-                                              SizedBox(
-                                                width: 10.0,
-                                              ),
-                                              Text(tasks[index]['end_date']
-                                                  .toString())
-                                            ],
+                                                      ? Colors.red.shade100
+                                                      : Colors
+                                                          .orange.shade100;
+                                            }),
                                           ),
+                                          child: Text(
+                                            tasks[index]['priority'] == 0
+                                                ? 'Low'
+                                                : tasks[index]
+                                                            ['priority'] ==
+                                                        1
+                                                    ? 'High'
+                                                    : 'Urgent',
+                                            style: TextStyle(
+                                                color: tasks[index]
+                                                            ['priority'] ==
+                                                        0
+                                                    ? ColorsTheme
+                                                        .compbtnColor
+                                                    : tasks[index][
+                                                                'priority'] ==
+                                                            1
+                                                        ? ColorsTheme
+                                                            .inCompbtnColor
+                                                        : ColorsTheme
+                                                            .inProgbtnColor,
+                                                fontSize: 12.0,
+                                                fontWeight:
+                                                    FontWeight.w400),
+                                          ),
+                                          onPressed: () {},
                                         )
                                       ],
-                                    )
-                                  ]),
-                                ),
+                                    ),
+                                  ),
+                                  Container(
+                                    alignment: Alignment.centerLeft,
+                                    padding: EdgeInsets.only(bottom: 20.0),
+                                    margin:
+                                        EdgeInsets.only(left: 20, right: 20),
+                                    decoration: BoxDecoration(
+                                        border: Border(
+                                            bottom: BorderSide(
+                                      color: Colors.black,
+                                    ))),
+                                    child: AutoSizeText(
+                                      tasks[index]['title'],
+                                      overflow: TextOverflow.ellipsis,
+                                      maxLines: 1,
+                                      style: TextStyle(
+                                          fontWeight: FontWeight.w600,
+                                          fontSize: 18.0),
+                                    ),
+                                  ),
+                                  Row(
+                                    children: [
+                                      Container(
+                                        padding: EdgeInsets.all(20.0),
+                                        child: Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.start,
+                                          children: [
+                                            Image.asset(
+                                                'assets/due_date_icon.png'),
+                                            SizedBox(
+                                              width: 10.0,
+                                            ),
+                                            Text(tasks[index]['end_date']
+                                                .toString())
+                                          ],
+                                        ),
+                                      )
+                                    ],
+                                  )
+                                ]),
                               ),
-                            );
-                          }),
-                    ),
+                            ),
+                          );
+                        }),
                   ),
-                if (is_loading == true && tasks.isEmpty)
-                  Container(
-                    alignment: Alignment.bottomCenter,
-                    margin: EdgeInsets.only(top: height * 0.3),
-                    // margin: EdgeInsets.only(to),
-                    child: CircularProgressIndicator(
-                      valueColor:
-                          AlwaysStoppedAnimation<Color>(ColorsTheme.btnColor),
-                    ),
+                ),
+              if (is_loading == true && tasks.isEmpty)
+                Container(
+                  alignment: Alignment.bottomCenter,
+                  margin: EdgeInsets.only(top: height * 0.3),
+                  // margin: EdgeInsets.only(to),
+                  child: CircularProgressIndicator(
+                    valueColor:
+                        AlwaysStoppedAnimation<Color>(ColorsTheme.btnColor),
                   ),
-                if (is_loading == false && tasks.length == 0)
-                  Container(
-                    alignment: Alignment.bottomCenter,
-                    margin: EdgeInsets.only(top: height * 0.3),
-                    // margin: EdgeInsets.only(to),
-                    child: Text(
-                      'No Task Found',
-                    ),
+                ),
+              if (is_loading == false && tasks.length == 0)
+                Container(
+                  alignment: Alignment.bottomCenter,
+                  margin: EdgeInsets.only(top: height * 0.3),
+                  // margin: EdgeInsets.only(to),
+                  child: Text(
+                    'No Task Found',
                   ),
-              ],
-            ),
+                ),
+            ],
           ),
-        );
-      }),
-      // floatingActionButton: Visibility(
-      //   visible: !keyboardVisible,
-      //   child: GestureDetector(
-      //     onTap: () {
-      //       _addTaskModalBottomSheet(context);
-      //     },
-      //     child: Container(
-      //       margin: EdgeInsets.only(bottom: 40.0),
-      //       height: 90,
-      //       width: 90,
-      //       decoration: BoxDecoration(
-      //           image: DecorationImage(
-      //               image: AssetImage('assets/plus_floating_button.png'))),
-      //     ),
-      //   ),
-      // ),
-      // floatingActionButton: FloatingActionButton(
-      //   onPressed: () {
-      //     _addProjectModalBottomSheet(context);
-      //   },
-      //   child: Icon(Icons.add),
-      //   backgroundColor: ColorsTheme.btnColor,
-      // ),
+        ),
+      );
+    }),
+    // floatingActionButton: Visibility(
+    //   visible: !keyboardVisible,
+    //   child: GestureDetector(
+    //     onTap: () {
+    //       _addTaskModalBottomSheet(context);
+    //     },
+    //     child: Container(
+    //       margin: EdgeInsets.only(bottom: 40.0),
+    //       height: 90,
+    //       width: 90,
+    //       decoration: BoxDecoration(
+    //           image: DecorationImage(
+    //               image: AssetImage('assets/plus_floating_button.png'))),
+    //     ),
+    //   ),
+    // ),
+    // floatingActionButton: FloatingActionButton(
+    //   onPressed: () {
+    //     _addProjectModalBottomSheet(context);
+    //   },
+    //   child: Icon(Icons.add),
+    //   backgroundColor: ColorsTheme.btnColor,
+    // ),
 /////////////////////////////////
-      floatingActionButtonLocation: ExpandableFab.location,
-      floatingActionButton: ExpandableFab(
-        backgroundColor: ColorsTheme.btnColor,
-        distance: 75,
-        children: [
-          FloatingActionButton.extended(
-            backgroundColor: ColorsTheme.btnColor,
-            heroTag: null,
-            label: Text('TimeBox'),
-            icon: Icon(Icons.timer),
-            onPressed: () {
-              Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) => ChangeNotifierProvider(
-                          create: (_) => TimeBoxState(),
-                          child: TimeBoxPage())));
-            },
-          ),
-          FloatingActionButton.extended(
-            backgroundColor: ColorsTheme.btnColor,
+    floatingActionButtonLocation: ExpandableFab.location,
+    floatingActionButton: ExpandableFab(
+      backgroundColor: ColorsTheme.btnColor,
+      distance: 75,
+      children: [
+        FloatingActionButton.extended(
+          backgroundColor: ColorsTheme.btnColor,
+          // heroTag: null,
+          label: Text('TimeBox'),
+          icon: Icon(Icons.timer),
+          onPressed: () {
+            Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (context) => ChangeNotifierProvider(
+                        create: (_) => TimeBoxState(),
+                        child: TimeBoxPage())));
+          },
+        ),
+        FloatingActionButton.extended(
+          backgroundColor: ColorsTheme.btnColor,
 
-            heroTag: null,
-            label: Text('Tasks'),
-            icon: Icon(Icons.task),
-            onPressed: () {
-              _addTaskModalBottomSheet(context);
-            },
-          ),
-        ],
-      ),
+          // heroTag: null,
+          label: Text('Tasks'),
+          icon: Icon(Icons.task),
+          onPressed: () {
+            _addTaskModalBottomSheet(context);
+          },
+        ),
+      ],
+    ),
 //////////////////////////////////
     );
   }

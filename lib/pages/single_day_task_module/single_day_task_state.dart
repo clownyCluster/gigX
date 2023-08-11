@@ -1,6 +1,7 @@
 import 'package:calendar_builder/calendar_builder.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:gigX/data/network/network_api_services.dart';
 import 'package:gigX/service/toastService.dart';
 import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -13,14 +14,14 @@ import '../../login.dart';
 class SingleDayTaskState extends ChangeNotifier {
   // String date;
   var date;
-  SingleDayTaskState(context) {
-    final args = ModalRoute.of(context)?.settings.arguments;
+  SingleDayTaskState(context, args) {
+    // final args = ModalRoute.of(context)?.settings.arguments;
     if (args != null) {
       date = args;
       notifyListeners();
     }
-    
-    print(date);
+
+    print('args wala date:  $date');
     getUserTasks();
   }
   MyTodos myTodosResponse = MyTodos();
@@ -83,52 +84,67 @@ class SingleDayTaskState extends ChangeNotifier {
     print(commentMap[val]);
   }
 
-  getUserTasks() async {
-    String formattedDate = DateFormat('yyyy-MM-dd').format(date);
+  // getUserTasks() async {
+  //   String formattedDate = DateFormat('yyyy-MM-dd').format(date);
 
+  //   setLoading(true);
+  //   final _dio = Dio();
+  //   String? access_token;
+  //   this.preferences = await SharedPreferences.getInstance();
+  //   access_token = this.preferences?.getString('access_token');
+  //   notifyListeners();
+
+  //   try {
+  //     Response response = await _dio.get(
+  //         '${API.base_url}my/todos?today=$formattedDate',
+  //         options: Options(headers: {"authorization": "Bearer $access_token"}));
+  //     print(formattedDate);
+  //     if (response.statusCode == 200) {
+  //       this.preferences?.setBool('someoneLoggedIn', false);
+  //       myTodosResponse = MyTodos.fromJson(response.data);
+  //       print(response.data);
+  //     } else if (response.statusCode == 401) {
+  //       await this.preferences?.remove('access_token');
+  //       ToastService().e('Session Expired, Proceed to login');
+  //       // Navigator.of(context, rootNavigator: true).pushAndRemoveUntil(
+  //       //   MaterialPageRoute(
+  //       //     builder: (BuildContext context) {
+  //       //       return const Login();
+  //       //     },
+  //       //   ),
+  //       //   (_) => false,
+  //       // );
+  //     }
+  //   } on DioError catch (e) {
+  //     if (e.response?.statusCode == 401) {
+  //       this.preferences?.setBool('someoneLoggedIn', true);
+  //       await this.preferences?.remove('access_token');
+  //       ToastService().e('Session Expired, Proceed to login');
+
+  //       // Navigator.of(context, rootNavigator: true).pushAndRemoveUntil(
+  //       //   MaterialPageRoute(
+  //       //     builder: (BuildContext context) {
+  //       //       return const Login();
+  //       //     },
+  //       //   ),
+  //       //   (_) => false,
+  //       // );
+  //     }
+  //   }
+  //   setLoading(false);
+  // }
+
+  Future getUserTasks() async {
     setLoading(true);
-    final _dio = Dio();
-    String? access_token;
-    this.preferences = await SharedPreferences.getInstance();
-    access_token = this.preferences?.getString('access_token');
-    notifyListeners();
+    String formattedDate = DateFormat('yyyy-MM-dd').format(date);
+    final _apiServices = NetworkApiServices();
 
     try {
-      Response response = await _dio.get(
-          '${API.base_url}my/todos?today=$formattedDate',
-          options: Options(headers: {"authorization": "Bearer $access_token"}));
-      print(formattedDate);
-      if (response.statusCode == 200) {
-        this.preferences?.setBool('someoneLoggedIn', false);
-        myTodosResponse = MyTodos.fromJson(response.data);
-        print(response.data);
-      } else if (response.statusCode == 401) {
-        await this.preferences?.remove('access_token');
-        ToastService().e('Session Expired, Proceed to login');
-        // Navigator.of(context, rootNavigator: true).pushAndRemoveUntil(
-        //   MaterialPageRoute(
-        //     builder: (BuildContext context) {
-        //       return const Login();
-        //     },
-        //   ),
-        //   (_) => false,
-        // );
-      }
+      var response = await _apiServices
+          .getAPI('${API.base_url}/my/todos?today=$formattedDate');
+      myTodosResponse = MyTodos.fromJson(response);
     } on DioError catch (e) {
-      if (e.response?.statusCode == 401) {
-        this.preferences?.setBool('someoneLoggedIn', true);
-        await this.preferences?.remove('access_token');
-        ToastService().e('Session Expired, Proceed to login');
-
-        // Navigator.of(context, rootNavigator: true).pushAndRemoveUntil(
-        //   MaterialPageRoute(
-        //     builder: (BuildContext context) {
-        //       return const Login();
-        //     },
-        //   ),
-        //   (_) => false,
-        // );
-      }
+      print(e.response);
     }
     setLoading(false);
   }

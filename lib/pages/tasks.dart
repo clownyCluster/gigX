@@ -23,28 +23,28 @@ import 'package:syncfusion_flutter_sliders/sliders.dart';
 import 'timebox_module/time_box.dart';
 import 'timebox_module/time_box_state.dart';
 
-class TaskTab extends StatelessWidget {
-  const TaskTab({super.key});
+// class TaskTab extends StatelessWidget {
+//   const TaskTab({super.key});
 
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Task Tab',
-      debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-        fontFamily: 'Poppins',
-      ),
-      // home: const TaskTabPage(),
-      initialRoute: '/',
-      routes: {
-        '/': (context) => TaskTabPage(),
-        '/singleTask': (context) => ChangeNotifierProvider(
-            create: (_) => SingleDayTaskState(context), child: SingleDayTask())
-      },
-    );
-  }
-}
+//   @override
+//   Widget build(BuildContext context) {
+//     return MaterialApp(
+//       title: 'Task Tab',
+//       debugShowCheckedModeBanner: false,
+//       theme: ThemeData(
+//         primarySwatch: Colors.blue,
+//         fontFamily: 'Poppins',
+//       ),
+//       // home: const TaskTabPage(),
+//       initialRoute: '/',
+//       routes: {
+//         '/': (context) => TaskTabPage(),
+//         '/singleTask': (context) => ChangeNotifierProvider(
+//             create: (_) => SingleDayTaskState(context), child: SingleDayTask())
+//       },
+//     );
+//   }
+// }
 
 String subject = "";
 String formatted_start_time = "";
@@ -740,35 +740,6 @@ class _TaskTabPageState extends State<TaskTabPage> {
     FirebaseMessaging _firebaseMessage = FirebaseMessaging.instance;
     String? deviceToken = await _firebaseMessage.getToken();
     return (deviceToken == null) ? "" : deviceToken;
-    //    final _dio = new Dio();
-    // this.preferences = await SharedPreferences.getInstance();
-    // setState(() {
-    //   access_token = this.preferences?.getString('access_token');
-    // });
-    // try {
-    //   Response response = await _dio.get(API.base_url + 'me',
-    //       options: Options(headers: {"authorization": "Bearer $access_token"}));
-
-    //   if (response.statusCode == 200) {
-    //     this.preferences?.setBool('someoneLoggedIn', false);
-    //     setState(() {
-
-    //     });
-    //   } else if (response.statusCode == 401) {
-    //     await this.preferences?.remove('access_token');
-    //     Navigator.of(context, rootNavigator: true).pushAndRemoveUntil(
-    //       MaterialPageRoute(
-    //         builder: (BuildContext context) {
-    //           return const Login();
-    //         },
-    //       ),
-    //       (_) => false,
-    //     );
-    //   }
-    // } on DioError catch (e) {
-    //   print(e);
-
-    // }
   }
 
   Future<void> sendNotification(int id, String notification) async {
@@ -1530,7 +1501,8 @@ class _TaskTabPageState extends State<TaskTabPage> {
 
                                   Navigator.of(context, rootNavigator: false)
                                       .push(MaterialPageRoute(
-                                          builder: (context) => const TaskTab(),
+                                          builder: (context) =>
+                                              const TaskTabPage(),
                                           fullscreenDialog: true));
 
                                   // sendNotification(project_id, 'Task assigned');
@@ -2292,7 +2264,8 @@ class _TaskTabPageState extends State<TaskTabPage> {
 
                                   Navigator.of(context, rootNavigator: false)
                                       .push(MaterialPageRoute(
-                                          builder: (context) => const TaskTab(),
+                                          builder: (context) =>
+                                              const TaskTabPage(),
                                           fullscreenDialog: true));
 
                                   // NotificationService().showNotification(
@@ -2482,7 +2455,10 @@ class _TaskTabPageState extends State<TaskTabPage> {
       resizeToAvoidBottomInset: false,
       appBar: AppBar(
         backgroundColor: whiteColor,
-        title: Text('Calendar', style: kkBoldTextStyle().copyWith(color: darkGrey, fontSize: 20),),
+        title: Text(
+          'Calendar',
+          style: kkBoldTextStyle().copyWith(color: darkGrey, fontSize: 20),
+        ),
         centerTitle: false,
         elevation: 0,
       ),
@@ -2502,7 +2478,6 @@ class _TaskTabPageState extends State<TaskTabPage> {
               Container(
                 padding: kStandardPadding(),
                 child: Row(
-
                   children: [
                     Row(
                       children: [
@@ -2511,7 +2486,9 @@ class _TaskTabPageState extends State<TaskTabPage> {
                           radius: 10,
                         ),
                         minWidthSpan(),
-                        Text('Completed',)
+                        Text(
+                          'Completed',
+                        )
                       ],
                     ),
                     largeWidthSpan(),
@@ -2522,11 +2499,11 @@ class _TaskTabPageState extends State<TaskTabPage> {
                           radius: 10,
                         ),
                         minWidthSpan(),
-                        Text('Incomplete',)
+                        Text(
+                          'Incomplete',
+                        )
                       ],
                     ),
-
-
                   ],
                 ),
               ),
@@ -2549,7 +2526,7 @@ class _TaskTabPageState extends State<TaskTabPage> {
                       //   if (onDateSelected.hasEvent)
                       //     getSelectedTasks(onDateSelected.selectedDate);
                       // }
-                     
+
                       Navigator.pushNamed(context, '/singleTask',
                           arguments: onDateSelected.selectedDate);
                     },
@@ -2595,10 +2572,13 @@ class _TaskTabPageState extends State<TaskTabPage> {
                     monthCustomizer: MonthCustomizer(
                       montMinhHeight: 200,
                       monthMinWidth: 450,
-                      
                       padding: const EdgeInsets.all(20),
-                      monthHeaderBuilder:
-                          (month, headerHeight, headerWidth, paddingLeft,) {
+                      monthHeaderBuilder: (
+                        month,
+                        headerHeight,
+                        headerWidth,
+                        paddingLeft,
+                      ) {
                         return Container(
                           // color: Colors.grey[200],
                           height: headerHeight,
@@ -2855,21 +2835,23 @@ class _TaskTabPageState extends State<TaskTabPage> {
         children: [
           FloatingActionButton.extended(
             backgroundColor: ColorsTheme.btnColor,
-            heroTag: null,
+            // heroTag: null,
             label: Text('TimeBox'),
             icon: Icon(Icons.timer),
             // child: const Icon(Icons.edit),
             onPressed: () {
-              Navigator.push(context,
-                  MaterialPageRoute(builder: (context) => ChangeNotifierProvider(
-            create: (_) => TimeBoxState(),
-            child: TimeBoxPage())));
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => ChangeNotifierProvider(
+                          create: (_) => TimeBoxState(),
+                          child: TimeBoxPage())));
             },
           ),
           FloatingActionButton.extended(
             backgroundColor: ColorsTheme.btnColor,
 
-            heroTag: null,
+            // heroTag: null,
             label: Text('Tasks'),
             icon: Icon(Icons.task),
             // child: const Icon(Icons.search),

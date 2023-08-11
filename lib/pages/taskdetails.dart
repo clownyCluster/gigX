@@ -1105,7 +1105,7 @@ class _TaskDetailsPageState extends State<TaskDetailsPage> {
                           children: [
                             GestureDetector(
                               onTap: () {
-                                // showAssigneeDialog(context);
+                                showAssigneeDialog(context);
                               },
                               child: Row(
                                 mainAxisAlignment: MainAxisAlignment.start,

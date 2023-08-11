@@ -24,28 +24,28 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../constant/constants.dart';
 import '../service/toastService.dart';
 
-class AccountTab extends StatelessWidget {
-  const AccountTab({super.key});
+// class AccountTab extends StatelessWidget {
+//   const AccountTab({super.key});
 
-  @override
-  Widget build(BuildContext context) {
-    return OKToast(
-      child: MaterialApp(
-        title: 'Account Tab Page',
-        debugShowCheckedModeBanner: false,
-        theme: ThemeData(
-            primarySwatch: Colors.blue,
-            fontFamily: 'Poppins',
-            scaffoldBackgroundColor: ColorsTheme.bgColor),
-        home: const AccountTabPage(),
-        routes: {
-          '/time_box': (context) => ChangeNotifierProvider(
-              create: (_) => TimeBoxState(), child: TimeBoxPage()),
-        },
-      ),
-    );
-  }
-}
+//   @override
+//   Widget build(BuildContext context) {
+//     return OKToast(
+//       child: MaterialApp(
+//         title: 'Account Tab Page',
+//         debugShowCheckedModeBanner: false,
+//         theme: ThemeData(
+//             primarySwatch: Colors.blue,
+//             fontFamily: 'Poppins',
+//             scaffoldBackgroundColor: ColorsTheme.bgColor),
+//         home: const AccountTabPage(),
+//         routes: {
+//           '/time_box': (context) => ChangeNotifierProvider(
+//               create: (_) => TimeBoxState(), child: TimeBoxPage()),
+//         },
+//       ),
+//     );
+//   }
+// }
 
 var height, width;
 Map<String, dynamic> user = new Map<String, dynamic>();
@@ -424,25 +424,7 @@ class _AccountTabPageState extends State<AccountTabPage> {
       child: ListView(
         physics: NeverScrollableScrollPhysics(),
         children: [
-          // ListTile(
-          //   leading: Image.asset('assets/language_icon.png'),
-          //   title: new RichText(
-          //       text: TextSpan(children: [
-          //     new TextSpan(
-          //         text: 'Language \n',
-          //         style: TextStyle(
-          //             fontSize: 20.0,
-          //             fontWeight: FontWeight.w600,
-          //             color: Colors.black)),
-          //     new TextSpan(
-          //         text: 'English',
-          //         style: TextStyle(
-          //             color: ColorsTheme.txtDescColor,
-          //             fontWeight: FontWeight.w400,
-          //             fontSize: 14.0)),
-          //   ])),
-          //   trailing: Image.asset('assets/arrow_right.png'),
-          // ),
+          
           InkWell(
             onTap: () {
               // Navigator.push(context,
