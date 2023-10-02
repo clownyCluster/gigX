@@ -26,10 +26,8 @@ class SingleDayTask extends StatelessWidget {
     final state = Provider.of<SingleDayTaskState>(context);
 
     CalendarController? calendarController;
-    return Scaffold(
-      
+    return Scaffold(      
       appBar: AppBar(
-        
         title: Text(
           'Tasks',
           // style:
@@ -49,12 +47,9 @@ class SingleDayTask extends StatelessWidget {
       ),
       body: Container(
         child: Column(
-          children: [
-            
+          children: [ 
             TableCalendar(
-              
               daysOfWeekHeight: 40,
-
               firstDay: DateTime.utc(2010, 10, 16),
               lastDay: DateTime.utc(2030, 3, 14),
               focusedDay: state.date,

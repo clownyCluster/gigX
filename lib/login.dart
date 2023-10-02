@@ -2,10 +2,13 @@ import 'dart:developer';
 import 'dart:io';
 
 import 'package:auto_size_text/auto_size_text.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dio/dio.dart';
 import 'package:gigX/api.dart';
 import 'package:gigX/colors.dart';
 import 'package:gigX/constant/constants.dart';
+import 'package:gigX/data/api_model/getUsersModel.dart';
+import 'package:gigX/data/network/network_api_services.dart';
 import 'package:gigX/home.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
@@ -13,6 +16,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:gigX/pages/register_module/register_screen.dart';
+import 'package:gigX/service/local_storage_service.dart';
 import 'package:local_auth/local_auth.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -69,6 +73,8 @@ class _LoginPageState extends State<LoginPage> {
     });
   }
 
+
+
   Future<bool> login() async {
     setState(() {
       isLoading = true;
@@ -97,13 +103,15 @@ class _LoginPageState extends State<LoginPage> {
         data: map,
       );
       Map result = response.data;
+
       access_token = result['access_token'];
 
       this.preferences?.setString('access_token', access_token);
+
+      
       setState(() {
         isLoading = false;
       });
-
       return (response.statusCode == 200) ? true : false;
     } catch (error) {
       if (txtEmailController.text.isEmpty &&
@@ -129,7 +137,6 @@ class _LoginPageState extends State<LoginPage> {
             backgroundColor: ColorsTheme.btnColor,
             textColor: Colors.white,
             fontSize: 16.0);
-      print(error.toString());
       setState(() {
         isLoading = false;
       });
@@ -145,7 +152,6 @@ class _LoginPageState extends State<LoginPage> {
 
     txtEmailController = new TextEditingController(text: email);
     txtPasswordController = new TextEditingController(text: password);
-    print(email);
   }
 
   Future<void> checkIfOtherLoggedIn() async {
@@ -166,7 +172,6 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   Future<void> checkIfLoggedIn() async {
-    print(this.preferences?.getBool('stay_logged_in'));
 
     if (this.preferences?.getBool('stay_logged_in') == true &&
         widget.is_logged_out == false) {
@@ -185,8 +190,7 @@ class _LoginPageState extends State<LoginPage> {
 
     try {
       if (isBiometricSupported) {
-        print(isBiometricSupported);
-        print(canCheckBiometrics);
+       
 
         if (Platform.isIOS) {
           bool pass = await auth.authenticate(
@@ -236,7 +240,6 @@ class _LoginPageState extends State<LoginPage> {
 
             result = await login();
 
-            print(result);
 
             if (result == true) {
               Navigator.of(context, rootNavigator: true).pushAndRemoveUntil(
@@ -270,7 +273,6 @@ class _LoginPageState extends State<LoginPage> {
             fontSize: 16.0);
       }
     } on PlatformException catch (e) {
-      print('denied');
     }
   }
 
@@ -324,7 +326,6 @@ class _LoginPageState extends State<LoginPage> {
                   ),
                   LSizedBox(),
                   Container(
-                    
                     child: AutoSizeText(
                       'PASSWORD',
                       style: TextStyle(
@@ -502,7 +503,8 @@ class _LoginPageState extends State<LoginPage> {
                         onTap: () {
                           authenticateFaceID();
                         },
-                        child: Image(image: AssetImage('assets/face_id_icon.png')),
+                        child:
+                            Image(image: AssetImage('assets/face_id_icon.png')),
                       ),
                     ],
                   )

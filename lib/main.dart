@@ -58,7 +58,8 @@ class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    bool isDark = LocalStorageService().readBool(LocalStorageKeys.isDark)!;
+    bool isDark =
+        LocalStorageService().readBool(LocalStorageKeys.isDark) ?? false;
     return OKToast(
       child: GetMaterialApp(
         theme:
@@ -80,7 +81,7 @@ class MyApp extends StatelessWidget {
 final ThemeData customLightTheme = ThemeData(
   brightness: Brightness.light,
   primaryColor: primaryColor,
-  // hintColor: primaryColor,
+  hintColor: primaryColor,
   scaffoldBackgroundColor: Colors.white,
   appBarTheme: AppBarTheme(
     color: Colors.white, // Appbar color
@@ -101,18 +102,46 @@ final ThemeData customLightTheme = ThemeData(
     textTheme: ButtonTextTheme.primary,
   ),
   textTheme: TextTheme(
-    bodyText1: TextStyle(color: Colors.grey[800]), // Body text color
-    bodyText2: TextStyle(color: Colors.grey[800]),
-    subtitle1: TextStyle(color: Colors.grey[800]), // Subtitle color
-    subtitle2: TextStyle(color: Colors.grey[800]),
-    button: TextStyle(color: Colors.white), // Button text color
+    bodyLarge:
+        TextStyle(color: Colors.grey[800], fontSize: 14), // Body text color
+    bodyMedium: TextStyle(color: Colors.grey[700], fontSize: 12),
+    bodySmall: TextStyle(color: Colors.grey, fontSize: 10),
+    titleSmall: TextStyle(color: Colors.grey[700], fontSize: 10),
+    titleMedium:
+        TextStyle(color: Colors.grey[800], fontSize: 12), // Subtitle color
+    titleLarge: TextStyle(color: Colors.grey, fontSize: 14),
+    labelMedium: TextStyle(
+        color: Colors.white, fontSize: 14, fontWeight: FontWeight.w500),
+    labelSmall: TextStyle(color: Colors.grey, fontSize: 10),
+
+    labelLarge: TextStyle(color: Colors.grey[800], fontSize: 14),
+    // Button text color
   ),
+  // inputDecorationTheme: InputDecorationTheme(
+  //   // Change the border color for all InputDecorations
+  //   isDense: true,
+  //   labelStyle: TextStyle(color: blueColor),
+  //   border: OutlineInputBorder(
+  //     borderRadius: BorderRadius.circular(10),
+  //   ),
+  //   focusedBorder: OutlineInputBorder(
+  //     borderRadius: BorderRadius.circular(10),
+  //     borderSide: BorderSide(
+  //       color: primaryColor, // Change this color to the desired color
+  //       width: 1.0, // Change the border width if needed
+  //     ),
+  //   ),
+  // ),
+
   inputDecorationTheme: InputDecorationTheme(
+    labelStyle: TextStyle(color: primaryColor),
     // Change the border color for all InputDecorations
-    labelStyle: TextStyle(color: blueColor),
     border: OutlineInputBorder(
-      borderRadius: BorderRadius.circular(10),
-    ),
+        borderRadius: BorderRadius.circular(10),
+        borderSide: BorderSide(
+          color: Colors.grey,
+          width: 1,
+        )),
     focusedBorder: OutlineInputBorder(
       borderRadius: BorderRadius.circular(10),
       borderSide: BorderSide(
@@ -121,7 +150,6 @@ final ThemeData customLightTheme = ThemeData(
       ),
     ),
   ),
-  
 );
 
 final ThemeData customDarkTheme = ThemeData(
@@ -151,12 +179,11 @@ final ThemeData customDarkTheme = ThemeData(
     labelStyle: TextStyle(color: buttonColor),
     // Change the border color for all InputDecorations
     border: OutlineInputBorder(
-      borderRadius: BorderRadius.circular(10),
-      borderSide: BorderSide(
-        color: Colors.white,
-        width: 1,
-      )
-    ),
+        borderRadius: BorderRadius.circular(10),
+        borderSide: BorderSide(
+          color: Colors.white,
+          width: 1,
+        )),
     focusedBorder: OutlineInputBorder(
       borderRadius: BorderRadius.circular(10),
       borderSide: BorderSide(
@@ -166,10 +193,17 @@ final ThemeData customDarkTheme = ThemeData(
     ),
   ),
   textTheme: TextTheme(
-    bodyText1: TextStyle(color: Colors.white), // Body text color
-    bodyText2: TextStyle(color: Colors.white),
-    subtitle1: TextStyle(color: Colors.white), // Subtitle color
-    subtitle2: TextStyle(color: Colors.white),
-    button: TextStyle(color: Colors.white), // Button text color
+    bodyLarge: TextStyle(color: Colors.white, fontSize: 14), // Body text color
+    bodyMedium: TextStyle(color: Colors.white, fontSize: 12),
+    bodySmall: TextStyle(color: Colors.white, fontSize: 10),
+    titleMedium: TextStyle(color: Colors.white, fontSize: 12), // Subtitle color
+    titleSmall: TextStyle(color: Colors.white, fontSize: 10),
+    titleLarge: TextStyle(color: Colors.white, fontSize: 14),
+    labelMedium: TextStyle(
+        color: Colors.grey[800], fontSize: 12, fontWeight: FontWeight.w500),
+    labelSmall: TextStyle(color: Colors.white, fontSize: 10),
+
+    labelLarge:
+        TextStyle(color: Colors.white, fontSize: 14), // Button text color
   ),
 );

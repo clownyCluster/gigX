@@ -85,43 +85,43 @@ class _ProjectDetailsPageState extends State<ProjectDetailsPage> {
   late ScrollController controller;
 
   @override
-  // void initState() {
-  //   // TODO: implement initState
-  //   WidgetsFlutterBinding.ensureInitialized();
+  void initState() {
+    // TODO: implement initState
+    WidgetsFlutterBinding.ensureInitialized();
 
-  //   super.initState();
+    super.initState();
 
-  //   KeyboardVisibilityController().onChange.listen((isVisible) {
-  //     setState(() {
-  //       keyboardVisible = isVisible;
-  //     });
-  //   });
-  //   setState(() {
-  //     inCompColor = Colors.black;
-  //     compColor = Colors.black;
-  //     inprogColor = Colors.black;
-  //     todoColor = Colors.black;
-  //   });
-  //   controller = ScrollController();
+    KeyboardVisibilityController().onChange.listen((isVisible) {
+      setState(() {
+        keyboardVisible = isVisible;
+      });
+    });
+    setState(() {
+      inCompColor = Colors.black;
+      compColor = Colors.black;
+      inprogColor = Colors.black;
+      todoColor = Colors.black;
+    });
+    controller = ScrollController();
 
-  //   list = List.generate(4, (index) => null);
-  //   WidgetsBinding.instance.addPostFrameCallback((_) {
-  //     pref();
-  //     getTasks();
-  //     getUsers();
-  //     getProjects();
-  //   });
+    list = List.generate(4, (index) => null);
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      pref();
+      getTasks();
+      getUsers();
+      getProjects();
+    });
 
-  //   controller.addListener(() {
-  //     if (controller.position.pixels == controller.position.maxScrollExtent) {
-  //       // pageNumber++;
+    controller.addListener(() {
+      if (controller.position.pixels == controller.position.maxScrollExtent) {
+        // pageNumber++;
 
-  //       setState(() {
-  //         getMoreProjects();
-  //       }); // if add this, Reload your futurebuilder and load more data
-  //     }
-  //   });
-  // }
+        setState(() {
+          getMoreProjects();
+        }); // if add this, Reload your futurebuilder and load more data
+      }
+    });
+  }
 
   Future<void> pref() async {
     this.preferences = await SharedPreferences.getInstance();
@@ -1740,7 +1740,6 @@ class _ProjectDetailsPageState extends State<ProjectDetailsPage> {
       children: [
         FloatingActionButton.extended(
           backgroundColor: ColorsTheme.btnColor,
-          // heroTag: null,
           label: Text('TimeBox'),
           icon: Icon(Icons.timer),
           onPressed: () {
@@ -1755,7 +1754,6 @@ class _ProjectDetailsPageState extends State<ProjectDetailsPage> {
         FloatingActionButton.extended(
           backgroundColor: ColorsTheme.btnColor,
 
-          // heroTag: null,
           label: Text('Tasks'),
           icon: Icon(Icons.task),
           onPressed: () {

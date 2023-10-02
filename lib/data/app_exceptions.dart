@@ -1,11 +1,11 @@
 class AppExceptions implements Exception {
-  final _message;
+  final message;
   final _prefix;
 
-  AppExceptions([this._message, this._prefix]);
+  AppExceptions([this.message, this._prefix]);
 
-  String tostring() {
-    return "$_prefix $_message";
+  String toString() {
+    return "$_prefix $message";
   }
 }
 
@@ -29,4 +29,16 @@ class NotFoundException extends AppExceptions {
 
 class DefaultException extends AppExceptions {
   DefaultException([String? message]) : super(message, 'Something went wrong');
+}
+
+class ForbiddenException extends AppExceptions {
+  ForbiddenException([String? message]) : super(message, 'You don\t have an access to this.');
+}
+
+class BadRequestException extends AppExceptions {
+  BadRequestException([String? message]) : super(message, 'Not Found');
+}
+
+class UnauthorizedException extends AppExceptions {
+  UnauthorizedException([String? message]) : super(message, 'You are not authorized!, Please login and try again');
 }

@@ -84,7 +84,7 @@ AppBar defaultAppBar(String title) {
 
 TextStyle kTextStyle() => TextStyle(
       fontFamily: 'QuickSand',
-      fontSize: 14,
+      fontSize: 12,
       color: Colors.grey[700],
       fontWeight: FontWeight.w300,
     );
@@ -92,72 +92,72 @@ TextStyle kTextStyle() => TextStyle(
 TextStyle kkTextStyle() => TextStyle(
       color: Colors.grey[800],
       fontFamily: 'QuickSand',
-      fontSize: 16,
+      fontSize: 14,
     );
 
 TextStyle sTextStyle() => TextStyle(
       color: Colors.grey[600],
       fontFamily: 'QuickSand',
-      fontSize: 11,
+      fontSize: 10,
     );
 TextStyle sWhiteTextStyle() => TextStyle(
       color: Colors.white,
       fontFamily: 'QuickSand',
-      fontSize: 11,
+      fontSize: 10,
     );
 
 TextStyle kBoldTextStyle() => TextStyle(
       color: Colors.grey[800],
       fontFamily: 'QuickSand',
-      fontSize: 14,
+      fontSize: 12,
       fontWeight: FontWeight.w700,
     );
 
 TextStyle kWhiteBoldTextStyle() => TextStyle(
       color: Colors.white,
       fontFamily: 'QuickSand',
-      fontSize: 14,
+      fontSize: 12,
       fontWeight: FontWeight.w700,
     );
 
 TextStyle kkBoldTextStyle() => TextStyle(
       // color: Colors.grey[800],
       fontFamily: 'QuickSand',
-      fontSize: 16,
+      fontSize: 14,
       fontWeight: FontWeight.bold,
     );
 
 TextStyle kkWhiteBoldTextStyle() => TextStyle(
       color: Colors.white,
       fontFamily: 'QuickSand',
-      fontSize: 18,
+      fontSize: 14,
       fontWeight: FontWeight.bold,
     );
 TextStyle kkWhiteTextStyle() => TextStyle(
       color: Colors.white,
       fontFamily: 'QuickSand',
-      fontSize: 18,
+      fontSize: 14,
       fontWeight: FontWeight.w400,
     );
 
 TextStyle kWhiteTextStyle() => TextStyle(
       color: Colors.white,
       fontFamily: 'QuickSand',
-      fontSize: 14,
+      fontSize: 12,
       fontWeight: FontWeight.w300,
     );
 
 TextStyle tabsTextStyle() => TextStyle(
       color: Colors.white,
       fontFamily: 'QuickSand',
-      fontSize: 15,
+      fontSize: 14,
       fontWeight: FontWeight.w500,
     );
 
 TextStyle sBoldTextStyle() => TextStyle(
       color: Colors.white,
       fontFamily: 'QuickSand',
-      fontSize: 12,
+      fontSize: 10,
       fontWeight: FontWeight.bold,
     );
 

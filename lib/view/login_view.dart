@@ -24,9 +24,9 @@ class _LoginViewState extends State<LoginView> {
     // TODO: implement initState
     super.initState();
     state.emailController.value.text =
-        LocalStorageService().read(LocalStorageKeys.email)!;
+        LocalStorageService().read(LocalStorageKeys.email) ?? '';
     state.passwordController.value.text =
-        LocalStorageService().read(LocalStorageKeys.password)!;
+        LocalStorageService().read(LocalStorageKeys.password) ?? '';
   }
 
   @override

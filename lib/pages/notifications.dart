@@ -218,10 +218,10 @@ class _NotificationTabPageState extends State<NotificationTabPage> {
     height = MediaQuery.of(context).size.height;
     width = MediaQuery.of(context).size.width;
     return Scaffold(
-      backgroundColor: whiteColor,
+      // backgroundColor: whiteColor,
       resizeToAvoidBottomInset: false,
       appBar: AppBar(
-        backgroundColor: Colors.white,
+        // backgroundColor: Colors.white,
         centerTitle: true,
         elevation: 0,
         

@@ -2835,7 +2835,6 @@ class _TaskTabPageState extends State<TaskTabPage> {
         children: [
           FloatingActionButton.extended(
             backgroundColor: ColorsTheme.btnColor,
-            // heroTag: null,
             label: Text('TimeBox'),
             icon: Icon(Icons.timer),
             // child: const Icon(Icons.edit),
@@ -2851,7 +2850,6 @@ class _TaskTabPageState extends State<TaskTabPage> {
           FloatingActionButton.extended(
             backgroundColor: ColorsTheme.btnColor,
 
-            // heroTag: null,
             label: Text('Tasks'),
             icon: Icon(Icons.task),
             // child: const Icon(Icons.search),

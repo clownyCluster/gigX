@@ -4,6 +4,7 @@ import 'package:get/get.dart';
 import 'package:gigX/service/toastService.dart';
 import 'package:gigX/view_model/project_edit_view_model.dart';
 import 'package:intl/intl.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../colors.dart';
 import '../constant/constants.dart';
@@ -37,15 +38,18 @@ class ProjectEditView extends StatelessWidget {
           largeWidthSpan(),
         ],
       ),
-      body: Container(
-        padding: kStandardPadding(),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Expanded(
-              child: SingleChildScrollView(
+      body: Obx(() {
+        return state.isLoading.value
+            ? Center(
+                child: CircularProgressIndicator(
+                  color: blueColor,
+                ),
+              )
+            : Container(
+                padding: kStandardPadding(),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -60,6 +64,7 @@ class ProjectEditView extends StatelessWidget {
                                 // style: kkBoldTextStyle().copyWith(fontSize: 18),
                               )),
                         ),
+                        minWidthSpan(),
                         TextButton(
                             onPressed: () {},
                             style: ButtonStyle(
@@ -85,15 +90,15 @@ class ProjectEditView extends StatelessWidget {
                                   return ColorsTheme.txtDescColor;
                                 return ColorsTheme.txtDescColor;
                               }),
-                              backgroundColor:
-                                  MaterialStateProperty.resolveWith<Color>(
-                                      (Set<MaterialState> states) {
-                                if (states.contains(MaterialState.hovered) ||
-                                    states.contains(MaterialState.focused))
-                                  return ColorsTheme.bgColor;
+                              // backgroundColor:
+                              //     MaterialStateProperty.resolveWith<Color>(
+                              //         (Set<MaterialState> states) {
+                              //   if (states.contains(MaterialState.hovered) ||
+                              //       states.contains(MaterialState.focused))
+                              //     return ColorsTheme.bgColor;
 
-                                return ColorsTheme.bgColor;
-                              }),
+                              //   return ColorsTheme.bgColor;
+                              // }),
                             ),
                             child: Text(
                               state.taskData!.status == 0
@@ -134,9 +139,16 @@ class ProjectEditView extends StatelessWidget {
                             SizedBox(
                               width: 10.0,
                             ),
-                            AutoSizeText('eFleetPass', style: TextStyle(
-                              fontSize: 16
-                            ))
+                            InkWell(
+                              onTap: () async {
+                                var preferences =
+                                    await SharedPreferences.getInstance();
+                                var id = preferences?.getInt('task_id');
+                                print(id);
+                              },
+                              child: AutoSizeText('eFleetPass',
+                                  style: TextStyle(fontSize: 16)),
+                            )
                           ]),
                     ),
                     LSizedBox(),
@@ -167,7 +179,6 @@ class ProjectEditView extends StatelessWidget {
                                     children: [
                                       new AutoSizeText('Assigned to',
                                           style: TextStyle(
-                                              
                                               fontSize: 10.0,
                                               fontWeight: FontWeight.w400)),
                                       Container(
@@ -180,9 +191,8 @@ class ProjectEditView extends StatelessWidget {
                                                   .toString(),
                                           maxLines: 2,
                                           style: TextStyle(
-                                            fontSize: 10.0,
-                                              fontWeight: FontWeight.w400
-                                          ),
+                                              fontSize: 10.0,
+                                              fontWeight: FontWeight.w400),
                                         ),
                                       ),
                                     ])
@@ -223,7 +233,6 @@ class ProjectEditView extends StatelessWidget {
                                   new TextSpan(
                                       text: 'Due Date \n',
                                       style: TextStyle(
-                                          
                                           fontSize: 10.0,
                                           fontWeight: FontWeight.w400)),
                                   if (state.taskData!.endDate != null)
@@ -231,7 +240,8 @@ class ProjectEditView extends StatelessWidget {
                                         text: state.taskData!.endDate!,
                                         // TextSpan(text: '2078/09/08'),
                                         style: TextStyle(
-                                            color: Color.fromARGB(255, 46, 218, 83),
+                                            color: Color.fromARGB(
+                                                255, 46, 218, 83),
                                             fontSize: 12.0,
                                             fontWeight: FontWeight.w600)),
                                 ]))
@@ -256,7 +266,7 @@ class ProjectEditView extends StatelessWidget {
                               EdgeInsets.symmetric(horizontal: 14, vertical: 8),
                           decoration: BoxDecoration(
                               borderRadius: BorderRadius.circular(14),
-                              color: Colors.grey[200],
+                              // color: Colors.grey[200],
                               border: Border.all(
                                   color: state.taskData!.priority == 0
                                       ? Colors.green
@@ -273,7 +283,7 @@ class ProjectEditView extends StatelessWidget {
                               EdgeInsets.symmetric(horizontal: 14, vertical: 8),
                           decoration: BoxDecoration(
                               borderRadius: BorderRadius.circular(14),
-                              color: Colors.grey[200],
+                              // color: Colors.grey[200],
                               border: Border.all(
                                   color: state.taskData!.priority == 1
                                       ? Colors.yellow
@@ -292,7 +302,7 @@ class ProjectEditView extends StatelessWidget {
                               EdgeInsets.symmetric(horizontal: 14, vertical: 8),
                           decoration: BoxDecoration(
                               borderRadius: BorderRadius.circular(14),
-                              color: Colors.grey[200],
+                              // color: Colors.grey[200],
                               border: Border.all(
                                   color: state.taskData!.priority == 2
                                       ? Colors.red
@@ -324,9 +334,7 @@ class ProjectEditView extends StatelessWidget {
                       state.taskData!.description.toString(),
                       maxLines: 3,
                       style: TextStyle(
-                          
-                          fontSize: 14.0,
-                          fontWeight: FontWeight.w400),
+                          fontSize: 14.0, fontWeight: FontWeight.w400),
                     ),
                     LSizedBox(),
                     Container(
@@ -339,137 +347,87 @@ class ProjectEditView extends StatelessWidget {
                         style: kkBoldTextStyle(),
                       ),
                     ),
-                    Obx(() {
-                      return state.isLoading.value
+                    Expanded(
+                      child: state.commentResponse!.data!.length == 0
                           ? Center(
-                              child: CircularProgressIndicator(
-                                color: blueColor,
+                              child: Text(
+                                'No Comments Found!',
+                                style: TextStyle(
+                                    fontWeight: FontWeight.w700,
+                                    fontSize: 14.0),
                               ),
                             )
-                          : Container(
-                              // margin: EdgeInsets.only(left: 20.0),
-                              height: 150.0,
-                              width: Get.width,
-                              child: state.commentResponse!.data!.length == 0
-                                  ? Center(
-                                      child: Text(
-                                        'No Comments Found!',
-                                        style: TextStyle(
-                                            
-                                            fontWeight: FontWeight.w700,
-                                            fontSize: 14.0),
-                                      ),
-                                    )
-                                  : MediaQuery.removePadding(
-                                      context: context,
-                                      removeTop: true,
-                                      removeBottom: true,
-                                      child: ListView.builder(
-                                          itemCount: state
-                                              .commentResponse!.data!.length,
-                                          itemBuilder:
-                                              (BuildContext context, index) {
-                                            return ListTile(
-                                              leading: CircleAvatar(
-                                                radius: 20.0,
-                                                backgroundImage: AssetImage(
-                                                    'assets/profile.png'),
-                                              ),
-                                              title: new Column(
-                                                  crossAxisAlignment:
-                                                      CrossAxisAlignment.start,
-                                                  children: [
-                                                    new AutoSizeText(
-                                                        state
-                                                            .commentResponse!
-                                                            .data![index]
-                                                            .comment!,
-                                                        maxLines: 2,
-                                                        style: TextStyle(
-                                                            
-                                                            fontSize: 12.0,
-                                                            fontWeight:
-                                                                FontWeight
-                                                                    .w600)),
-                                                    new AutoSizeText(
-                                                        state
-                                                            .commentResponse!
-                                                            .data![index]
-                                                            .createdAt!,
-                                                        style: TextStyle(
-                                                            
-                                                            fontSize: 10.0))
-                                                  ]),
-                                            );
-                                          }),
-                                    ),
-                            );
-                    })
-                  ],
-                ),
-              ),
-            ),
-            Container(
-              alignment: Alignment.bottomCenter,
-              // height: 150,
-              width: Get.width,
-              color: Colors.white,
-              child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                      children: [
-                        Container(
-                          width: Get.width * 0.7,
-                          child: TextField(
-                            onChanged: (value) {
-                              // setState(() {
-                              //   comment = value.toString();
-                              // });
-                            },
-                            decoration:
-                                InputDecoration(hintText: 'Add a comment'),
-                          ),
-                        ),
-                        Container(
-                          alignment: Alignment.centerRight,
-                          child: SizedBox(
-                            width: 80,
-                            height: 50,
-                            child: TextButton(
-                              onPressed: () async {
-                                // bool result = await saveComment();
-                                // if (result) {
-                                //   ToastService().s('Comment Posted!');
-                                //   getComments();
-                                //   FocusScope.of(context).unfocus();
-                                // }
-                              },
-                              style: ButtonStyle(
-                                  // alignment: Alignment.bottomRight,
-                                  // shape: MaterialStateProperty.all(
-                                  //     RoundedRectangleBorder(
-                                  //         borderRadius: BorderRadius.circular(14.0))),
-                                  backgroundColor: MaterialStateProperty.all(
-                                      ColorsTheme.btnColor)),
-                              child: AutoSizeText(
-                                'Save',
-                                style: TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 16.0,
-                                    fontWeight: FontWeight.w600),
+                          : ListView.builder(
+                              physics: BouncingScrollPhysics(),
+                              itemCount: state.commentResponse!.data!.length,
+                              itemBuilder: (BuildContext context, index) {
+                                return ListTile(
+                                  leading: CircleAvatar(
+                                    radius: 20.0,
+                                    backgroundImage:
+                                        AssetImage('assets/profile.png'),
+                                  ),
+                                  title: new Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        new AutoSizeText(
+                                            state.commentResponse!.data![index]
+                                                .comment!,
+                                            maxLines: 2,
+                                            style: TextStyle(
+                                                fontSize: 12.0,
+                                                fontWeight: FontWeight.w600)),
+                                        new AutoSizeText(
+                                            state.commentResponse!.data![index]
+                                                .createdAt!,
+                                            style: TextStyle(fontSize: 10.0))
+                                      ]),
+                                );
+                              }),
+                    ),
+                    Container(
+                      margin: EdgeInsets.only(bottom: 10),
+                      alignment: Alignment.bottomCenter,
+                      // height: 150,
+                      width: double.infinity,
+                      // color: Colors.white,
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        children: [
+                          Expanded(
+                            child: Container(
+                              // width: Get.width * 0.7,
+                              child: TextField(
+                                onChanged: (val) {
+                                  state.onCommentChanged(val);
+                                },
+                                decoration: InputDecoration(
+                                    isDense: true, hintText: 'Add a comment'),
                               ),
                             ),
                           ),
-                        )
-                      ],
+                          maxWidthSpan(),
+                          ElevatedButton(
+                              style: ButtonStyle(
+                                  backgroundColor: MaterialStateProperty.all(
+                                      Theme.of(context).primaryColor)),
+                              onPressed: state.comment.value == ''
+                                  ? () {
+                                      ToastService()
+                                          .e('Comment cannot be null');
+                                    }
+                                  : () async {
+                                      state.postComment();
+                                    },
+                              child: Text('Comment', style: TextStyle(fontSize: 11),))
+                        ],
+                      ),
                     ),
-                  ]),
-            ),
-          ],
-        ),
-      ),
+                  ],
+                ),
+              );
+      }),
     );
   }
 }

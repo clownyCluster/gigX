@@ -5,8 +5,7 @@ class LocalStorageKeys {
   static const accessToken = "access_token";
   static const isFirstTime = "isFirstTime";
   static const isDark = 'isDark';
-  // static const bookingId = 'bookingId';
-  // static const chargerData = 'chargerData';
+  static const userId = 'userId';
   static const email = 'email';
   static const password = 'password';
 }
@@ -19,12 +18,14 @@ class LocalStorageService {
   }
 
   String? read(key) {
+    return _box.read(key.toString());
+  }
+
+  bool? readBool(key) {
     return _box.read(key);
   }
 
-  
-
-  bool? readBool(key) {
+   int? readInt(key) {
     return _box.read(key);
   }
 

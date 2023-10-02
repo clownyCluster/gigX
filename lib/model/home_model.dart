@@ -2,14 +2,17 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:gigX/home.dart';
+import 'package:gigX/modules/chat/chatpage.dart';
 import 'package:gigX/pages/account.dart';
 import 'package:gigX/pages/chat_module/chat_screen.dart';
 import 'package:gigX/pages/chat_module/chat_screen_state.dart';
+import 'package:gigX/pages/chat_module/chat_users_module/chat_users_screen.dart';
 import 'package:gigX/pages/home.dart';
 import 'package:gigX/pages/notifications.dart';
 import 'package:gigX/pages/tasks.dart';
 import 'package:gigX/view/account_view.dart';
 import 'package:gigX/view/home_screen_view.dart';
+import 'package:gigX/view/notification_old_view.dart';
 import 'package:gigX/view/notification_view.dart';
 import 'package:gigX/view/task_view.dart';
 import 'package:provider/provider.dart';
@@ -29,14 +32,15 @@ class HomeView extends GetView<HomeController> {
                 HomeScreenView(),
                 // Center(child: Text('Tssak')),
                 TaskViewScreen(),
-                NotificationView(),
+                NotificationOldView(),
                 AccountView(),
-
+                ChatUsersScreen(),
+// ChatPage(),
                 // TaskTabPage(),
                 // NotificationTabPage(),
                 // AccountTabPage(),
-                ChangeNotifierProvider(
-                    create: (_) => ChatScreenState(), child: ChatScreen())
+                // ChangeNotifierProvider(
+                //     create: (_) => ChatScreenState(), child: ChatScreen())
               ],
             )),
         bottomNavigationBar: Obx(

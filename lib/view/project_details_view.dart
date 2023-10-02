@@ -35,11 +35,9 @@ class ProjectDetailsView extends StatelessWidget {
               Row(
                 mainAxisAlignment: MainAxisAlignment.start,
                 children: [
-                  Text( 'project_title',
-                        style: TextStyle(
-                            fontSize: 20.0, fontWeight: FontWeight.w600)),
-                    
-                  
+                  Text('project_title',
+                      style: TextStyle(
+                          fontSize: 20.0, fontWeight: FontWeight.w600)),
                 ],
               ),
               GestureDetector(
@@ -55,7 +53,7 @@ class ProjectDetailsView extends StatelessWidget {
         ),
       ),
       resizeToAvoidBottomInset: false,
-      
+
       body: Obx(() {
         return state.isLoading.value
             ? Center(
@@ -63,7 +61,10 @@ class ProjectDetailsView extends StatelessWidget {
                   color: primaryColor,
                 ),
               )
-            : state.taskResponse!.data!.isEmpty ||
+            : 
+            state.taskResponse == null || 
+            state.taskResponse!.data!.isEmpty ||
+            
                     state.taskResponse!.data == []
                 ? Center(
                     child: Text('No task!'),
@@ -98,6 +99,7 @@ class ProjectDetailsView extends StatelessWidget {
                                     width: Get.width,
                                     child: GestureDetector(
                                       onTap: () async {
+                                        // print(state.taskResponse!.data![index].id);
                                         Get.toNamed(RouteName.projectEditScreen,
                                             arguments: state
                                                 .taskResponse!.data![index]);
@@ -247,9 +249,7 @@ class ProjectDetailsView extends StatelessWidget {
                                                     left: 20, right: 20),
                                                 decoration: BoxDecoration(
                                                     border: Border(
-                                                        bottom: BorderSide(
-                                                  
-                                                ))),
+                                                        bottom: BorderSide())),
                                                 child: AutoSizeText(
                                                   state.taskResponse!
                                                       .data![index].description
@@ -306,7 +306,6 @@ class ProjectDetailsView extends StatelessWidget {
           FloatingActionButton.extended(
             // backgroundColor:
             //     state.isDark.value ? buttonColor : ColorsTheme.btnColor,
-            // heroTag: null,
             label: Text('TimeBox'),
             icon: Icon(Icons.timer),
             // child: const Icon(Icons.edit),
@@ -315,17 +314,20 @@ class ProjectDetailsView extends StatelessWidget {
           FloatingActionButton.extended(
             // backgroundColor: state.isDark.value ? buttonColor : ColorsTheme.btnColor,
 
-            // heroTag: null,
-            label: Text('Tasks',
-                ),
-            icon: Icon(Icons.task,
-                ),
+            label: Text(
+              'Tasks',
+            ),
+            icon: Icon(
+              Icons.task,
+            ),
             // child: const Icon(Icons.search),
             onPressed: () {
               Get.bottomSheet(Obx(() => Container(
                     height: Get.height * 0.85,
                     decoration: BoxDecoration(
-                        color: Get.isDarkMode ? customDarkTheme.scaffoldBackgroundColor : customLightTheme.scaffoldBackgroundColor,
+                        color: Get.isDarkMode
+                            ? customDarkTheme.scaffoldBackgroundColor
+                            : customLightTheme.scaffoldBackgroundColor,
                         borderRadius: BorderRadius.only(
                             topLeft: Radius.circular(20),
                             topRight: Radius.circular(20))),
@@ -339,9 +341,7 @@ class ProjectDetailsView extends StatelessWidget {
                             child: Text(
                               'Task Name',
                               style: TextStyle(
-                                  
-                                  fontWeight: FontWeight.w600,
-                                  fontSize: 14.0),
+                                  fontWeight: FontWeight.w600, fontSize: 14.0),
                             ),
                           ),
                           Container(
@@ -382,7 +382,6 @@ class ProjectDetailsView extends StatelessWidget {
                                                   Text(
                                                     'Please select project.',
                                                     style: TextStyle(
-                                                        
                                                         fontWeight:
                                                             FontWeight.w700),
                                                   ),
@@ -474,16 +473,17 @@ class ProjectDetailsView extends StatelessWidget {
                                 //     :
                                 // AutoSizeText('Add Project')
                                 Expanded(
-                                  child: 
-                                  state.showProject.value ? 
-                                  AutoSizeText(
-                                    state
-                                            .projectResponse!
-                                            .data![state.selectedProject.value]
-                                            .title!,
-                                    overflow: TextOverflow.ellipsis,
-                                    maxLines: 1,
-                                  ) : Text('Select Project'),
+                                  child: state.showProject.value
+                                      ? AutoSizeText(
+                                          state
+                                              .projectResponse!
+                                              .data![
+                                                  state.selectedProject.value]
+                                              .title!,
+                                          overflow: TextOverflow.ellipsis,
+                                          maxLines: 1,
+                                        )
+                                      : Text('Select Project'),
                                 ),
                               ],
                             ),
@@ -508,7 +508,6 @@ class ProjectDetailsView extends StatelessWidget {
                                                 Text(
                                                   'Please select a user.',
                                                   style: TextStyle(
-                                                      
                                                       fontWeight:
                                                           FontWeight.w700),
                                                 ),
@@ -596,16 +595,16 @@ class ProjectDetailsView extends StatelessWidget {
                                 ),
                               ),
                               Expanded(
-                                child: 
-                                state.showUser.value ?
-                                AutoSizeText(
-                                  state
-                                          .userResponse!
-                                          .data![state.selectedUser.value]
-                                          .username!,
-                                  overflow: TextOverflow.ellipsis,
-                                  maxLines: 1,
-                                ) : Text('Select User'),
+                                child: state.showUser.value
+                                    ? AutoSizeText(
+                                        state
+                                            .userResponse!
+                                            .data![state.selectedUser.value]
+                                            .username!,
+                                        overflow: TextOverflow.ellipsis,
+                                        maxLines: 1,
+                                      )
+                                    : Text('Select User'),
                               ),
                               GestureDetector(
                                 onTap: () async {
@@ -662,9 +661,7 @@ class ProjectDetailsView extends StatelessWidget {
                             child: Text(
                               'Description',
                               style: TextStyle(
-                                  
-                                  fontWeight: FontWeight.w600,
-                                  fontSize: 14.0),
+                                  fontWeight: FontWeight.w600, fontSize: 14.0),
                             ),
                           ),
                           kSizedBox(),
@@ -683,9 +680,7 @@ class ProjectDetailsView extends StatelessWidget {
                           Text(
                             'Percent Done',
                             style: TextStyle(
-                                
-                                fontWeight: FontWeight.w600,
-                                fontSize: 14.0),
+                                fontWeight: FontWeight.w600, fontSize: 14.0),
                           ),
                           kSizedBox(),
                           Container(
@@ -709,9 +704,7 @@ class ProjectDetailsView extends StatelessWidget {
                           Text(
                             'Priority',
                             style: TextStyle(
-                                
-                                fontWeight: FontWeight.w600,
-                                fontSize: 14.0),
+                                fontWeight: FontWeight.w600, fontSize: 14.0),
                           ),
                           kSizedBox(),
                           Row(
@@ -737,9 +730,7 @@ class ProjectDetailsView extends StatelessWidget {
                           Text(
                             'Status',
                             style: TextStyle(
-                                
-                                fontWeight: FontWeight.w600,
-                                fontSize: 14.0),
+                                fontWeight: FontWeight.w600, fontSize: 14.0),
                           ),
                           kSizedBox(),
                           Row(
@@ -814,7 +805,6 @@ class ProjectDetailsView extends StatelessWidget {
                                       child: Text('Create'),
                                       onPressed: () async {
                                         state.createTask();
-                                        
                                       }),
                                 ),
                               ],

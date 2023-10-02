@@ -5,7 +5,9 @@ import 'dart:io';
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import 'package:get/get.dart';
+import 'package:gigX/appRoute/routeName.dart';
 import 'package:gigX/service/local_storage_service.dart';
+import 'package:gigX/service/toastService.dart';
 
 import '../app_exceptions.dart';
 import 'base_api_services.dart';
@@ -29,11 +31,12 @@ class NetworkApiServices extends BaseApiServices {
           .timeout(
             Duration(seconds: 10),
           );
-      jsonResponse = returnResponse(response);
-    } on SocketException {
-      throw InternetException('Please connect to the Internet');
-    } on RequestTimeOutException {
-      throw TimeoutException('Requested time out');
+      if (response.statusCode == 200) {
+        jsonResponse = returnResponse(response);
+      }
+    } on DioError catch (e) {
+      _handleApiException(e);
+      rethrow;
     }
     return jsonResponse;
   }
@@ -57,13 +60,14 @@ class NetworkApiServices extends BaseApiServices {
               }))
           .timeout(Duration(seconds: 10));
       jsonResponse = returnResponse(response);
-    } on SocketException {
-      throw InternetException('Please connect to the Internet');
-    } on RequestTimeOutException {
-      throw TimeoutException('Requested time out');
     } on DioError catch (e) {
-      print(e);
-      print(e.response);
+      if (e.response?.statusCode == 400) {
+        final responseData = e.response?.data ?? {};
+        final errorMessage = responseData['message'] ?? 'Validation error';
+        throw BadRequestException(errorMessage);
+      }
+      _handleApiException(e); // Handle other exceptions
+      rethrow;
     }
     return jsonResponse;
   }
@@ -85,10 +89,9 @@ class NetworkApiServices extends BaseApiServices {
               }))
           .timeout(Duration(seconds: 10));
       jsonResponse = returnResponse(response);
-    } on SocketException {
-      throw InternetException('Please connect to the Internet');
-    } on RequestTimeOutException {
-      throw TimeoutException('Requested time out');
+    } on DioError catch (e) {
+      _handleApiException(e);
+      rethrow;
     }
     return jsonResponse;
   }
@@ -110,10 +113,9 @@ class NetworkApiServices extends BaseApiServices {
               }))
           .timeout(Duration(seconds: 10));
       jsonResponse = returnResponse(response);
-    } on SocketException {
-      throw InternetException('Please connect to the Internet');
-    } on RequestTimeOutException {
-      throw TimeoutException('Requested time out');
+    } on DioError catch (e) {
+      _handleApiException(e);
+      rethrow;
     }
     return jsonResponse;
   }
@@ -135,30 +137,64 @@ class NetworkApiServices extends BaseApiServices {
               }))
           .timeout(Duration(seconds: 10));
       jsonResponse = returnResponse(response);
-    } on SocketException {
-      throw InternetException('Please connect to the Internet');
-    } on RequestTimeOutException {
-      throw TimeoutException('Requested time out');
+    } on DioError catch (e) {
+      _handleApiException(e);
+      rethrow;
     }
     return jsonResponse;
   }
 
-  dynamic returnResponse(dynamic response) {
-    switch (response.statusCode) {
-      case 200:
-        // dynamic responseJson = jsonDecode(response);
-        // return responseJson;
-        print('Yo return respone ko response ho');
+  void _handleApiException(DioError e) {
+    if (e.type == DioErrorType.connectTimeout ||
+        e.type == DioErrorType.receiveTimeout ||
+        e.type == DioErrorType.sendTimeout) {
+      throw RequestTimeOutException();
+    } else if (e.type == DioErrorType.response) {
+      final statusCode = e.response!.statusCode;
+      final responseData = e.response!.data;
 
-        return response.data;
-      // case 400:
-      //   throw NotFoundException('No data found');
-      // case 500:
-      //   throw ServerException('Error occured communicating with the server');
+      switch (statusCode) {
+        case 400:
+          throw BadRequestException(responseData['message']);
+        case 401:
+          Get.offNamedUntil(RouteName.loginScreen, (route) => false);
+          throw UnauthorizedException(responseData['message']);
+
+        case 403:
+          throw ForbiddenException(responseData['message']);
+        case 404:
+          throw NotFoundException(responseData['message']);
+        case 500:
+          throw ServerException(responseData['message']);
+        default:
+          throw DefaultException(responseData['message']);
+      }
+    } else {
+      throw InternetException();
+    }
+  }
+
+  dynamic returnResponse(dynamic response) {
+    final statusCode = response.statusCode;
+    final responseData = response.data;
+
+    switch (statusCode) {
+      case 200:
+        // Successful response
+        return responseData;
+      case 400:
+        throw BadRequestException('Bad request: ${responseData['message']}');
+      case 401:
+        throw UnauthorizedException('Unauthorized: ${responseData['message']}');
+      case 403:
+        throw ForbiddenException('Forbidden: ${responseData['message']}');
+      case 404:
+        throw NotFoundException('Not found: ${responseData['message']}');
+      case 500:
+        throw ServerException(
+            'Internal server error: ${responseData['message']}');
       default:
-        // throw DefaultException('Issue');
-        // dynamic responseJson = jsonDecode(response.data);
-        return response.data;
+        throw DefaultException('An error occurred: ${responseData['message']}');
     }
   }
 }

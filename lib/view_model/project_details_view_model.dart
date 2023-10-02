@@ -22,7 +22,7 @@ class ProjectDetailsViewModel extends GetxController {
   // }
 
   ProjectDetailsViewModel() {
-    isDark.value = LocalStorageService().readBool(LocalStorageKeys.isDark)!;
+    // isDark.value = LocalStorageService().readBool(LocalStorageKeys.isDark) ?? false;
     if (Get.arguments != null) {
       selectedProjectId = Get.arguments;
       projectId.value = selectedProjectId;
@@ -31,12 +31,26 @@ class ProjectDetailsViewModel extends GetxController {
     getTask();
   }
 
-  RxBool isDark = false.obs;
+  // RxBool isDark = false.obs;
   var selectedProjectId;
 
   RxString projectStatus = 'InCompleted Tasks'.obs;
   onProjectStatusChanged(val) {
     projectStatus.value = val;
+    if (projectStatus.value == 'InCompleted Tasks') {
+      print('chaleko thiyo haii');
+      taskResponse = taskResponse!.data!
+          .where((element) => element.category == 0)
+          .toList() as TaskModel;
+    } else if (projectStatus.value == 'Completed Tasks') {
+      taskResponse = taskResponse!.data!
+          .where((element) => element.category == 1)
+          .toList() as TaskModel;
+    } else if (projectStatus.value == 'Inprogress') {
+      taskResponse = taskResponse!.data!
+          .where((element) => element.category == 2)
+          .toList() as TaskModel;
+    }
   }
 
   TaskModel? taskResponse;
@@ -54,6 +68,7 @@ class ProjectDetailsViewModel extends GetxController {
           .getAPI('${API.base_url}todos/$selectedProjectId/0');
       getUsers();
       print(response);
+
       taskResponse = TaskModel.fromJson(response);
       print(taskResponse!.data!.first.title);
     } catch (e) {
@@ -158,10 +173,12 @@ class ProjectDetailsViewModel extends GetxController {
   getTasks() async {
     final _apiServices = NetworkApiServices();
     try {
-      var response = await _apiServices.getAPI('${API.base_url}/my-todos');
-      todoResponse = TodoModels.fromJson(response);
-    } catch (e) {
-      print(e);
+      var response = await _apiServices.getAPI('${API.base_url}/my/todos');
+      print('YO get task ko error dekhauda ko error ho: $response');
+      // todoResponse = TodoModels.fromJson(response);
+    } on dio.DioError catch (e) {
+      print('Get task ko error data : ${e.response}');
+      print(e.response);
     }
   }
 

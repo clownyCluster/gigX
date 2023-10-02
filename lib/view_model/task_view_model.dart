@@ -16,7 +16,7 @@ import 'package:scrollable_clean_calendar/controllers/clean_calendar_controller.
 
 class TaskViewModel extends GetxController {
   TaskViewModel() {
-    isDark.value = LocalStorageService().readBool(LocalStorageKeys.isDark)!;
+    // isDark.value = LocalStorageService().readBool(LocalStorageKeys.isDark) ?? false;
     getUsers();
     events = {
       DateTime(2023, 8, 1): ['Event 1'],
@@ -25,7 +25,7 @@ class TaskViewModel extends GetxController {
     };
   }
 
-  RxBool isDark = false.obs;
+  // RxBool isDark = false.obs;
   RxString taskStatus = 'Todo'.obs;
   onTaskStatusChanged(val) {
     taskStatus.value = val;
@@ -79,7 +79,7 @@ class TaskViewModel extends GetxController {
     try {
       var response = await _apiServices.getAPI('${API.base_url}users/select2');
       await getProjects();
-      print('User ko data : $response');
+      // print('User ko data : $response');
       userResponse = UserModel.fromJson(response);
       setLoading(false);
     } catch (e) {
@@ -126,7 +126,7 @@ class TaskViewModel extends GetxController {
   getTasks() async {
     final _apiServices = NetworkApiServices();
     try {
-      var response = await _apiServices.getAPI('${API.base_url}/my-todos');
+      var response = await _apiServices.getAPI('${API.base_url}my/todos');
 
       todoResponse = TodoModels.fromJson(response);
     } on DioError catch (e) {

@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/services.dart';
@@ -13,35 +14,111 @@ import 'package:gigX/service/local_storage_service.dart';
 import 'package:gigX/service/toastService.dart';
 import 'package:local_auth/local_auth.dart';
 
+import '../data/api_model/getUsersModel.dart';
+
 class LoginViewModel extends GetxController {
   final emailController = TextEditingController().obs;
   final passwordController = TextEditingController().obs;
 
   LoginViewModel() {
-    isDark.value = LocalStorageService().readBool(LocalStorageKeys.isDark)!;
+    isDark.value =
+        LocalStorageService().readBool(LocalStorageKeys.isDark) ?? false;
   }
   RxBool isDark = false.obs;
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  GetUserModels? getUserModels;
+  Future getUserProfile(token) async {
+    print('get user chalyathiyo login ma');
+    Dio dio = Dio();
+    try {
+      var response = await dio.get('${API.base_url}me',
+          options: Options(headers: {
+            'Authorization': 'Bearer $token',
+          }));
+      print(response.data);
+      getUserModels = GetUserModels.fromJson(response.data);
+    } catch (e) {
+    
+    }
+  }
 
-  Future<bool> login() async {
+  // Future<bool> login() async {
+  //   setLoading(true);
+  //   var data = {
+  //     "grant_type": "password",
+  //     "client_id": API.clientId,
+  //     "client_secret": API.clientSecret,
+  //     "username": emailController.value.text,
+  //     "password": passwordController.value.text
+  //   };
+  //   print(data);
+  //   RxBool result = false.obs;
+
+  //   final _apiServices = NetworkApiServices();
+
+  //   await _apiServices
+  //       .postAPI('${API.base_url}oauth/token', data)
+  //       .then((value) async {
+  //     await getUserProfile(value['access_token']);
+  //     if (value != null) {
+  //       ToastService().s('Login Successful');
+  //       // setLoading(false);
+  //       Get.offNamedUntil(RouteName.homeScreen, (route) => false);
+  //       LocalStorageService()
+  //           .write(LocalStorageKeys.email, emailController.value.text);
+  //       LocalStorageService()
+  //           .write(LocalStorageKeys.password, passwordController.value.text);
+  //       LocalStorageService()
+  //           .write(LocalStorageKeys.accessToken, value['access_token']);
+
+  //       LocalStorageService()
+  //           .write(LocalStorageKeys.email, getUserModels!.email);
+  //       LocalStorageService().write(LocalStorageKeys.userId, getUserModels!.id);
+
+  //       await _firestore
+  //           .collection('users')
+  //           .doc(getUserModels!.id.toString())
+  //           .set({
+  //         'uid': getUserModels!.id,
+  //         'email': getUserModels!.email,
+  //         'name': getUserModels!.username,
+  //         'profilePic': getUserModels!.profilePic
+  //       }, SetOptions(merge: true));
+  //       result.value = true;
+  //     } else {
+  //       ToastService().e('Please enter correct credentials and try again.');
+  //     }
+  //     setLoading(false);
+  //   }).onError((error, stackTrace) {
+  //     setLoading(false);
+
+  //     ToastService().e('The user credentials were incorrect');
+  //     print('Yo error ho ${error.toString()}');
+  //   });
+  //   print('Result.value ho haii-    ------------------->   ${result.value}');
+  //   return result.value;
+  // }
+
+  Future login() async {
     setLoading(true);
-    print('Login function chalyo');
     var data = {
       "grant_type": "password",
-      "client_id": 18,
-      "client_secret": "VDt8JhTzNdBrCWoKTwWNGOw0SQ5bPg99J2HI2BLL",
+      "client_id": API.clientId,
+      "client_secret": API.clientSecret,
       "username": emailController.value.text,
       "password": passwordController.value.text
     };
     print(data);
-    RxBool result = false.obs;
-
     final _apiServices = NetworkApiServices();
-    await _apiServices
-        .postAPI('${API.base_url}oauth/token', data)
-        .then((value) {
-      print('Value:" $value');
+    try {
+      var response =
+          await _apiServices.postAPI('${API.base_url}oauth/token', data);
 
-      if (value != null) {
+      // print(response['access_token']);
+
+      if (response['access_token'] != null) {
+        print('Ya vitra chalyo haii');
+        await getUserProfile(response['access_token']);
         ToastService().s('Login Successful');
         // setLoading(false);
         Get.offNamedUntil(RouteName.homeScreen, (route) => false);
@@ -50,20 +127,33 @@ class LoginViewModel extends GetxController {
         LocalStorageService()
             .write(LocalStorageKeys.password, passwordController.value.text);
         LocalStorageService()
-            .write(LocalStorageKeys.accessToken, value['access_token']);
-        result.value = true;
+            .write(LocalStorageKeys.accessToken, response['access_token']);
+
+        LocalStorageService()
+            .write(LocalStorageKeys.email, getUserModels!.email);
+        LocalStorageService().write(LocalStorageKeys.userId, getUserModels!.id);
+
+        await _firestore
+            .collection('users')
+            .doc(getUserModels!.id.toString())
+            .set({
+          'uid': getUserModels!.id,
+          'email': getUserModels!.email,
+          'name': getUserModels!.username,
+          'profilePic': getUserModels!.profilePic
+        }, SetOptions(merge: true));
+        print('Response null navayera if vitra chalyathiyo.');
       } else {
+        setLoading(false);
         ToastService().e('Please enter correct credentials and try again.');
       }
       setLoading(false);
-    }).onError((error, stackTrace) {
+    } catch (e) {
+      print(e);
       setLoading(false);
-
-      ToastService().e('The user credentials were incorrect');
-      print('Yo error ho ${error.toString()}');
-    });
-    print('Result.value ho haii-    ------------------->   ${result.value}');
-    return result.value;
+      ToastService().e(e.toString());
+      print('Error response thiyo yo : ${e}');
+    }
   }
 
   RxBool isPasswordVisible = true.obs;

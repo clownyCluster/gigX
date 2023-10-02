@@ -74,7 +74,7 @@ class TimeboxView extends StatelessWidget {
           Get.bottomSheet(Container(
               padding: kStandardPadding(),
               decoration: BoxDecoration(
-                  color: whiteColor,
+                  color: Get.isDarkMode ? Colors.grey : Colors.white,
                   borderRadius: BorderRadius.only(
                       topLeft: Radius.circular(20),
                       topRight: Radius.circular(20))),
@@ -91,11 +91,11 @@ class TimeboxView extends StatelessWidget {
                   TextFormField(
                     decoration: InputDecoration(
                         isDense: true,
-                        border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(10)),
-                        focusedBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(10),
-                            borderSide: BorderSide(color: primaryColor)),
+                        // border: OutlineInputBorder(
+                        //     borderRadius: BorderRadius.circular(10)),
+                        // focusedBorder: OutlineInputBorder(
+                        //     borderRadius: BorderRadius.circular(10),
+                        //     borderSide: BorderSide(color: primaryColor)),
                         labelText: 'Title'),
                   ),
                   kSizedBox(),
@@ -113,13 +113,13 @@ class TimeboxView extends StatelessWidget {
                             TextFormField(
                                 decoration: InputDecoration(
                                     isDense: true,
-                                    border: OutlineInputBorder(
-                                        borderRadius:
-                                            BorderRadius.circular(10)),
-                                    focusedBorder: OutlineInputBorder(
-                                        borderRadius: BorderRadius.circular(10),
-                                        borderSide:
-                                            BorderSide(color: primaryColor)),
+                                    // border: OutlineInputBorder(
+                                    //     borderRadius:
+                                    //         BorderRadius.circular(10)),
+                                    // focusedBorder: OutlineInputBorder(
+                                    //     borderRadius: BorderRadius.circular(10),
+                                    //     borderSide:
+                                    //         BorderSide(color: primaryColor)),
                                     labelText: 'duration')),
                           ],
                         ),
@@ -140,8 +140,9 @@ class TimeboxView extends StatelessWidget {
                             },
                             child: Container(
                               decoration: BoxDecoration(
-                                  border: Border.all(),
-                                  borderRadius: BorderRadius.circular(5)),
+                                  border: Border.all(color: Get.isDarkMode ? whiteColor : darkGrey),
+                                  borderRadius: BorderRadius.circular(5),
+                                  ),
                               padding: kStandardPadding(),
                               child: Row(
                                 children: [

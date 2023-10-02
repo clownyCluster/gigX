@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:dio/dio.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -22,9 +23,9 @@ class HomeScreenViewModel extends GetxController {
     isLoading.value = val;
   }
 
-  RxBool isDark = false.obs;
+  // RxBool isDark = false.obs;
   HomeScreenViewModel() {
-    isDark.value = LocalStorageService().readBool(LocalStorageKeys.isDark)!;
+    // isDark.value = LocalStorageService().readBool(LocalStorageKeys.isDark) ?? false;
   }
 
   Rx<Color> pickerColor = Color.fromARGB(255, 230, 50, 53).obs;
@@ -54,6 +55,7 @@ class HomeScreenViewModel extends GetxController {
     final _apiServices = NetworkApiServices();
     await _apiServices.getAPI('${API.base_url}/todo-projects').then((value) {
       productList = value;
+      projects = value['data'];
       print('avalue ho: ${value['data']}');
       setLoading(false);
     }).onError((error, stackTrace) {
@@ -61,6 +63,59 @@ class HomeScreenViewModel extends GetxController {
       setLoading(false);
     });
     print('Is loading ko value : ${isLoading.value}');
+  }
+
+  var projects = [];
+
+  Future<void> getProjectsFromSearch(String search) async {
+    // final _dio = Dio();
+    // setLoading(true);
+
+    // // Map<St  Future<void> getVehicles(String type) asyn2 {ring, dynamic> arrayTest;
+
+    // var access_token = LocalStorageService().read(LocalStorageKeys.accessToken);
+    // print('Access Token' + access_token.toString());
+    // try {
+    //   dio.Response response = await _dio.get(API.base_url + 'todo-projects',
+    //       options: Options(headers: {"authorization": "Bearer $access_token"}));
+    //   Map result = response.data;
+    //   print('Status Code ' + response.statusCode.toString());
+
+    //   if (response.statusCode == 200) {
+    //     projects = response.data['data'];
+    //     setSearchResults(search);
+
+    //     print(projects);
+    //   }
+    //   setLoading(false);
+
+    //   return null;
+    // } on DioError catch (e) {
+    //   setLoading(false);
+    //   return null;
+    // }
+    final _apiServices = NetworkApiServices();
+    try {
+      var response = await _apiServices.getAPI('${API.base_url}/todo-projects');
+      projects = response['data'];
+      setSearchResults(search);
+    } catch (e) {}
+  }
+
+  void setSearchResults(String query) {
+    isLoading.value = true;
+    projects = projects
+        .where((elem) =>
+            elem['title']
+                .toString()
+                .toLowerCase()
+                .contains(query.toLowerCase()) ||
+            elem['description']
+                .toString()
+                .toLowerCase()
+                .contains(query.toLowerCase()))
+        .toList();
+    isLoading.value = false;
   }
 
   RxBool isSearchVisible = true.obs;

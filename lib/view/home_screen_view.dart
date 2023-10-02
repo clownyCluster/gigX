@@ -132,7 +132,7 @@ class _HomeScreenViewState extends State<HomeScreenView> {
                                             fontSize: 20.0,
                                             fontWeight: FontWeight.w600)),
                                     Text(
-                                        '${state.isLoading.value ? '' : state.productList['data']?.length} projects',
+                                        '${state.isLoading.value ? '' : state.projects.length} projects',
                                         style: TextStyle(
                                             fontSize: 15.0,
                                             fontWeight: FontWeight.w600))
@@ -173,6 +173,7 @@ class _HomeScreenViewState extends State<HomeScreenView> {
                                   controller: state.searchController,
                                   onChanged: (query) {
                                     // getSuggestion(query);
+                                    state.getProjectsFromSearch(query.toString());
                                   },
                                 ),
                               ),
@@ -200,8 +201,8 @@ class _HomeScreenViewState extends State<HomeScreenView> {
                     color: primaryColor,
                   ),
                 )
-              : state.productList['data'] == null ||
-                      state.productList['data']!.isEmpty
+              : state.projects == [] ||
+                      state.projects.isEmpty
                   ? Center(
                       child: Text('No project found'),
                     )
@@ -211,16 +212,16 @@ class _HomeScreenViewState extends State<HomeScreenView> {
                       width: Get.width,
                       child: ListView.builder(
                           // controller: controller,
-                          itemCount: state.productList['data']!.length,
+                          itemCount: state.projects.length,
                           // shrinkWrap: true,
                           // itemExtent: 105.0,
                           itemBuilder: (BuildContext context, index) {
                             return GestureDetector(
                               onTap: () async {
                                 Get.toNamed(RouteName.projectDetailsScreen,
-                                    arguments: state.productList['data']![index]
+                                    arguments: state.projects[index]
                                         ['id']);
-                                print(state.productList['data']![index]
+                                print(state.projects[index]
                                     .toString());
                               },
                               child: Container(
@@ -232,16 +233,17 @@ class _HomeScreenViewState extends State<HomeScreenView> {
                                     border: Border.all(color: Colors.grey)),
                                 child: Row(
                                   children: [
-                                    state.productList['data'][index]
+                                    state.projects[index]
                                                 ['logo_url'] ==
-                                            null
+                                            null || state.projects[index]
+                                                ['logo_url'].toString().isEmpty
                                         ? Image.asset(
                                             'assets/sample_logo.png',
                                             height: 50,
                                             width: 50,
                                           )
                                         : Image.network(
-                                            state.productList['data'][index]
+                                            state.projects[index]
                                                 ['logo_url'],
                                             height: 50,
                                             width: 50,
@@ -254,7 +256,7 @@ class _HomeScreenViewState extends State<HomeScreenView> {
                                               CrossAxisAlignment.start,
                                           children: [
                                             Text(
-                                              state.productList['data'][index]
+                                              state.projects[index]
                                                   ['title'],
                                               maxLines: 1,
                                               style: TextStyle().copyWith(
@@ -263,7 +265,7 @@ class _HomeScreenViewState extends State<HomeScreenView> {
                                               overflow: TextOverflow.ellipsis,
                                             ),
                                             AutoSizeText(
-                                              state.productList['data'][index]
+                                              state.projects[index]
                                                   ['description'],
                                               maxLines: 1,
                                               overflow: TextOverflow.ellipsis,
@@ -292,7 +294,7 @@ class _HomeScreenViewState extends State<HomeScreenView> {
             // backgroundColor: state.isDark.value ? buttonColor : blueColor,
             child: ImageIcon(
               AssetImage('assets/add_project.png'),
-              color: state.isDark.value ? darkGrey : whiteColor,
+              color: Get.isDarkMode ? darkGrey : whiteColor,
             ),
             onPressed: () {
               Get.bottomSheet(Obx(() => Form(
@@ -381,6 +383,7 @@ class _HomeScreenViewState extends State<HomeScreenView> {
                               InkWell(
                                 onTap: () {
                                   DateTimeRangePicker(
+                                    
                                       startText: "From",
                                       endText: "To",
                                       doneText: "Yes",
@@ -472,7 +475,6 @@ class _HomeScreenViewState extends State<HomeScreenView> {
                           Row(
                             mainAxisAlignment: MainAxisAlignment.end,
                             children: [
-                              
                               ElevatedButton(
                                   onPressed: () {
                                     state.createProjects();

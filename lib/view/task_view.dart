@@ -194,7 +194,7 @@ class TaskViewScreen extends StatelessWidget {
                           weekendStyle: TextStyle(
                               color: const Color.fromARGB(255, 228, 26, 11)),
                           weekdayStyle: TextStyle(
-                              color: state.isDark.value
+                              color: Get.isDarkMode
                                   ? whiteColor
                                   : Colors.black)),
                       headerStyle: const HeaderStyle(
@@ -780,7 +780,6 @@ class TaskViewScreen extends StatelessWidget {
         children: [
           FloatingActionButton.extended(
             // backgroundColor: state.isDark.value ? buttonColor : ColorsTheme.btnColor,
-            // heroTag: null,
             label: Text(
               'TimeBox',            
             ),
@@ -794,7 +793,6 @@ class TaskViewScreen extends StatelessWidget {
           FloatingActionButton.extended(
             // backgroundColor: state.isDark.value ? buttonColor : ColorsTheme.btnColor,
 
-            // heroTag: null,
             label: Text('Tasks',
                ),
             icon: Icon(Icons.task,

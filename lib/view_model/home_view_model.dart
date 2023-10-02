@@ -12,7 +12,7 @@ class HomeController extends GetxController {
   }
 
   HomeController() {
-    isDark = LocalStorageService().readBool(LocalStorageKeys.isDark)!;
+    isDark = LocalStorageService().readBool(LocalStorageKeys.isDark) ?? false;
   }
 
   bool isDark = false;

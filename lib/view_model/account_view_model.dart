@@ -19,7 +19,8 @@ class AccountViewModel extends GetxController {
 
   AccountViewModel() {
     if (LocalStorageService().readBool(LocalStorageKeys.isDark) != null) {
-      isDark.value = LocalStorageService().readBool(LocalStorageKeys.isDark)!;
+      isDark.value =
+          LocalStorageService().readBool(LocalStorageKeys.isDark) ?? false;
     }
   }
 
@@ -77,13 +78,11 @@ class AccountViewModel extends GetxController {
                   ),
                   LSizedBox(),
                   TextButton(
-                      onPressed: 
-                      
-                      () {
+                      onPressed: () {
                         if (kDebugMode) {
-                          
-                        }
-                        // exit(0); // Exit the app
+                          Get.toNamed(RouteName.loginScreen);
+                        } else
+                          exit(0); // Exit the app
                       },
                       child: Text('OK'))
                 ],
