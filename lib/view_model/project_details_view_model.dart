@@ -3,15 +3,15 @@ import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:gigX/api.dart';
-import 'package:gigX/data/api_model/taskModel.dart';
+import 'package:gigX/data/model/taskModel.dart';
 import 'package:gigX/data/network/network_api_services.dart';
 import 'package:gigX/service/local_storage_service.dart';
 import 'package:gigX/service/toastService.dart';
 import 'package:intl/intl.dart';
 
-import '../data/api_model/projectModel.dart';
-import '../data/api_model/taskModels.dart';
-import '../data/api_model/userModel.dart';
+import '../data/model/projectModel.dart';
+import '../data/model/taskModels.dart';
+import '../data/model/userModel.dart';
 import 'package:dio/dio.dart' as dio;
 
 class ProjectDetailsViewModel extends GetxController {

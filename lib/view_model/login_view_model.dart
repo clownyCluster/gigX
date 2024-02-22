@@ -14,7 +14,7 @@ import 'package:gigX/service/local_storage_service.dart';
 import 'package:gigX/service/toastService.dart';
 import 'package:local_auth/local_auth.dart';
 
-import '../data/api_model/getUsersModel.dart';
+import '../data/model/getUsersModel.dart';
 
 class LoginViewModel extends GetxController {
   final emailController = TextEditingController().obs;

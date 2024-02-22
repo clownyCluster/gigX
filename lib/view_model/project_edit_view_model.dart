@@ -2,12 +2,12 @@ import 'package:dio/dio.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
-import 'package:gigX/data/api_model/commentModels.dart';
+import 'package:gigX/data/model/commentModels.dart';
 import 'package:gigX/service/toastService.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../api.dart';
-import '../data/api_model/taskModel.dart';
+import '../data/model/taskModel.dart';
 import '../data/network/network_api_services.dart';
 
 class ProjectDetailsEditViewModel extends GetxController {

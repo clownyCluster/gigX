@@ -7,7 +7,7 @@ import 'package:dio/dio.dart';
 import 'package:gigX/api.dart';
 import 'package:gigX/colors.dart';
 import 'package:gigX/constant/constants.dart';
-import 'package:gigX/data/api_model/getUsersModel.dart';
+import 'package:gigX/data/model/getUsersModel.dart';
 import 'package:gigX/data/network/network_api_services.dart';
 import 'package:gigX/home.dart';
 import 'package:flutter/gestures.dart';
